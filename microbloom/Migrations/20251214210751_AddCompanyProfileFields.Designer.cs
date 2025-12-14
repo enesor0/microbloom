@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using microbloom.Data;
@@ -11,37 +12,42 @@ using microbloom.Data;
 namespace microbloom.Migrations
 {
     [DbContext(typeof(KariyerDBContext))]
-    [Migration("20251109170113_AddDepartmentsToAllUniversities")]
-    partial class AddDepartmentsToAllUniversities
+    [Migration("20251214210751_AddCompanyProfileFields")]
+    partial class AddCompanyProfileFields
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
                 });
@@ -50,17 +56,19 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -73,17 +81,19 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -95,17 +105,17 @@ namespace microbloom.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -117,10 +127,10 @@ namespace microbloom.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -132,16 +142,16 @@ namespace microbloom.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -151,63 +161,87 @@ namespace microbloom.Migrations
             modelBuilder.Entity("microbloom.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CompanyId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CvUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GitHubUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinkedInUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Skills")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("WebsiteUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -218,7 +252,8 @@ namespace microbloom.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -227,16 +262,48 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContactEmail")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeCount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FoundedYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Industry")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LinkedInUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LogoUrl")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TwitterUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -263,26 +330,28 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ContentCategoryId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Summary")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -351,15 +420,17 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -384,22 +455,24 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FileDownloadUrl")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ThumbnailImageUrl")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -410,24 +483,26 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("LastYearBaseRanking")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("LastYearBaseScore")
-                        .HasColumnType("REAL");
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ScoreType")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UniversityId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -475,6 +550,105 @@ namespace microbloom.Migrations
                         new
                         {
                             Id = 5,
+                            LastYearBaseRanking = 4200,
+                            LastYearBaseScore = 488.5,
+                            Name = "İktisat",
+                            ScoreType = "EA",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            LastYearBaseRanking = 4650,
+                            LastYearBaseScore = 482.30000000000001,
+                            Name = "Siyaset Bilimi",
+                            ScoreType = "EA",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 7,
+                            LastYearBaseRanking = 5100,
+                            LastYearBaseScore = 475.80000000000001,
+                            Name = "Tarih",
+                            ScoreType = "SOZ",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 8,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.5,
+                            Name = "Türk Dili ve Edebiyatı",
+                            ScoreType = "SOZ",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 9,
+                            LastYearBaseRanking = 5650,
+                            LastYearBaseScore = 468.89999999999998,
+                            Name = "Felsefe",
+                            ScoreType = "SOZ",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 10,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 478.5,
+                            Name = "Sosyoloji",
+                            ScoreType = "EA",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 11,
+                            LastYearBaseRanking = 4450,
+                            LastYearBaseScore = 485.19999999999999,
+                            Name = "Matematik",
+                            ScoreType = "SAY",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 12,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 478.69999999999999,
+                            Name = "Fizik",
+                            ScoreType = "SAY",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 13,
+                            LastYearBaseRanking = 5050,
+                            LastYearBaseScore = 475.5,
+                            Name = "Kimya",
+                            ScoreType = "SAY",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 14,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.80000000000001,
+                            Name = "Biyoloji",
+                            ScoreType = "SAY",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 15,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.5,
+                            Name = "İstatistik",
+                            ScoreType = "SAY",
+                            UniversityId = 1
+                        },
+                        new
+                        {
+                            Id = 16,
                             LastYearBaseRanking = 1250,
                             LastYearBaseScore = 525.5,
                             Name = "Bilgisayar Mühendisliği",
@@ -483,7 +657,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 17,
                             LastYearBaseRanking = 1580,
                             LastYearBaseScore = 520.29999999999995,
                             Name = "Elektrik-Elektronik Mühendisliği",
@@ -492,7 +666,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 7,
+                            Id = 18,
                             LastYearBaseRanking = 2100,
                             LastYearBaseScore = 515.79999999999995,
                             Name = "Makine Mühendisliği",
@@ -501,7 +675,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 19,
                             LastYearBaseRanking = 2450,
                             LastYearBaseScore = 512.39999999999998,
                             Name = "İnşaat Mühendisliği",
@@ -510,7 +684,151 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 9,
+                            Id = 20,
+                            LastYearBaseRanking = 1850,
+                            LastYearBaseScore = 518.70000000000005,
+                            Name = "Endüstri Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 21,
+                            LastYearBaseRanking = 2850,
+                            LastYearBaseScore = 505.80000000000001,
+                            Name = "Kimya Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 22,
+                            LastYearBaseRanking = 2650,
+                            LastYearBaseScore = 508.5,
+                            Name = "Makine Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 23,
+                            LastYearBaseRanking = 3450,
+                            LastYearBaseScore = 498.69999999999999,
+                            Name = "Metalurji ve Malzeme Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 24,
+                            LastYearBaseRanking = 3650,
+                            LastYearBaseScore = 495.5,
+                            Name = "Gıda Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 25,
+                            LastYearBaseRanking = 4050,
+                            LastYearBaseScore = 488.80000000000001,
+                            Name = "Tekstil Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 26,
+                            LastYearBaseRanking = 3850,
+                            LastYearBaseScore = 492.5,
+                            Name = "Çevre Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 27,
+                            LastYearBaseRanking = 4350,
+                            LastYearBaseScore = 485.69999999999999,
+                            Name = "Jeoloji Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 28,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.5,
+                            Name = "Maden Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 29,
+                            LastYearBaseRanking = 3650,
+                            LastYearBaseScore = 495.80000000000001,
+                            Name = "Petrol ve Doğal Gaz Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 30,
+                            LastYearBaseRanking = 2450,
+                            LastYearBaseScore = 512.5,
+                            Name = "Uçak Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 31,
+                            LastYearBaseRanking = 3150,
+                            LastYearBaseScore = 502.80000000000001,
+                            Name = "Gemi İnşaatı ve Gemi Makineleri Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 32,
+                            LastYearBaseRanking = 4050,
+                            LastYearBaseScore = 488.5,
+                            Name = "Harita Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 33,
+                            LastYearBaseRanking = 4350,
+                            LastYearBaseScore = 485.30000000000001,
+                            Name = "Jeofizik Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 34,
+                            LastYearBaseRanking = 2950,
+                            LastYearBaseScore = 505.69999999999999,
+                            Name = "Matematik Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 35,
+                            LastYearBaseRanking = 2750,
+                            LastYearBaseScore = 508.80000000000001,
+                            Name = "Mimarlık",
+                            ScoreType = "SAY",
+                            UniversityId = 2
+                        },
+                        new
+                        {
+                            Id = 36,
                             LastYearBaseRanking = 980,
                             LastYearBaseScore = 530.20000000000005,
                             Name = "Bilgisayar Mühendisliği",
@@ -519,7 +837,43 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 10,
+                            Id = 37,
+                            LastYearBaseRanking = 1280,
+                            LastYearBaseScore = 525.79999999999995,
+                            Name = "Elektrik-Elektronik Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 38,
+                            LastYearBaseRanking = 1450,
+                            LastYearBaseScore = 522.5,
+                            Name = "Endüstri Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 39,
+                            LastYearBaseRanking = 1850,
+                            LastYearBaseScore = 518.70000000000005,
+                            Name = "Makine Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 40,
+                            LastYearBaseRanking = 2050,
+                            LastYearBaseScore = 515.5,
+                            Name = "İnşaat Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 41,
                             LastYearBaseRanking = 3200,
                             LastYearBaseScore = 495.5,
                             Name = "İşletme",
@@ -528,16 +882,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 11,
-                            LastYearBaseRanking = 4500,
-                            LastYearBaseScore = 485.30000000000001,
-                            Name = "Psikoloji",
-                            ScoreType = "EA",
-                            UniversityId = 3
-                        },
-                        new
-                        {
-                            Id = 12,
+                            Id = 42,
                             LastYearBaseRanking = 3800,
                             LastYearBaseScore = 490.80000000000001,
                             Name = "Ekonomi",
@@ -546,7 +891,106 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 13,
+                            Id = 43,
+                            LastYearBaseRanking = 3550,
+                            LastYearBaseScore = 492.5,
+                            Name = "Uluslararası İlişkiler",
+                            ScoreType = "EA",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 44,
+                            LastYearBaseRanking = 3950,
+                            LastYearBaseScore = 488.80000000000001,
+                            Name = "Siyaset Bilimi ve Uluslararası İlişkiler",
+                            ScoreType = "EA",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 45,
+                            LastYearBaseRanking = 4500,
+                            LastYearBaseScore = 485.30000000000001,
+                            Name = "Psikoloji",
+                            ScoreType = "EA",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 46,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 478.69999999999999,
+                            Name = "Sosyoloji",
+                            ScoreType = "EA",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 47,
+                            LastYearBaseRanking = 5050,
+                            LastYearBaseScore = 475.5,
+                            Name = "Tarih",
+                            ScoreType = "SOZ",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 48,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.80000000000001,
+                            Name = "Felsefe",
+                            ScoreType = "SOZ",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 49,
+                            LastYearBaseRanking = 2950,
+                            LastYearBaseScore = 505.80000000000001,
+                            Name = "Matematik",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 50,
+                            LastYearBaseRanking = 3150,
+                            LastYearBaseScore = 502.5,
+                            Name = "Fizik",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 51,
+                            LastYearBaseRanking = 3450,
+                            LastYearBaseScore = 498.69999999999999,
+                            Name = "Kimya",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 52,
+                            LastYearBaseRanking = 2750,
+                            LastYearBaseScore = 508.5,
+                            Name = "Moleküler Biyoloji ve Genetik",
+                            ScoreType = "SAY",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 53,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 478.5,
+                            Name = "Çeviribilim",
+                            ScoreType = "SOZ",
+                            UniversityId = 3
+                        },
+                        new
+                        {
+                            Id = 54,
                             LastYearBaseRanking = 2350,
                             LastYearBaseScore = 510.5,
                             Name = "Hukuk",
@@ -555,7 +999,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 14,
+                            Id = 55,
                             LastYearBaseRanking = 1150,
                             LastYearBaseScore = 535.79999999999995,
                             Name = "Tıp",
@@ -564,7 +1008,25 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 15,
+                            Id = 56,
+                            LastYearBaseRanking = 1950,
+                            LastYearBaseScore = 518.70000000000005,
+                            Name = "Diş Hekimliği",
+                            ScoreType = "SAY",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 57,
+                            LastYearBaseRanking = 2450,
+                            LastYearBaseScore = 512.5,
+                            Name = "Eczacılık",
+                            ScoreType = "SAY",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 58,
                             LastYearBaseRanking = 4200,
                             LastYearBaseScore = 485.19999999999999,
                             Name = "İşletme",
@@ -573,7 +1035,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 16,
+                            Id = 59,
                             LastYearBaseRanking = 5100,
                             LastYearBaseScore = 475.60000000000002,
                             Name = "İktisat",
@@ -582,7 +1044,97 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 17,
+                            Id = 60,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.80000000000001,
+                            Name = "Uluslararası İlişkiler",
+                            ScoreType = "EA",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 61,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 478.5,
+                            Name = "Siyaset Bilimi ve Kamu Yönetimi",
+                            ScoreType = "EA",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 62,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.5,
+                            Name = "İletişim",
+                            ScoreType = "EA",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 63,
+                            LastYearBaseRanking = 5050,
+                            LastYearBaseScore = 475.80000000000001,
+                            Name = "Radyo, Televizyon ve Sinema",
+                            ScoreType = "EA",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 64,
+                            LastYearBaseRanking = 4350,
+                            LastYearBaseScore = 485.5,
+                            Name = "Hemşirelik",
+                            ScoreType = "SAY",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 65,
+                            LastYearBaseRanking = 4050,
+                            LastYearBaseScore = 488.69999999999999,
+                            Name = "Fizyoterapi ve Rehabilitasyon",
+                            ScoreType = "SAY",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 66,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.5,
+                            Name = "Beslenme ve Diyetetik",
+                            ScoreType = "SAY",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 67,
+                            LastYearBaseRanking = 5750,
+                            LastYearBaseScore = 468.80000000000001,
+                            Name = "Bankacılık ve Finans",
+                            ScoreType = "EA",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 68,
+                            LastYearBaseRanking = 6050,
+                            LastYearBaseScore = 465.5,
+                            Name = "Turizm İşletmeciliği",
+                            ScoreType = "EA",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 69,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.80000000000001,
+                            Name = "Sosyal Hizmet",
+                            ScoreType = "EA",
+                            UniversityId = 4
+                        },
+                        new
+                        {
+                            Id = 70,
                             LastYearBaseRanking = 1750,
                             LastYearBaseScore = 518.39999999999998,
                             Name = "Bilgisayar Mühendisliği",
@@ -591,7 +1143,16 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 18,
+                            Id = 71,
+                            LastYearBaseRanking = 2450,
+                            LastYearBaseScore = 512.79999999999995,
+                            Name = "Elektrik-Elektronik Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 72,
                             LastYearBaseRanking = 2850,
                             LastYearBaseScore = 505.19999999999999,
                             Name = "İnşaat Mühendisliği",
@@ -600,7 +1161,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 19,
+                            Id = 73,
                             LastYearBaseRanking = 2650,
                             LastYearBaseScore = 508.69999999999999,
                             Name = "Makine Mühendisliği",
@@ -609,7 +1170,106 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 74,
+                            LastYearBaseRanking = 2550,
+                            LastYearBaseScore = 510.5,
+                            Name = "Endüstri Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 75,
+                            LastYearBaseRanking = 3450,
+                            LastYearBaseScore = 498.80000000000001,
+                            Name = "Kimya Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 76,
+                            LastYearBaseRanking = 3850,
+                            LastYearBaseScore = 492.5,
+                            Name = "Gıda Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 77,
+                            LastYearBaseRanking = 4350,
+                            LastYearBaseScore = 485.69999999999999,
+                            Name = "Harita Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 78,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.5,
+                            Name = "Jeodezi ve Fotogrametri Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 79,
+                            LastYearBaseRanking = 4050,
+                            LastYearBaseScore = 488.80000000000001,
+                            Name = "Çevre Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 80,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 478.5,
+                            Name = "Matematik",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 81,
+                            LastYearBaseRanking = 5050,
+                            LastYearBaseScore = 475.80000000000001,
+                            Name = "Fizik",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 82,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.5,
+                            Name = "Kimya",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 83,
+                            LastYearBaseRanking = 3450,
+                            LastYearBaseScore = 498.5,
+                            Name = "Mimarlık",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 84,
+                            LastYearBaseRanking = 3850,
+                            LastYearBaseScore = 492.69999999999999,
+                            Name = "Şehir ve Bölge Planlama",
+                            ScoreType = "SAY",
+                            UniversityId = 5
+                        },
+                        new
+                        {
+                            Id = 85,
                             LastYearBaseRanking = 2150,
                             LastYearBaseScore = 515.29999999999995,
                             Name = "Hukuk",
@@ -618,7 +1278,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 21,
+                            Id = 86,
                             LastYearBaseRanking = 3450,
                             LastYearBaseScore = 492.5,
                             Name = "İşletme",
@@ -627,7 +1287,16 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 22,
+                            Id = 87,
+                            LastYearBaseRanking = 3950,
+                            LastYearBaseScore = 488.69999999999999,
+                            Name = "İktisat",
+                            ScoreType = "EA",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 88,
                             LastYearBaseRanking = 3900,
                             LastYearBaseScore = 488.89999999999998,
                             Name = "Uluslararası İlişkiler",
@@ -636,7 +1305,79 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 23,
+                            Id = 89,
+                            LastYearBaseRanking = 4250,
+                            LastYearBaseScore = 485.5,
+                            Name = "Siyaset Bilimi",
+                            ScoreType = "EA",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 90,
+                            LastYearBaseRanking = 4750,
+                            LastYearBaseScore = 478.80000000000001,
+                            Name = "Sosyoloji",
+                            ScoreType = "EA",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 91,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.5,
+                            Name = "Matematik",
+                            ScoreType = "SAY",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 92,
+                            LastYearBaseRanking = 2950,
+                            LastYearBaseScore = 505.80000000000001,
+                            Name = "Bilgisayar ve Bilişim Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 93,
+                            LastYearBaseRanking = 3150,
+                            LastYearBaseScore = 502.5,
+                            Name = "Endüstri Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 94,
+                            LastYearBaseRanking = 5050,
+                            LastYearBaseScore = 475.80000000000001,
+                            Name = "İletişim",
+                            ScoreType = "EA",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 95,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.5,
+                            Name = "Felsefe",
+                            ScoreType = "SOZ",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 96,
+                            LastYearBaseRanking = 5650,
+                            LastYearBaseScore = 468.89999999999998,
+                            Name = "Tarih",
+                            ScoreType = "SOZ",
+                            UniversityId = 6
+                        },
+                        new
+                        {
+                            Id = 97,
                             LastYearBaseRanking = 1650,
                             LastYearBaseScore = 522.79999999999995,
                             Name = "Hukuk",
@@ -645,7 +1386,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 98,
                             LastYearBaseRanking = 920,
                             LastYearBaseScore = 542.29999999999995,
                             Name = "Tıp",
@@ -654,16 +1395,16 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 25,
-                            LastYearBaseRanking = 4850,
-                            LastYearBaseScore = 495.69999999999999,
-                            Name = "Veterinerlik",
+                            Id = 99,
+                            LastYearBaseRanking = 1650,
+                            LastYearBaseScore = 522.5,
+                            Name = "Diş Hekimliği",
                             ScoreType = "SAY",
                             UniversityId = 7
                         },
                         new
                         {
-                            Id = 26,
+                            Id = 100,
                             LastYearBaseRanking = 3200,
                             LastYearBaseScore = 510.19999999999999,
                             Name = "Eczacılık",
@@ -672,7 +1413,151 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 27,
+                            Id = 101,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 495.69999999999999,
+                            Name = "Veterinerlik",
+                            ScoreType = "SAY",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 102,
+                            LastYearBaseRanking = 2850,
+                            LastYearBaseScore = 505.80000000000001,
+                            Name = "Siyasal Bilgiler",
+                            ScoreType = "EA",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 103,
+                            LastYearBaseRanking = 3950,
+                            LastYearBaseScore = 488.5,
+                            Name = "İletişim",
+                            ScoreType = "EA",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 104,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.80000000000001,
+                            Name = "Dil ve Tarih-Coğrafya Fakültesi - Tarih",
+                            ScoreType = "SOZ",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 105,
+                            LastYearBaseRanking = 4850,
+                            LastYearBaseScore = 478.5,
+                            Name = "Türk Dili ve Edebiyatı",
+                            ScoreType = "SOZ",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 106,
+                            LastYearBaseRanking = 5050,
+                            LastYearBaseScore = 475.69999999999999,
+                            Name = "Arkeoloji",
+                            ScoreType = "SOZ",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 107,
+                            LastYearBaseRanking = 5350,
+                            LastYearBaseScore = 472.5,
+                            Name = "Coğrafya",
+                            ScoreType = "SOZ",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 108,
+                            LastYearBaseRanking = 5650,
+                            LastYearBaseScore = 468.80000000000001,
+                            Name = "Felsefe",
+                            ScoreType = "SOZ",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 109,
+                            LastYearBaseRanking = 3550,
+                            LastYearBaseScore = 492.5,
+                            Name = "Psikoloji",
+                            ScoreType = "EA",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 110,
+                            LastYearBaseRanking = 4150,
+                            LastYearBaseScore = 485.80000000000001,
+                            Name = "Sosyoloji",
+                            ScoreType = "EA",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 111,
+                            LastYearBaseRanking = 4750,
+                            LastYearBaseScore = 478.69999999999999,
+                            Name = "Antropoloji",
+                            ScoreType = "EA",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 112,
+                            LastYearBaseRanking = 4050,
+                            LastYearBaseScore = 488.5,
+                            Name = "Hemşirelik",
+                            ScoreType = "SAY",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 113,
+                            LastYearBaseRanking = 4550,
+                            LastYearBaseScore = 482.69999999999999,
+                            Name = "Ebelik",
+                            ScoreType = "SAY",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 114,
+                            LastYearBaseRanking = 3850,
+                            LastYearBaseScore = 492.80000000000001,
+                            Name = "Fizik Tedavi ve Rehabilitasyon",
+                            ScoreType = "SAY",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 115,
+                            LastYearBaseRanking = 4350,
+                            LastYearBaseScore = 485.5,
+                            Name = "Beslenme ve Diyetetik",
+                            ScoreType = "SAY",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 116,
+                            LastYearBaseRanking = 5050,
+                            LastYearBaseScore = 475.80000000000001,
+                            Name = "Ziraat Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 7
+                        },
+                        new
+                        {
+                            Id = 117,
                             LastYearBaseRanking = 1100,
                             LastYearBaseScore = 528.70000000000005,
                             Name = "Bilgisayar Mühendisliği",
@@ -681,16 +1566,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 28,
-                            LastYearBaseRanking = 1850,
-                            LastYearBaseScore = 518.20000000000005,
-                            Name = "Endüstri Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 8
-                        },
-                        new
-                        {
-                            Id = 29,
+                            Id = 118,
                             LastYearBaseRanking = 1450,
                             LastYearBaseScore = 522.5,
                             Name = "Elektrik-Elektronik Mühendisliği",
@@ -699,7 +1575,7 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 30,
+                            Id = 119,
                             LastYearBaseRanking = 2150,
                             LastYearBaseScore = 515.29999999999995,
                             Name = "Makine Mühendisliği",
@@ -708,462 +1584,201 @@ namespace microbloom.Migrations
                         },
                         new
                         {
-                            Id = 31,
-                            LastYearBaseRanking = 750,
-                            LastYearBaseScore = 548.5,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 9
-                        },
-                        new
-                        {
-                            Id = 32,
-                            LastYearBaseRanking = 1650,
-                            LastYearBaseScore = 525.29999999999995,
-                            Name = "Diş Hekimliği",
-                            ScoreType = "SAY",
-                            UniversityId = 9
-                        },
-                        new
-                        {
-                            Id = 33,
-                            LastYearBaseRanking = 2250,
-                            LastYearBaseScore = 518.70000000000005,
-                            Name = "Eczacılık",
-                            ScoreType = "SAY",
-                            UniversityId = 9
-                        },
-                        new
-                        {
-                            Id = 34,
-                            LastYearBaseRanking = 3550,
-                            LastYearBaseScore = 492.39999999999998,
-                            Name = "Psikoloji",
-                            ScoreType = "EA",
-                            UniversityId = 9
-                        },
-                        new
-                        {
-                            Id = 35,
-                            LastYearBaseRanking = 1250,
-                            LastYearBaseScore = 535.20000000000005,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 10
-                        },
-                        new
-                        {
-                            Id = 36,
-                            LastYearBaseRanking = 2650,
-                            LastYearBaseScore = 505.80000000000001,
-                            Name = "Hukuk",
-                            ScoreType = "EA",
-                            UniversityId = 10
-                        },
-                        new
-                        {
-                            Id = 37,
-                            LastYearBaseRanking = 2850,
-                            LastYearBaseScore = 508.39999999999998,
-                            Name = "Bilgisayar Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 10
-                        },
-                        new
-                        {
-                            Id = 38,
-                            LastYearBaseRanking = 4850,
-                            LastYearBaseScore = 478.30000000000001,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 10
-                        },
-                        new
-                        {
-                            Id = 39,
-                            LastYearBaseRanking = 1050,
-                            LastYearBaseScore = 538.70000000000005,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 12
-                        },
-                        new
-                        {
-                            Id = 40,
+                            Id = 120,
                             LastYearBaseRanking = 1850,
-                            LastYearBaseScore = 520.5,
-                            Name = "Diş Hekimliği",
-                            ScoreType = "SAY",
-                            UniversityId = 12
-                        },
-                        new
-                        {
-                            Id = 41,
-                            LastYearBaseRanking = 2450,
-                            LastYearBaseScore = 512.79999999999995,
-                            Name = "Eczacılık",
-                            ScoreType = "SAY",
-                            UniversityId = 12
-                        },
-                        new
-                        {
-                            Id = 42,
-                            LastYearBaseRanking = 4350,
-                            LastYearBaseScore = 482.5,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 12
-                        },
-                        new
-                        {
-                            Id = 43,
-                            LastYearBaseRanking = 1350,
-                            LastYearBaseScore = 532.39999999999998,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 13
-                        },
-                        new
-                        {
-                            Id = 44,
-                            LastYearBaseRanking = 2850,
-                            LastYearBaseScore = 502.69999999999999,
-                            Name = "Hukuk",
-                            ScoreType = "EA",
-                            UniversityId = 13
-                        },
-                        new
-                        {
-                            Id = 45,
-                            LastYearBaseRanking = 2950,
-                            LastYearBaseScore = 505.80000000000001,
-                            Name = "Bilgisayar Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 13
-                        },
-                        new
-                        {
-                            Id = 46,
-                            LastYearBaseRanking = 5150,
-                            LastYearBaseScore = 475.39999999999998,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 13
-                        },
-                        new
-                        {
-                            Id = 47,
-                            LastYearBaseRanking = 2050,
-                            LastYearBaseScore = 515.70000000000005,
-                            Name = "Bilgisayar Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 14
-                        },
-                        new
-                        {
-                            Id = 48,
-                            LastYearBaseRanking = 2750,
-                            LastYearBaseScore = 508.30000000000001,
-                            Name = "Elektrik-Elektronik Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 14
-                        },
-                        new
-                        {
-                            Id = 49,
-                            LastYearBaseRanking = 3150,
-                            LastYearBaseScore = 502.60000000000002,
-                            Name = "Makine Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 14
-                        },
-                        new
-                        {
-                            Id = 50,
-                            LastYearBaseRanking = 1450,
-                            LastYearBaseScore = 528.5,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 16
-                        },
-                        new
-                        {
-                            Id = 51,
-                            LastYearBaseRanking = 2550,
-                            LastYearBaseScore = 512.29999999999995,
-                            Name = "Diş Hekimliği",
-                            ScoreType = "SAY",
-                            UniversityId = 16
-                        },
-                        new
-                        {
-                            Id = 52,
-                            LastYearBaseRanking = 3350,
-                            LastYearBaseScore = 495.80000000000001,
-                            Name = "Hukuk",
-                            ScoreType = "EA",
-                            UniversityId = 16
-                        },
-                        new
-                        {
-                            Id = 53,
-                            LastYearBaseRanking = 5450,
-                            LastYearBaseScore = 472.39999999999998,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 16
-                        },
-                        new
-                        {
-                            Id = 54,
-                            LastYearBaseRanking = 1550,
-                            LastYearBaseScore = 525.70000000000005,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 17
-                        },
-                        new
-                        {
-                            Id = 55,
-                            LastYearBaseRanking = 3550,
-                            LastYearBaseScore = 492.5,
-                            Name = "Hukuk",
-                            ScoreType = "EA",
-                            UniversityId = 17
-                        },
-                        new
-                        {
-                            Id = 56,
-                            LastYearBaseRanking = 4250,
-                            LastYearBaseScore = 488.30000000000001,
-                            Name = "Veterinerlik",
-                            ScoreType = "SAY",
-                            UniversityId = 17
-                        },
-                        new
-                        {
-                            Id = 57,
-                            LastYearBaseRanking = 5850,
-                            LastYearBaseScore = 468.89999999999998,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 17
-                        },
-                        new
-                        {
-                            Id = 58,
-                            LastYearBaseRanking = 1320,
-                            LastYearBaseScore = 524.79999999999995,
-                            Name = "Bilgisayar Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 31
-                        },
-                        new
-                        {
-                            Id = 59,
-                            LastYearBaseRanking = 3800,
-                            LastYearBaseScore = 490.19999999999999,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 31
-                        },
-                        new
-                        {
-                            Id = 60,
-                            LastYearBaseRanking = 2550,
-                            LastYearBaseScore = 508.5,
-                            Name = "Hukuk",
-                            ScoreType = "EA",
-                            UniversityId = 31
-                        },
-                        new
-                        {
-                            Id = 61,
-                            LastYearBaseRanking = 3250,
-                            LastYearBaseScore = 495.69999999999999,
-                            Name = "Ekonomi",
-                            ScoreType = "EA",
-                            UniversityId = 31
-                        },
-                        new
-                        {
-                            Id = 62,
-                            LastYearBaseRanking = 1450,
-                            LastYearBaseScore = 522.5,
-                            Name = "Bilgisayar Bilimi ve Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 32
-                        },
-                        new
-                        {
-                            Id = 63,
-                            LastYearBaseRanking = 2350,
-                            LastYearBaseScore = 512.29999999999995,
+                            LastYearBaseScore = 518.20000000000005,
                             Name = "Endüstri Mühendisliği",
                             ScoreType = "SAY",
-                            UniversityId = 32
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 64,
-                            LastYearBaseRanking = 3950,
-                            LastYearBaseScore = 488.60000000000002,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 32
-                        },
-                        new
-                        {
-                            Id = 65,
-                            LastYearBaseRanking = 3600,
-                            LastYearBaseScore = 492.30000000000001,
-                            Name = "Ekonomi",
-                            ScoreType = "EA",
-                            UniversityId = 32
-                        },
-                        new
-                        {
-                            Id = 66,
-                            LastYearBaseRanking = 2950,
-                            LastYearBaseScore = 505.39999999999998,
-                            Name = "Bilgisayar Mühendisliği",
+                            Id = 121,
+                            LastYearBaseRanking = 2450,
+                            LastYearBaseScore = 512.5,
+                            Name = "İnşaat Mühendisliği",
                             ScoreType = "SAY",
-                            UniversityId = 33
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 67,
-                            LastYearBaseRanking = 5050,
-                            LastYearBaseScore = 475.80000000000001,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 33
+                            Id = 122,
+                            LastYearBaseRanking = 2750,
+                            LastYearBaseScore = 508.80000000000001,
+                            Name = "Kimya Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 68,
-                            LastYearBaseRanking = 3950,
-                            LastYearBaseScore = 488.5,
-                            Name = "Hukuk",
-                            ScoreType = "EA",
-                            UniversityId = 33
+                            Id = 123,
+                            LastYearBaseRanking = 2950,
+                            LastYearBaseScore = 505.69999999999999,
+                            Name = "Metalurji ve Malzeme Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 69,
-                            LastYearBaseRanking = 3850,
-                            LastYearBaseScore = 495.19999999999999,
+                            Id = 124,
+                            LastYearBaseRanking = 3450,
+                            LastYearBaseScore = 498.5,
+                            Name = "Maden Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 125,
+                            LastYearBaseRanking = 3650,
+                            LastYearBaseScore = 495.80000000000001,
+                            Name = "Jeoloji Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 126,
+                            LastYearBaseRanking = 2950,
+                            LastYearBaseScore = 505.5,
+                            Name = "Petrol ve Doğal Gaz Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 127,
+                            LastYearBaseRanking = 3150,
+                            LastYearBaseScore = 502.80000000000001,
+                            Name = "Çevre Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 128,
+                            LastYearBaseRanking = 2050,
+                            LastYearBaseScore = 515.79999999999995,
+                            Name = "Havacılık ve Uzay Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 129,
+                            LastYearBaseRanking = 3450,
+                            LastYearBaseScore = 498.69999999999999,
+                            Name = "Gıda Mühendisliği",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 130,
+                            LastYearBaseRanking = 2750,
+                            LastYearBaseScore = 508.5,
+                            Name = "Fizik",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 131,
+                            LastYearBaseRanking = 2950,
+                            LastYearBaseScore = 505.80000000000001,
+                            Name = "Kimya",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 132,
+                            LastYearBaseRanking = 2550,
+                            LastYearBaseScore = 510.5,
+                            Name = "Matematik",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 133,
+                            LastYearBaseRanking = 3450,
+                            LastYearBaseScore = 498.80000000000001,
+                            Name = "İstatistik",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 134,
+                            LastYearBaseRanking = 3150,
+                            LastYearBaseScore = 502.5,
+                            Name = "Biyoloji",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 135,
+                            LastYearBaseRanking = 2750,
+                            LastYearBaseScore = 508.69999999999999,
+                            Name = "Moleküler Biyoloji ve Genetik",
+                            ScoreType = "SAY",
+                            UniversityId = 8
+                        },
+                        new
+                        {
+                            Id = 136,
+                            LastYearBaseRanking = 2450,
+                            LastYearBaseScore = 512.79999999999995,
                             Name = "Mimarlık",
                             ScoreType = "SAY",
-                            UniversityId = 33
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 70,
-                            LastYearBaseRanking = 1280,
-                            LastYearBaseScore = 526.5,
-                            Name = "Bilgisayar Mühendisliği",
+                            Id = 137,
+                            LastYearBaseRanking = 2950,
+                            LastYearBaseScore = 505.5,
+                            Name = "Şehir ve Bölge Planlama",
                             ScoreType = "SAY",
-                            UniversityId = 41
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 71,
-                            LastYearBaseRanking = 3250,
-                            LastYearBaseScore = 495.80000000000001,
+                            Id = 138,
+                            LastYearBaseRanking = 2850,
+                            LastYearBaseScore = 505.80000000000001,
                             Name = "İşletme",
                             ScoreType = "EA",
-                            UniversityId = 41
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 72,
-                            LastYearBaseRanking = 2450,
-                            LastYearBaseScore = 510.39999999999998,
-                            Name = "Hukuk",
+                            Id = 139,
+                            LastYearBaseRanking = 3050,
+                            LastYearBaseScore = 502.5,
+                            Name = "Ekonomi",
                             ScoreType = "EA",
-                            UniversityId = 41
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 73,
-                            LastYearBaseRanking = 2850,
-                            LastYearBaseScore = 502.69999999999999,
+                            Id = 140,
+                            LastYearBaseRanking = 3350,
+                            LastYearBaseScore = 498.80000000000001,
                             Name = "Uluslararası İlişkiler",
                             ScoreType = "EA",
-                            UniversityId = 41
+                            UniversityId = 8
                         },
                         new
                         {
-                            Id = 74,
-                            LastYearBaseRanking = 1380,
-                            LastYearBaseScore = 530.5,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 20
-                        },
-                        new
-                        {
-                            Id = 75,
-                            LastYearBaseRanking = 2150,
-                            LastYearBaseScore = 515.79999999999995,
-                            Name = "Diş Hekimliği",
-                            ScoreType = "SAY",
-                            UniversityId = 20
-                        },
-                        new
-                        {
-                            Id = 76,
-                            LastYearBaseRanking = 3350,
-                            LastYearBaseScore = 495.39999999999998,
-                            Name = "Hukuk",
+                            Id = 141,
+                            LastYearBaseRanking = 3550,
+                            LastYearBaseScore = 495.69999999999999,
+                            Name = "Psikoloji",
                             ScoreType = "EA",
-                            UniversityId = 20
-                        },
-                        new
-                        {
-                            Id = 77,
-                            LastYearBaseRanking = 5150,
-                            LastYearBaseScore = 475.19999999999999,
-                            Name = "İşletme",
-                            ScoreType = "EA",
-                            UniversityId = 20
-                        },
-                        new
-                        {
-                            Id = 78,
-                            LastYearBaseRanking = 1450,
-                            LastYearBaseScore = 528.29999999999995,
-                            Name = "Tıp",
-                            ScoreType = "SAY",
-                            UniversityId = 19
-                        },
-                        new
-                        {
-                            Id = 79,
-                            LastYearBaseRanking = 2550,
-                            LastYearBaseScore = 512.5,
-                            Name = "Diş Hekimliği",
-                            ScoreType = "SAY",
-                            UniversityId = 19
-                        },
-                        new
-                        {
-                            Id = 80,
-                            LastYearBaseRanking = 3850,
-                            LastYearBaseScore = 492.69999999999999,
-                            Name = "Veterinerlik",
-                            ScoreType = "SAY",
-                            UniversityId = 19
-                        },
-                        new
-                        {
-                            Id = 81,
-                            LastYearBaseRanking = 6250,
-                            LastYearBaseScore = 468.5,
-                            Name = "Ziraat Mühendisliği",
-                            ScoreType = "SAY",
-                            UniversityId = 19
+                            UniversityId = 8
                         });
                 });
 
@@ -1171,19 +1786,21 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AppUserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("ApplicationDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("JobPostingId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1198,25 +1815,27 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CompanyId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Location")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("PostedDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1232,7 +1851,7 @@ namespace microbloom.Migrations
                             Description = "ASP.NET Core ve Azure konusunda deneyimli...",
                             IsActive = true,
                             Location = "İstanbul",
-                            PostedDate = new DateTime(2025, 11, 9, 17, 1, 12, 898, DateTimeKind.Utc).AddTicks(7121),
+                            PostedDate = new DateTime(2025, 12, 14, 21, 7, 50, 981, DateTimeKind.Utc).AddTicks(6684),
                             Title = "Kıdemli .NET Geliştiricisi"
                         },
                         new
@@ -1242,7 +1861,7 @@ namespace microbloom.Migrations
                             Description = "React ve TypeScript bilen...",
                             IsActive = true,
                             Location = "Ankara",
-                            PostedDate = new DateTime(2025, 11, 9, 17, 1, 12, 898, DateTimeKind.Utc).AddTicks(7125),
+                            PostedDate = new DateTime(2025, 12, 14, 21, 7, 50, 981, DateTimeKind.Utc).AddTicks(6688),
                             Title = "Frontend Geliştirici (React)"
                         },
                         new
@@ -1252,7 +1871,7 @@ namespace microbloom.Migrations
                             Description = "CI/CD süreçlerine hakim...",
                             IsActive = true,
                             Location = "İstanbul",
-                            PostedDate = new DateTime(2025, 11, 9, 17, 1, 12, 898, DateTimeKind.Utc).AddTicks(7126),
+                            PostedDate = new DateTime(2025, 12, 14, 21, 7, 50, 981, DateTimeKind.Utc).AddTicks(6689),
                             Title = "DevOps Mühendisi"
                         });
                 });
@@ -1261,24 +1880,26 @@ namespace microbloom.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsStateUniversity")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("LogoUrl")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WebSite")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

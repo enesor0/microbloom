@@ -7,6 +7,18 @@ namespace microbloom.Entities
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
+        // Profile Info
+        public string? Title { get; set; } // e.g. "Software Developer"
+        public string? Bio { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+        public string? CvUrl { get; set; }
+        
+        // Social Media
+        public string? LinkedInUrl { get; set; }
+        public string? GitHubUrl { get; set; }
+        public string? WebsiteUrl { get; set; }
+        public string? Skills { get; set; } // Comma separated
+
         // Company İlişkisi - Bir kullanıcı bir şirkete ait
         public int? CompanyId { get; set; }
         public Company? Company { get; set; }
@@ -16,13 +28,24 @@ namespace microbloom.Entities
 
     public class Company
     {
-     public int Id { get; set; }
-     public string? Name { get; set; }
+        public int Id { get; set; }
+        public string? Name { get; set; }
         public string? Description { get; set; }
-
-  public string? LogoUrl { get; set; }
+        public string? LogoUrl { get; set; }
         
-   // Bir şirketin birden fazla çalışanı olabilir
+        // Yeni alanlar
+        public string? Industry { get; set; }
+        public string? EmployeeCount { get; set; }
+        public int? FoundedYear { get; set; }
+        public string? Website { get; set; }
+        public string? ContactEmail { get; set; }
+        public string? Phone { get; set; }
+        public string? Location { get; set; }
+        public string? LinkedInUrl { get; set; }
+        public string? TwitterUrl { get; set; }
+        public string? InstagramUrl { get; set; }
+        
+        // Bir şirketin birden fazla çalışanı olabilir
         public ICollection<AppUser>? Employees { get; set; }
         public ICollection<JobPosting>? JobPostings { get; set; } 
     }

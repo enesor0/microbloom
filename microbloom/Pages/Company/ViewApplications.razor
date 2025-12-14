@@ -1,0 +1,300 @@
+@page "/view-applications"
+@using microbloom.DTOs
+@using microbloom.Services.Interfaces
+@using microbloom.Entities
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject ICompanyService CompanyService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<AppUser> UserManager
+
+@attribute [Authorize(Roles = "Employer")]
+
+<PageTitle>Başvuranlar - microbloom</PageTitle>
+
+<div class="container my-4">
+    <div class="applications-hero text-center mb-4 p-5 rounded-4 text-white" style="background: linear-gradient(135deg, #004225, #1b4332);">
+        <h1 class="fw-bold text-white">👥 Başvuranlar</h1>
+        <p class="lead mb-0 text-white">İlanlarınıza gelen başvuruları inceleyin</p>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+            <p class="mt-3 text-muted">Başvurular yükleniyor...</p>
+        </div>
+    }
+    else if (errorMessage != null)
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>@errorMessage
+        </div>
+    }
+    else if (jobs == null || !jobs.Any())
+    {
+        <div class="text-center p-5 bg-light rounded-4">
+            <div class="display-1 text-muted mb-3">📋</div>
+            <h4>Henüz İlanınız Yok</h4>
+            <p class="text-muted mb-4">Başvuruları görmek için önce bir iş ilanı oluşturun.</p>
+            <a href="/company/create-job" class="btn btn-primary px-4">
+                <i class="bi bi-plus-lg me-2"></i>İlan Oluştur
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- İlan Seçici -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">İlan Seçin:</label>
+                        <select class="form-select" @onchange="OnJobSelected">
+                            <option value="">Tüm ilanlar</option>
+                            @foreach (var job in jobs)
+                            {
+                                <option value="@job.Id">@job.Title</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                        <span class="text-muted">Toplam başvuru: <strong>@GetTotalApplicationCount()</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (GetFilteredApplications().Any())
+        {
+            @foreach (var job in GetFilteredJobs())
+            {
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-briefcase me-2 text-primary"></i>@job.Title
+                        <span class="badge bg-primary ms-2">@job.ApplicationCount başvuru</span>
+                    </h5>
+
+                    @foreach (var app in job.Applications ?? new List<ApplicationDto>())
+                    {
+                        <div class="card border-0 shadow-sm mb-3 hover-shadow transition-all">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 50px; height: 50px; font-size: 1.25rem; font-weight: bold;">
+                                        @(string.IsNullOrEmpty(app.UserFirstName) ? "?" : app.UserFirstName.Substring(0, 1).ToUpper())
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">@app.UserFirstName @app.UserLastName</h6>
+                                                <p class="text-muted mb-1 small">
+                                                    <i class="bi bi-envelope me-1"></i>@app.UserEmail
+                                                </p>
+                                                <a href="/profile/@app.AppUserId" class="btn btn-sm btn-link p-0 text-decoration-none mt-1">
+                                                    <i class="bi bi-person-badge me-1"></i>Tüm Profili Gör
+                                                </a>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge rounded-pill @GetStatusClass(app.Status) px-3 py-2">@GetStatusText(app.Status)</span>
+                                                <p class="text-muted small mt-2 mb-0">
+                                                    <i class="bi bi-calendar3 me-1"></i>@app.ApplicationDate.ToString("dd MMM yyyy")
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        @if (app.Status == "Pending")
+                                        {
+                                            <div class="mt-3 d-flex gap-2">
+                                                <button class="btn btn-success btn-sm" @onclick="() => ApproveApplication(app.Id)">
+                                                    <i class="bi bi-check-lg me-1"></i>Onayla
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" @onclick="() => RejectApplication(app.Id)">
+                                                    <i class="bi bi-x-lg me-1"></i>Reddet
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center p-5 bg-light rounded-4">
+                <div class="display-1 text-muted mb-3">📭</div>
+                <h4>Henüz Başvuru Yok</h4>
+                <p class="text-muted">Bu ilana henüz başvuru gelmedi.</p>
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .transition-all {
+        transition: all .2s ease-in-out;
+    }
+    .status-approved { background-color: #d1e7dd; color: #0f5132; }
+    .status-rejected { background-color: #f8d7da; color: #842029; }
+    .status-pending { background-color: #fff3cd; color: #664d03; }
+</style>
+
+@code {
+    private List<JobViewModel>? jobs;
+    private int? selectedJobId;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private int? currentCompanyId;
+
+    public class JobViewModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public int ApplicationCount { get; set; }
+        public List<ApplicationDto>? Applications { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadApplications();
+    }
+
+    private async Task LoadApplications()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated != true)
+            {
+                errorMessage = "Oturum açmanız gerekiyor.";
+                return;
+            }
+
+            var appUser = await UserManager.GetUserAsync(user);
+            if (appUser?.CompanyId == null)
+            {
+                errorMessage = "Şirket hesabı bulunamadı.";
+                return;
+            }
+            
+            currentCompanyId = appUser.CompanyId.Value;
+
+            // Fetch Jobs
+            var jobPostings = await CompanyService.GetJobsByCompanyAsync(currentCompanyId.Value);
+            
+            jobs = new List<JobViewModel>();
+
+            foreach (var job in jobPostings)
+            {
+                // Fetch Applications for each job
+                var applications = await CompanyService.GetApplicationsForJobAsync(job.Id);
+
+                jobs.Add(new JobViewModel
+                {
+                    Id = job.Id,
+                    Title = job.Title,
+                    Applications = applications,
+                    ApplicationCount = applications.Count
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Hata: {ex.Message}";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OnJobSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int id))
+        {
+            selectedJobId = id;
+        }
+        else
+        {
+            selectedJobId = null;
+        }
+    }
+
+    private IEnumerable<JobViewModel> GetFilteredJobs()
+    {
+        if (jobs == null) return Enumerable.Empty<JobViewModel>();
+        if (selectedJobId == null) return jobs.Where(j => j.ApplicationCount > 0);
+        return jobs.Where(j => j.Id == selectedJobId && j.ApplicationCount > 0);
+    }
+
+    private IEnumerable<ApplicationDto> GetFilteredApplications()
+    {
+        return GetFilteredJobs().SelectMany(j => j.Applications ?? new List<ApplicationDto>());
+    }
+
+    private int GetTotalApplicationCount()
+    {
+        return jobs?.Sum(j => j.ApplicationCount) ?? 0;
+    }
+
+    private string GetStatusClass(string? status) => status switch
+    {
+        "Approved" => "status-approved",
+        "Rejected" => "status-rejected",
+        _ => "status-pending"
+    };
+
+    private string GetStatusText(string? status) => status switch
+    {
+        "Approved" => "✓ Onaylandı",
+        "Rejected" => "✗ Reddedildi",
+        _ => "⏳ Beklemede"
+    };
+
+    private async Task ApproveApplication(int applicationId)
+    {
+        if (currentCompanyId == null) return;
+        try
+        {
+            await CompanyService.UpdateApplicationStatusAsync(applicationId, "Approved", currentCompanyId.Value);
+            await LoadApplications(); // Reload to refresh list
+        }
+        catch (Exception ex)
+        {
+             // Handle error if needed
+             Console.WriteLine($"Error approving: {ex.Message}");
+        }
+    }
+
+    private async Task RejectApplication(int applicationId)
+    {
+        if (currentCompanyId == null) return;
+        try
+        {
+            await CompanyService.UpdateApplicationStatusAsync(applicationId, "Rejected", currentCompanyId.Value);
+            await LoadApplications();
+        }
+         catch (Exception ex)
+        {
+             // Handle error if needed
+             Console.WriteLine($"Error rejecting: {ex.Message}");
+        }
+    }
+}

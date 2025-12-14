@@ -4,24 +4,39 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-<PageTitle>&#x1F3EB; Üniversiteler - microbloom</PageTitle>
+<PageTitle>ğŸ« Ãœniversiteler - microbloom</PageTitle>
 
 <style>
-  .universities-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 3rem 2rem;
-        border-radius: 20px;
-      margin-bottom: 3rem;
+    .universities-hero {
+        background: var(--gradient-aurora);
+        padding: 4rem 2rem;
+        border-radius: var(--radius-2xl);
+        margin-bottom: 3rem;
         color: white;
         text-align: center;
-  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        box-shadow: var(--shadow-aurora);
+        position: relative;
+        overflow: hidden;
     }
 
+    .universities-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .universities-hero h1 { color: white !important; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+    .universities-hero p { color: white !important; opacity: 0.95; }
+
     .search-box {
-        background: white;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
         padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--glass-shadow);
+        border: 1px solid var(--glass-border);
         margin-bottom: 2rem;
     }
 
@@ -32,22 +47,23 @@
         margin-top: 1rem;
     }
 
-.filter-btn {
- padding: 0.6rem 1.5rem;
- border: 2px solid #667eea;
-    background: white;
-        color: #667eea;
-      border-radius: 25px;
+    .filter-btn {
+        padding: 0.6rem 1.5rem;
+        border: 2px solid var(--aurora-primary);
+        background: transparent;
+        color: var(--aurora-primary);
+        border-radius: var(--radius-full);
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
     }
 
-  .filter-btn:hover, .filter-btn.active {
-        background: linear-gradient(135deg, #667eea, #764ba2);
- color: white;
+    .filter-btn:hover, .filter-btn.active {
+        background: var(--gradient-aurora);
+        color: white;
+        border-color: transparent;
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        box-shadow: var(--shadow-aurora);
     }
 
     .university-grid {
@@ -57,31 +73,33 @@
     }
 
     .university-card {
-        background: white;
-    border-radius: 15px;
-      overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--glass-shadow);
         transition: all 0.3s ease;
         cursor: pointer;
-      border: 2px solid transparent;
+        border: 1px solid var(--glass-border);
     }
 
     .university-card:hover {
-     transform: translateY(-8px);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25);
-        border-color: #667eea;
-}
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-aurora);
+        border-color: var(--aurora-primary-light);
+    }
 
     .card-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-  padding: 1.5rem;
+        background: var(--gradient-aurora-soft);
+        color: var(--aurora-primary);
+        padding: 1.5rem;
         text-align: center;
+        border-bottom: 1px solid var(--border-secondary);
     }
 
     .university-icon {
         font-size: 3rem;
-   margin-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
     }
 
     .card-body {
@@ -91,10 +109,10 @@
     .university-type {
         display: inline-block;
         padding: 0.4rem 1rem;
-     border-radius: 20px;
+        border-radius: 20px;
         font-size: 0.85rem;
-     font-weight: 600;
- margin-bottom: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
     }
 
     .state-uni {
@@ -103,93 +121,93 @@
     }
 
     .private-uni {
-    background: #fce4ec;
-   color: #c2185b;
- }
+        background: #fce4ec;
+        color: #c2185b;
+    }
 
     .department-count {
- display: flex;
+        display: flex;
         align-items: center;
         gap: 0.5rem;
-      color: #718096;
+        color: #718096;
         margin-top: 1rem;
     }
 </style>
 
 <div class="container my-5">
     <div class="universities-hero">
-        <h1>&#x1F3EB; Üniversiteler</h1>
-        <p>Türkiye'deki üniversiteleri keşfedin, bölümleri inceleyin</p>
+        <h1>ğŸ« Ãœniversiteler</h1>
+        <p>TÃ¼rkiye'deki Ã¼niversiteleri keÅŸfedin, bÃ¶lÃ¼mleri inceleyin</p>
     </div>
 
     <div class="search-box">
         <div class="mb-3">
-     <input type="text" class="form-control form-control-lg" 
-    placeholder="&#x1F50D; Üniversite veya şehir ara..."
-           @bind="searchTerm" @bind:event="oninput" />
+            <input type="text" class="form-control form-control-lg" 
+                   placeholder="ğŸ” Ãœniversite veya ÅŸehir ara..."
+                   @bind="searchTerm" @bind:event="oninput" />
         </div>
         <div class="filter-buttons">
-     <button class="filter-btn @(selectedFilter == null ? "active" : "")" 
-        @onclick="() => FilterUniversities(null)">
-    &#x1F30D; Tümü (@totalCount)
-     </button>
-     <button class="filter-btn @(selectedFilter == true ? "active" : "")" 
-             @onclick="() => FilterUniversities(true)">
-            &#x1F3DB; Devlet (@stateCount)
+            <button class="filter-btn @(selectedFilter == null ? "active" : "")" 
+                    @onclick="() => FilterUniversities(null)">
+                ğŸŒ TÃ¼mÃ¼ (@totalCount)
             </button>
-    <button class="filter-btn @(selectedFilter == false ? "active" : "")" 
-      @onclick="() => FilterUniversities(false)">
-                &#x1F3E2; Vakıf (@privateCount)
-   </button>
-    </div>
+            <button class="filter-btn @(selectedFilter == true ? "active" : "")" 
+                    @onclick="() => FilterUniversities(true)">
+                ğŸ›ï¸ Devlet (@stateCount)
+            </button>
+            <button class="filter-btn @(selectedFilter == false ? "active" : "")" 
+                    @onclick="() => FilterUniversities(false)">
+                ğŸ¢ VakÄ±f (@privateCount)
+            </button>
+        </div>
     </div>
 
     @if (isLoading)
     {
-   <div class="text-center py-5">
+        <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
-          <p class="mt-3 text-muted">Üniversiteler yükleniyor...</p>
+            <p class="mt-3 text-muted">Ãœniversiteler yÃ¼kleniyor...</p>
         </div>
     }
     else if (filteredUniversities != null && filteredUniversities.Any())
-  {
- <div class="university-grid">
+    {
+        <div class="university-grid">
             @foreach (var uni in filteredUniversities)
- {
-   <div class="university-card" @onclick="() => NavigateToDetail(uni.Id)">
-        <div class="card-header">
-    <div class="university-icon">&#x1F393;</div>
-  <h4 style="margin: 0;">@uni.Name</h4>
-      </div>
- <div class="card-body">
-       <span class="university-type @(uni.IsStateUniversity ? "state-uni" : "private-uni")">
-    @(uni.IsStateUniversity ? "&#x1F3DB; Devlet" : "&#x1F3E2; Vakıf")
-          </span>
-         <p style="margin: 0.5rem 0;">
-        <strong>&#x1F4CD; @uni.City</strong>
-     </p>
-      <div class="department-count">
-           <span>&#x1F4DA;</span>
-          <span>@uni.DepartmentCount Bölüm</span>
-   </div>
-              @if (!string.IsNullOrEmpty(uni.WebSite))
-       {
-          <a href="@uni.WebSite" target="_blank" class="btn btn-sm btn-outline-primary mt-2" 
-    @onclick:stopPropagation="true">
-            &#x1F517; Web Sitesi
-      </a>
-                   }
+            {
+                <div class="university-card" @onclick="() => NavigateToDetail(uni.Id)">
+                    <div class="card-header">
+                        <div class="university-icon">ğŸ“</div>
+                        <h4 style="margin: 0;">@uni.Name</h4>
+                    </div>
+                    <div class="card-body">
+                        <span class="university-type @(uni.IsStateUniversity ? "state-uni" : "private-uni")">
+                            @(uni.IsStateUniversity ? "ğŸ›ï¸ Devlet" : "ğŸ¢ VakÄ±f")
+                        </span>
+                        <p style="margin: 0.5rem 0;">
+                            <strong>ğŸ“ @uni.City</strong>
+                        </p>
+                        <div class="department-count">
+                            <span>ğŸ“š</span>
+                            <span>@uni.DepartmentCount BÃ¶lÃ¼m</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(uni.WebSite))
+                        {
+                            <a href="@uni.WebSite" target="_blank" class="btn btn-sm btn-outline-primary mt-2" 
+                               @onclick:stopPropagation="true">
+                                ğŸ”— Web Sitesi
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
         </div>
- </div>
-   }
-        </div>
-  }
+    }
     else
     {
- <div class="text-center py-5">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">&#x1F50D;</div>
-          <h3>Sonuç Bulunamadı</h3>
-       <p class="text-muted">Arama kriterlerinize uygun üniversite bulunamadı.</p>
+        <div class="text-center py-5">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">ğŸ”</div>
+            <h3>SonuÃ§ BulunamadÄ±</h3>
+            <p class="text-muted">Arama kriterlerinize uygun Ã¼niversite bulunamadÄ±.</p>
         </div>
     }
 </div>
@@ -197,40 +215,40 @@
 @code {
     private List<UniversityDto>? allUniversities;
     private List<UniversityDto>? filteredUniversities;
-  private bool isLoading = true;
+    private bool isLoading = true;
     private string searchTerm = "";
     private bool? selectedFilter = null;
-  private int totalCount = 0;
+    private int totalCount = 0;
     private int stateCount = 0;
     private int privateCount = 0;
 
     protected override async Task OnInitializedAsync()
-{
+    {
         try
         {
-         allUniversities = await Http.GetFromJsonAsync<List<UniversityDto>>("api/university");
-      if (allUniversities != null)
- {
-         totalCount = allUniversities.Count;
-        stateCount = allUniversities.Count(u => u.IsStateUniversity);
-    privateCount = allUniversities.Count(u => !u.IsStateUniversity);
-          ApplyFilters();
-    }
-    }
-        catch (Exception ex)
-   {
-            Console.WriteLine($"Hata: {ex.Message}");
-      allUniversities = new List<UniversityDto>();
+            allUniversities = await Http.GetFromJsonAsync<List<UniversityDto>>("api/university");
+            if (allUniversities != null)
+            {
+                totalCount = allUniversities.Count;
+                stateCount = allUniversities.Count(u => u.IsStateUniversity);
+                privateCount = allUniversities.Count(u => !u.IsStateUniversity);
+                ApplyFilters();
+            }
         }
-      finally
+        catch (Exception ex)
         {
-  isLoading = false;
+            Console.WriteLine($"Hata: {ex.Message}");
+            allUniversities = new List<UniversityDto>();
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
     private void FilterUniversities(bool? isState)
     {
-    selectedFilter = isState;
+        selectedFilter = isState;
         ApplyFilters();
     }
 
@@ -238,11 +256,11 @@
     {
         if (allUniversities == null) return;
 
-     filteredUniversities = allUniversities
- .Where(u => selectedFilter == null || u.IsStateUniversity == selectedFilter)
-  .Where(u => string.IsNullOrWhiteSpace(searchTerm) || 
-         u.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-        u.City.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+        filteredUniversities = allUniversities
+            .Where(u => selectedFilter == null || u.IsStateUniversity == selectedFilter)
+            .Where(u => string.IsNullOrWhiteSpace(searchTerm) || 
+                        u.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        u.City.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
 

@@ -1,160 +1,565 @@
-﻿@namespace microbloom.Pages
+@namespace microbloom.Pages
 @page "/jobs"
 
 @using microbloom.DTOs
+@using microbloom.Services.Interfaces
 @using Microsoft.AspNetCore.Components.Authorization
-@inject HttpClient Http
+@inject IJobService JobService
 @inject NavigationManager NavigationManager
 
-<PageTitle>?? �� �lanlar� - microbloom</PageTitle>
+<PageTitle>💼 İş İlanları - microbloom</PageTitle>
 
-<div class="container my-5">
-    <!-- ?? Arama B�l�m� - Yuvarlak ve Modern -->
-    <div class="row mb-5">
-        <div class="col-md-12">
-     <div class="card shadow border-0">
-      <div class="card-body p-4">
-           <h2 class="mb-4 text-center">
-      <span style="font-size: 2rem;">??</span> �� F�rsatlar�n� Ke�fet
-   </h2>
-         
-<div class="row g-3 align-items-end">
-           <div class="col-md-5">
-         <label class="form-label fw-bold">
-     ?? Pozisyon Ara...
-         </label>
-                  <div class="input-group" style="border-radius: 2rem; overflow: hidden; border: 2px solid var(--theme-border);">
-    <span class="input-group-text bg-white border-0" style="padding-left: 1.25rem;">
-          <i class="bi bi-briefcase" style="color: var(--theme-primary);"></i>
-            </span>
-<input type="text" 
-         class="form-control border-0" 
-    placeholder="Geli�tirici, Tasar�mc�, Y�netici..." 
-               style="padding: 0.75rem 1.25rem;"
-@bind="searchKeyword" 
-           @onkeyup="HandleKeyPress" />
+<div class="jobs-page">
+    <!-- Hero Section -->
+    <section class="jobs-hero">
+        <div class="container">
+            <div class="hero-content text-center">
+                <h1 class="hero-title">
+                    <span class="gradient-text">Hayalindeki İşi</span> Bul
+                </h1>
+                <p class="hero-subtitle">
+                    Binlerce şirket, on binlerce fırsat. Kariyer yolculuğuna bugün başla.
+                </p>
             </div>
-          </div>
-  
-         <div class="col-md-5">
-  <label class="form-label fw-bold">
-   ?? Lokasyon...
-        </label>
-       <div class="input-group" style="border-radius: 2rem; overflow: hidden; border: 2px solid var(--theme-border);">
-     <span class="input-group-text bg-white border-0" style="padding-left: 1.25rem;">
-    <i class="bi bi-geo-alt" style="color: var(--theme-primary);"></i>
-    </span>
-        <input type="text" 
-   class="form-control border-0" 
-   placeholder="�stanbul, Ankara, Uzaktan..." 
-        style="padding: 0.75rem 1.25rem;"
-@bind="searchLocation" 
-         @onkeyup="HandleKeyPress" />
-        </div>
-</div>
             
-    <div class="col-md-2">
-             <button class="btn btn-primary w-100" @onclick="PerformSearch" style="padding: 0.875rem;">
-             ?? Ara
- </button>
-     </div>
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-box">
+                    <div class="search-field">
+                        <div class="search-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M6.5 1A5.5 5.5 0 0 0 1 6.5 5.5 5.5 0 0 0 6.5 12a5.5 5.5 0 0 0 3.5-1.27v.77l4 4 1.5-1.5-4-4h-.77A5.5 5.5 0 0 0 12 6.5 5.5 5.5 0 0 0 6.5 1zm0 1A4.5 4.5 0 0 1 11 6.5 4.5 4.5 0 0 1 6.5 11 4.5 4.5 0 0 1 2 6.5 4.5 4.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               class="search-input" 
+                               placeholder="Pozisyon, anahtar kelime..." 
+                               @bind="searchKeyword" 
+                               @onkeyup="HandleKeyPress" />
+                    </div>
+                    
+                    <div class="search-divider"></div>
+                    
+                    <div class="search-field">
+                        <div class="search-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               class="search-input" 
+                               placeholder="Şehir veya uzaktan..." 
+                               @bind="searchLocation" 
+                               @onkeyup="HandleKeyPress" />
+                    </div>
+                    
+                    <button class="search-btn" @onclick="PerformSearch">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                        <span>Ara</span>
+                    </button>
+                </div>
+                
+                @if (!string.IsNullOrWhiteSpace(searchKeyword) || !string.IsNullOrWhiteSpace(searchLocation))
+                {
+                    <button class="reset-btn" @onclick="ResetSearch">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        <span>Filtreleri Temizle</span>
+                    </button>
+                }
+            </div>
         </div>
-
-          @if (!string.IsNullOrWhiteSpace(searchKeyword) || !string.IsNullOrWhiteSpace(searchLocation))
-        {
-      <div class="mt-3 text-center">
-             <button class="btn btn-outline-primary btn-sm" @onclick="ResetSearch">
-             <i class="bi bi-arrow-counterclockwise"></i> S�f�rla
-     </button>
-    </div>
-      }
-</div>
-   </div>
-        </div>
-    </div>
-
-    <!-- ?? �lanlar Listeleme -->
-  <div class="row">
-        <div class="col-md-12">
-@if (jobList == null)
+    </section>
+    
+    <!-- Jobs List -->
+    <section class="jobs-list-section">
+        <div class="container">
+            @if (jobList == null)
             {
-           <div class="text-center py-5">
-   <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
-    <span class="visually-hidden">Y�kleniyor...</span>
-        </div>
-        <p class="text-muted">? �lanlar y�kleniyor...</p>
-   </div>
-         }
- else if (!jobList.Any())
- {
-           <div class="card shadow-sm text-center border-0">
-       <div class="card-body py-5">
-                 <div style="font-size: 5rem; margin-bottom: 1.5rem;">??</div>
-       <h3 class="mb-3">Arad���n�z Kriterlere Uygun �lan Bulunamad�</h3>
- <p class="text-muted mb-4">Arama kriterlerinizi de�i�tirerek tekrar deneyin veya t�m ilanlar� g�r�nt�leyin.</p>
-            <button class="btn btn-primary btn-lg" @onclick="ResetSearch">
-          ?? T�m �lanlar� G�ster
-     </button>
-        </div>
-     </div>
-  }
-      else
-  {
-  <div class="row mb-4 align-items-center">
-       <div class="col-md-6">
-     <h3 class="mb-0">
-      ?? Aktif �� �lanlar�
-            <span class="badge bg-primary ms-2">@jobList.Count</span>
-      </h3>
-   </div>
-         <div class="col-md-6 text-md-end">
-    <small class="text-muted">
-            ?? @jobList.Count adet aktif i� ilan� bulundu
-    </small>
-     </div>
-       </div>
-
-      <div class="row g-4">
-      @foreach (var job in jobList)
-      {
-            <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm interactive-card job-card">
-            <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-      <div class="flex-grow-1">
-               <h5 class="card-title mb-2" style="color: var(--theme-text-primary); font-weight: 700;">
-         ?? @job.Title
-     </h5>
- <p class="card-subtitle text-primary mb-0 fw-semibold">
-   ?? @job.CompanyName
-           </p>
-   </div>
-       <small class="text-muted text-nowrap ms-2">
-    ??? @job.PostedDate.ToShortDateString()
-         </small>
-          </div>
-
-              <p class="small text-muted mb-3">
-                   ?? @job.Location
-          </p>
-
-        <p class="card-text small" style="max-height: 85px; overflow: hidden; text-overflow: ellipsis; line-height: 1.6; color: var(--theme-text-secondary);">
-      @job.Description
-     </p>
-           </div>
-            <div class="card-footer bg-white border-top-0">
-       <a href="/job/@job.Id" class="btn btn-primary w-100">
-         <i class="bi bi-eye"></i> Detaylar� G�r
-              </a>
-             </div>
-      </div>
-                 </div>
-    }
-    </div>
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>İlanlar yükleniyor...</p>
+                </div>
+            }
+            else if (!jobList.Any())
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM8.5 8.5V10H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V11H6a.5.5 0 0 1 0-1h1.5V8.5a.5.5 0 0 1 1 0z"/>
+                        </svg>
+                    </div>
+                    <h3>Aradığınız Kriterlere Uygun İlan Bulunamadı</h3>
+                    <p>Arama kriterlerinizi değiştirerek tekrar deneyin</p>
+                    <button class="btn btn-primary" @onclick="ResetSearch">
+                        Tüm İlanları Göster
+                    </button>
+                </div>
+            }
+            else
+            {
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="results-info-card">
+                        <div class="info-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5zm1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0zM1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                        </div>
+                        <div class="info-text">
+                            Şu anda <span class="highlight-count">@jobList.Count</span> aktif iş ilanı listeleniyor
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Jobs Grid -->
+                <div class="jobs-grid">
+                    @foreach (var job in jobList)
+                    {
+                        <div class="job-card">
+                            <div class="job-card-header">
+                                <div class="company-avatar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                                        <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3V1z"/>
+                                    </svg>
+                                </div>
+                                <div class="job-meta">
+                                    <span class="company-name">@job.CompanyName</span>
+                                    <span class="post-date">@job.PostedDate.ToShortDateString()</span>
+                                </div>
+                            </div>
+                            
+                            <h3 class="job-title">@job.Title</h3>
+                            
+                            <div class="job-location">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                </svg>
+                                <span>@job.Location</span>
+                            </div>
+                            
+                            <p class="job-description">@job.Description</p>
+                            
+                            <a href="/job/@job.Id" class="job-action-btn">
+                                <span>Detayları Gör</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    }
+                </div>
             }
         </div>
-    </div>
+    </section>
 </div>
+
+<style>
+    /* Jobs Page */
+    .jobs-page {
+        min-height: 100vh;
+    }
+    
+    /* Hero Section */
+    .jobs-hero {
+        background: var(--gradient-aurora);
+        padding: 4rem 0 6rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .jobs-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 2.5rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero-title .gradient-text {
+        background: linear-gradient(135deg, #fff, #e0e7ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.85);
+        margin: 0;
+    }
+    
+    /* Search Container */
+    .search-container {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .search-box {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 0.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    [data-theme="dark"] .search-box {
+        background: rgba(30, 41, 59, 0.95);
+    }
+    
+    .search-field {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        padding: 0 1rem;
+    }
+    
+    .search-icon {
+        color: var(--aurora-primary);
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .search-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 1rem;
+        color: var(--text-primary);
+        padding: 0.75rem 0;
+        outline: none;
+    }
+    
+    .search-input::placeholder {
+        color: var(--text-muted);
+    }
+    
+    .search-divider {
+        width: 1px;
+        height: 2rem;
+        background: var(--border-primary);
+        margin: 0 0.5rem;
+    }
+    
+    .search-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--gradient-aurora);
+        border: none;
+        color: white;
+        padding: 0.875rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 150ms ease;
+        white-space: nowrap;
+    }
+    
+    .search-btn:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+    }
+    
+    .reset-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: all 150ms ease;
+    }
+    
+    .reset-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Jobs List Section */
+    .jobs-list-section {
+        padding: 3rem 0;
+        margin-top: -3rem;
+    }
+    
+    /* Loading State */
+    .loading-state {
+        text-align: center;
+        padding: 4rem 0;
+    }
+    
+    .loading-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid var(--border-primary);
+        border-top-color: var(--aurora-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .loading-state p {
+        color: var(--text-muted);
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border-radius: 1.5rem;
+        border: 1px solid var(--border-primary);
+    }
+    
+    .empty-icon {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+    
+    .results-header {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .results-info-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        padding: 0.75rem 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 10px 30px -10px rgba(0, 66, 37, 0.2);
+        transition: transform 0.2s ease;
+    }
+
+    [data-theme="dark"] .results-info-card {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .results-info-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .info-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: var(--gradient-aurora-soft);
+        color: var(--aurora-primary);
+        border-radius: 50%;
+    }
+
+    .info-text {
+        font-size: 1.05rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .highlight-count {
+        font-size: 1.35rem;
+        font-weight: 800;
+        margin: 0 0.25rem;
+        background: var(--gradient-aurora);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-family: var(--font-display, sans-serif);
+    }
+    
+    /* Jobs Grid */
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    /* Job Card */
+    .job-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-primary);
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        transition: all 150ms ease;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-aurora);
+        border-color: var(--aurora-primary-light);
+    }
+    
+    .job-card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .company-avatar {
+        width: 48px;
+        height: 48px;
+        background: var(--gradient-aurora-soft);
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--aurora-primary);
+        flex-shrink: 0;
+    }
+    
+    .job-meta {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .company-name {
+        font-weight: 600;
+        color: var(--aurora-primary);
+        font-size: 0.9375rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .post-date {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+    }
+    
+    .job-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+    
+    .job-location {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+    
+    .job-description {
+        flex: 1;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+    }
+    
+    .job-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: var(--gradient-aurora);
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        text-decoration: none;
+        transition: all 150ms ease;
+        margin-top: auto;
+    }
+    
+    .job-action-btn:hover {
+        filter: brightness(1.1);
+        color: white;
+        gap: 0.75rem;
+    }
+    
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 1.75rem;
+        }
+        
+        .search-box {
+            flex-direction: column;
+            padding: 1rem;
+            gap: 0.75rem;
+        }
+        
+        .search-field {
+            width: 100%;
+            padding: 0;
+        }
+        
+        .search-divider {
+            display: none;
+        }
+        
+        .search-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .jobs-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
 @code {
     private List<JobPostingDto>? jobList;
@@ -168,14 +573,14 @@
 
     private async Task LoadJobs()
     {
-   try
+        try
         {
-      jobList = await Http.GetFromJsonAsync<List<JobPostingDto>>("api/jobpostings");
+            jobList = await JobService.GetAllJobsAsync();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"�lanlar� �ekerken hata olu�tu: {ex.Message}");
-jobList = new List<JobPostingDto>();
+            Console.WriteLine($"İlanları çekerken hata oluştu: {ex.Message}");
+            jobList = new List<JobPostingDto>();
         }
     }
 
@@ -183,22 +588,19 @@ jobList = new List<JobPostingDto>();
     {
         try
         {
-       if (string.IsNullOrWhiteSpace(searchKeyword) && string.IsNullOrWhiteSpace(searchLocation))
+            if (string.IsNullOrWhiteSpace(searchKeyword) && string.IsNullOrWhiteSpace(searchLocation))
             {
-          await LoadJobs();
-      return;
+                await LoadJobs();
+                return;
             }
 
-     var keyword = Uri.EscapeDataString(searchKeyword ?? string.Empty);
-       var location = Uri.EscapeDataString(searchLocation ?? string.Empty);
-
-            jobList = await Http.GetFromJsonAsync<List<JobPostingDto>>($"api/jobpostings/search?keyword={keyword}&location={location}");
+            jobList = await JobService.SearchJobsAsync(searchKeyword, searchLocation);
         }
         catch (Exception ex)
         {
-       Console.WriteLine($"Arama s�ras�nda hata olu�tu: {ex.Message}");
-         jobList = new List<JobPostingDto>();
- }
+            Console.WriteLine($"Arama sırasında hata oluştu: {ex.Message}");
+            jobList = new List<JobPostingDto>();
+        }
     }
 
     private async Task ResetSearch()
@@ -212,7 +614,7 @@ jobList = new List<JobPostingDto>();
     {
         if (e.Key == "Enter")
         {
-         await PerformSearch();
+            await PerformSearch();
         }
     }
 }

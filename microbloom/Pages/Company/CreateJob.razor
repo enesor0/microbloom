@@ -1,150 +1,230 @@
-﻿@namespace microbloom.Pages
+@namespace microbloom.Pages
 @page "/company/create-job"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Employer")]
 
 @using microbloom.DTOs
-@inject HttpClient Http
+@using microbloom.Services.Interfaces
+@using Microsoft.AspNetCore.Identity
+@using microbloom.Data 
+@using System.Security.Claims
+@using microbloom.Entities
+
+@inject ICompanyService CompanyService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<AppUser> UserManager
 
-<PageTitle>?? Yeni �lan Olu�tur - microbloom</PageTitle>
+<PageTitle>📢 Yeni İlan Oluştur - microbloom</PageTitle>
 
-<div class="container my-5">
-    <div class="row justify-content-center">
- <div class="col-md-8">
-       <div class="card shadow-lg border-0">
-<div class="card-body p-5">
-      <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 2px solid var(--theme-border);">
- <div style="font-size: 3rem; margin-right: 1rem;">??</div>
-    <div>
- <h2 class="mb-1" style="font-weight: 800; color: var(--theme-primary);">Yeni �� �lan� Olu�tur</h2>
-     <p class="text-muted small mb-0">Nitelikli adaylar� bul ve ekibini g��lendir</p>
-     </div>
-  </div>
+<div class="create-job-page">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="glass-card">
+                    <!-- Header -->
+                    <div class="p-4 p-md-5 border-bottom border-light-subtle">
+                        <div class="d-flex flex-column flex-md-row align-items-center gap-3 text-center text-md-start">
+                            <div class="icon-wrapper">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                                    <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3V1z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="h3 fw-bold mb-1">Yeni İş İlanı Oluştur</h1>
+                                <p class="text-muted mb-0">Nitelikli adayları bulmak için ilan detaylarını girin.</p>
+                            </div>
+                        </div>
+                    </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-       {
-  <div class="alert alert-danger d-flex align-items-start" role="alert">
-      <i class="bi bi-exclamation-triangle me-2" style="font-size: 1.5rem;"></i>
-      <div>@errorMessage</div>
+                    <!-- Form Content -->
+                    <div class="p-4 p-md-5">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                </svg>
+                                <div>@errorMessage</div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(successMessage))
+                        {
+                            <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                </svg>
+                                <div>@successMessage</div>
+                            </div>
+                        }
+
+                        <EditForm Model="createJobDto" OnValidSubmit="HandleCreateJob">
+                            <DataAnnotationsValidator />
+                            <!-- Hiding the default validation summary to use individual messages, or styling it -->
+                            <!-- <ValidationSummary class="alert alert-warning" /> -->
+
+                            <div class="form-floating mb-4">
+                                <InputText id="title"
+                                           class="form-control"
+                                           placeholder="Örn: Senior Frontend Developer"
+                                           @bind-Value="createJobDto.Title" />
+                                <label for="title">İlan Başlığı</label>
+                                <ValidationMessage For="@(() => createJobDto.Title)" class="text-danger small mt-1" />
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <InputText id="location"
+                                           class="form-control"
+                                           placeholder="Örn: İstanbul, Uzaktan"
+                                           @bind-Value="createJobDto.Location" />
+                                <label for="location">Lokasyon</label>
+                                <ValidationMessage For="@(() => createJobDto.Location)" class="text-danger small mt-1" />
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <InputTextArea id="description"
+                                               class="form-control"
+                                               style="height: 300px;"
+                                               placeholder="İş tanımı, gereksinimler vb."
+                                               @bind-Value="createJobDto.Description" />
+                                <label for="description">İş Tanımı ve Detaylar</label>
+                                <ValidationMessage For="@(() => createJobDto.Description)" class="text-danger small mt-1" />
+                                <div class="form-text text-muted mt-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                    </svg>
+                                    Adayların ilgisini çekmek için detaylı ve açıklayıcı bir metin yazın.
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top border-light-subtle">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="NavigateBack">
+                                    İptal
+                                </button>
+                                <button type="submit" class="btn btn-primary px-5" disabled="@isSubmitting">
+                                    @if (isSubmitting)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        <span>Yayınlanıyor...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>🚀 İlanı Yayınla</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
         </div>
-     }
-
-        @if (!string.IsNullOrEmpty(successMessage))
-   {
-       <div class="alert alert-success d-flex align-items-start" role="alert">
-       <i class="bi bi-check-circle me-2" style="font-size: 1.5rem;"></i>
-    <div>@successMessage</div>
- </div>
-  }
-
- <EditForm Model="createJobDto" OnValidSubmit="HandleCreateJob">
-     <DataAnnotationsValidator />
-    <ValidationSummary class="alert alert-warning" />
-
-  <div class="mb-4">
-    <label for="title" class="form-label fw-bold">
- ?? �lan Ba�l���
-       </label>
-        <InputText id="title"
-   class="form-control"
-        placeholder="�rn: K�demli .NET Geli�tirici, Proje Y�neticisi, UX Tasar�mc�"
-    @bind-Value="createJobDto.Title" />
-   <ValidationMessage For="@(() => createJobDto.Title)" class="text-danger small" />
-  <small class="form-text text-muted d-block mt-1">
-     ?? A��k ve ilgi �ekici bir ba�l�k kullan�n
-   </small>
-     </div>
-
-          <div class="mb-4">
-  <label for="location" class="form-label fw-bold">
- ?? Lokasyon
-  </label>
-      <InputText id="location"
-  class="form-control"
-  placeholder="�rn: �stanbul, T�rkiye | Uzaktan | Hibrit"
-       @bind-Value="createJobDto.Location" />
-   <ValidationMessage For="@(() => createJobDto.Location)" class="text-danger small" />
-    </div>
-
-         <div class="mb-4">
-     <label for="description" class="form-label fw-bold">
-  ?? �� Tan�m�
-        </label>
-      <InputTextArea id="description"
- class="form-control"
-rows="12"
-    placeholder="Pozisyon gereksinimleri, beklentiler, �irket k�lt�r� ve kariyer geli�im f�rsatlar� hakk�nda detayl� bilgi verin..."
- style="line-height: 1.8;"
-     @bind-Value="createJobDto.Description" />
-     <ValidationMessage For="@(() => createJobDto.Description)" class="text-danger small" />
-      <small class="form-text text-muted d-block mt-1">
- ?? Ne kadar detayl� olursan�z, o kadar nitelikli adaylar� �ekersiniz
-    </small>
-  </div>
-
-      <div class="d-grid gap-3 d-md-flex justify-content-md-between mt-5 pt-3" style="border-top: 2px solid var(--theme-border);">
-    <button type="button" class="btn btn-outline-secondary" @onclick="NavigateBack">
-      <i class="bi bi-arrow-left"></i> Geri D�n
- </button>
-      <button type="submit" class="btn btn-primary btn-lg px-5" disabled="@isSubmitting">
-   @if (isSubmitting)
-   {
-      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-    <span>�lan yay�nlan�yor...</span>
-  }
-           else
-  {
-      <span>?? �lan� Yay�nla</span>
- }
-  </button>
-   </div>
-     </EditForm>
-   </div>
-   </div>
-  </div>
     </div>
 </div>
 
+<style>
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-primary);
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    }
+    
+    [data-theme="dark"] .glass-card {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(71, 85, 105, 0.4);
+    }
+
+    .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background: var(--gradient-aurora-soft);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--aurora-primary);
+        flex-shrink: 0;
+    }
+    
+    /* Form Floating Overrides */
+    .form-floating > .form-control {
+        background: var(--bg-secondary) !important;
+        border: 2px solid var(--border-primary) !important;
+        border-radius: 0.75rem !important;
+        height: 3.5rem;
+    }
+    
+    .form-floating > .form-control:focus {
+        border-color: var(--aurora-primary) !important;
+        box-shadow: 0 0 0 4px rgba(0, 66, 37, 0.15) !important;
+    }
+    
+    .form-floating > textarea.form-control {
+        height: auto;
+    }
+    
+    .form-floating > label {
+        color: var(--text-muted);
+    }
+</style>
+
 @code {
-  private CreateJobDto createJobDto = new();
+    private CreateJobDto createJobDto = new();
     private string errorMessage = string.Empty;
     private string successMessage = string.Empty;
     private bool isSubmitting = false;
 
- private async Task HandleCreateJob()
-{
+    private async Task HandleCreateJob()
+    {
         try
         {
-          isSubmitting = true;
-       errorMessage = string.Empty;
-          successMessage = string.Empty;
+            isSubmitting = true;
+            errorMessage = string.Empty;
+            successMessage = string.Empty;
 
-       var response = await Http.PostAsJsonAsync("api/company/jobs", createJobDto);
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
 
-       if (response.IsSuccessStatusCode)
-{
-     successMessage = "�lan ba�ar�yla olu�turuldu! ?? Y�nlendiriliyorsunuz...";
-    await Task.Delay(1500);
-     NavigationManager.NavigateTo("/company-dashboard");
-      }
-   else
-  {
-   var error = await response.Content.ReadAsStringAsync();
-     errorMessage = $"�lan olu�turulamad�: {error}";
- }
-  }
- catch (Exception ex)
-{
-   errorMessage = $"Hata: {ex.Message}";
- }
- finally
- {
-          isSubmitting = false;
-    }
+            if (user.Identity == null || !user.Identity.IsAuthenticated)
+            {
+                errorMessage = "Oturum açmanız gerekiyor.";
+                return;
+            }
+
+            var appUser = await UserManager.GetUserAsync(user);
+            if (appUser == null)
+            {
+                errorMessage = "Kullanıcı bilgileri alınamadı.";
+                return;
+            }
+
+            if (appUser.CompanyId == null || appUser.CompanyId <= 0)
+            {
+                errorMessage = "Herhangi bir şirkete bağlı değilsiniz.";
+                return;
+            }
+
+            await CompanyService.CreateJobPostingAsync(createJobDto, appUser.CompanyId.Value);
+
+            successMessage = "İlan başarıyla oluşturuldu! Yönlendiriliyorsunuz...";
+            await Task.Delay(1500);
+            NavigationManager.NavigateTo("/company-dashboard");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Hata: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
 
     private void NavigateBack()
-  {
- NavigationManager.NavigateTo("/company-dashboard");
+    {
+        NavigationManager.NavigateTo("/company-dashboard");
     }
 }

@@ -81,10 +81,10 @@ namespace microbloom.Services.Implementations
                 .FirstOrDefaultAsync(ja => ja.Id == applicationId);
 
             if (application == null)
-                throw new KeyNotFoundException("Ba�vuru bulunamad�.");
+                throw new KeyNotFoundException("Başvuru bulunamadı.");
 
             if (application.JobPosting?.CompanyId != companyId)
-                throw new UnauthorizedAccessException("Bu ba�vuruyu y�netme yetkiniz yok.");
+                throw new UnauthorizedAccessException("Bu başvuruyu yönetme yetkiniz yok.");
 
             application.Status = status;
             await _context.SaveChangesAsync();
@@ -96,10 +96,10 @@ namespace microbloom.Services.Implementations
                 .FirstOrDefaultAsync(jp => jp.Id == jobId);
 
             if (jobPosting == null)
-                throw new KeyNotFoundException("�lan bulunamad�.");
+                throw new KeyNotFoundException("İlan bulunamadı.");
 
             if (jobPosting.CompanyId != companyId)
-                throw new UnauthorizedAccessException("Bu ilan� silme yetkiniz yok.");
+                throw new UnauthorizedAccessException("Bu ilanı silme yetkiniz yok.");
 
             _context.JobPostings.Remove(jobPosting);
             await _context.SaveChangesAsync();
@@ -111,10 +111,10 @@ namespace microbloom.Services.Implementations
                 .FirstOrDefaultAsync(jp => jp.Id == jobId);
 
             if (jobPosting == null)
-                throw new KeyNotFoundException("�lan bulunamad�.");
+                throw new KeyNotFoundException("İlan bulunamadı.");
 
             if (jobPosting.CompanyId != companyId)
-                throw new UnauthorizedAccessException("Bu ilan� d�zenleme yetkiniz yok.");
+                throw new UnauthorizedAccessException("Bu ilanı düzenleme yetkiniz yok.");
 
             jobPosting.IsActive = isActive;
             await _context.SaveChangesAsync();
@@ -138,7 +138,16 @@ namespace microbloom.Services.Implementations
                 Name = company.Name,
                 Description = company.Description,
                 LogoUrl = company.LogoUrl,
-                EmployeeCount = company.Employees?.Count ?? 0,
+                Industry = company.Industry,
+                EmployeeCount = company.EmployeeCount,
+                FoundedYear = company.FoundedYear,
+                Website = company.Website,
+                ContactEmail = company.ContactEmail,
+                Phone = company.Phone,
+                Location = company.Location,
+                LinkedInUrl = company.LinkedInUrl,
+                TwitterUrl = company.TwitterUrl,
+                InstagramUrl = company.InstagramUrl,
                 ActiveJobCount = company.JobPostings?.Count(j => j.IsActive) ?? 0
             };
         }
@@ -153,12 +162,18 @@ namespace microbloom.Services.Implementations
             }
 
             company.Name = profile.Name?.Trim();
-            company.Description = string.IsNullOrWhiteSpace(profile.Description)
-                ? null
-                : profile.Description.Trim();
-            company.LogoUrl = string.IsNullOrWhiteSpace(profile.LogoUrl)
-                ? null
-                : profile.LogoUrl.Trim();
+            company.Description = string.IsNullOrWhiteSpace(profile.Description) ? null : profile.Description.Trim();
+            company.LogoUrl = string.IsNullOrWhiteSpace(profile.LogoUrl) ? null : profile.LogoUrl.Trim();
+            company.Industry = profile.Industry?.Trim();
+            company.EmployeeCount = profile.EmployeeCount?.Trim();
+            company.FoundedYear = profile.FoundedYear;
+            company.Website = string.IsNullOrWhiteSpace(profile.Website) ? null : profile.Website.Trim();
+            company.ContactEmail = string.IsNullOrWhiteSpace(profile.ContactEmail) ? null : profile.ContactEmail.Trim();
+            company.Phone = string.IsNullOrWhiteSpace(profile.Phone) ? null : profile.Phone.Trim();
+            company.Location = string.IsNullOrWhiteSpace(profile.Location) ? null : profile.Location.Trim();
+            company.LinkedInUrl = string.IsNullOrWhiteSpace(profile.LinkedInUrl) ? null : profile.LinkedInUrl.Trim();
+            company.TwitterUrl = string.IsNullOrWhiteSpace(profile.TwitterUrl) ? null : profile.TwitterUrl.Trim();
+            company.InstagramUrl = string.IsNullOrWhiteSpace(profile.InstagramUrl) ? null : profile.InstagramUrl.Trim();
 
             await _context.SaveChangesAsync();
         }

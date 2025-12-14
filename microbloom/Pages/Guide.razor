@@ -4,212 +4,226 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-<PageTitle>&#x1F3EB; ‹niversite Rehberi - microbloom</PageTitle>
+<PageTitle>üéì √úniversite Rehberi - microbloom</PageTitle>
 
 <style>
-    /* Modern Tasar˝m Stilleri */
+    /* Modern Tasarƒ±m Stilleri */
     .guide-hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 3rem 2rem;
-  border-radius: 20px;
+        background: var(--gradient-aurora);
+        padding: 4rem 2rem;
+        border-radius: var(--radius-2xl);
         margin-bottom: 3rem;
-     color: white;
+        color: white;
         text-align: center;
-      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        box-shadow: var(--shadow-aurora);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .guide-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
     }
 
     .guide-hero h1 {
         font-size: 2.5rem;
         font-weight: 700;
-   margin-bottom: 1rem;
-     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        color: white !important;
     }
 
-  .guide-hero p {
-  font-size: 1.1rem;
+    .guide-hero p {
+        font-size: 1.1rem;
         opacity: 0.95;
         margin-bottom: 0;
+        color: white !important;
     }
 
     .category-section {
- margin-bottom: 4rem;
+        margin-bottom: 4rem;
     }
 
     .category-header {
         display: flex;
-      align-items: center;
+        align-items: center;
         margin-bottom: 2rem;
         padding-bottom: 1rem;
-        border-bottom: 3px solid;
+        border-bottom: 1px solid var(--border-primary);
     }
 
     .category-university .category-header {
-   border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+        border-image: none; /* Removed custom gradient border */
     }
 
     .category-header h2 {
         font-size: 1.8rem;
-     font-weight: 700;
+        font-weight: 700;
         margin: 0;
-   background: linear-gradient(135deg, #667eea, #764ba2);
+        background: var(--gradient-text);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .category-icon {
-   font-size: 2rem;
-   margin-right: 1rem;
-     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+        font-size: 2rem;
+        margin-right: 1rem;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
     }
 
- /* Grid D¸zeni */
+    /* Grid D√ºzeni */
     .article-grid {
-      display: grid;
+        display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 1.5rem;
     }
 
     /* Kart Stilleri */
     .article-card {
-        background: white;
-        border-radius: 15px;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border-radius: var(--radius-xl);
         overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--glass-shadow);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-     position: relative;
-     border: 2px solid transparent;
-height: 100%;
-   display: flex;
-  flex-direction: column;
+        cursor: pointer;
+        position: relative;
+        border: 1px solid var(--glass-border);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .article-card:hover {
         transform: translateY(-8px);
-     box-shadow: 0 15px 40px rgba(102, 126, 234, 0.25);
-   border-color: #667eea;
+        box-shadow: 0 15px 40px rgba(0, 66, 37, 0.25);
+        border-color: #004225;
     }
 
     .card-gradient-bg {
-   position: absolute;
+        position: absolute;
         top: 0;
- left: 0;
-      right: 0;
+        left: 0;
+        right: 0;
         height: 5px;
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background: var(--gradient-aurora);
     }
 
     .card-content {
         padding: 1.75rem;
-  flex: 1;
- display: flex;
+        flex: 1;
+        display: flex;
         flex-direction: column;
-  }
+    }
 
     .card-icon {
         font-size: 2.5rem;
- margin-bottom: 1rem;
+        margin-bottom: 1rem;
         display: inline-block;
         transition: transform 0.3s ease;
     }
 
     .article-card:hover .card-icon {
- transform: scale(1.15) rotate(5deg);
+        transform: scale(1.15) rotate(5deg);
     }
 
     .card-title {
         font-size: 1.25rem;
-   font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 0.75rem;
-     line-height: 1.4;
-  }
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
 
     .card-summary {
-     color: #718096;
+        color: #718096;
         font-size: 0.9rem;
         line-height: 1.6;
         margin-bottom: 1.25rem;
-   flex: 1;
+        flex: 1;
     }
 
- .card-badge {
-display: inline-flex;
+    .card-badge {
+        display: inline-flex;
         align-items: center;
-  padding: 0.5rem 1rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 0.5rem 1rem;
+        background: var(--gradient-aurora);
         color: white;
-        border-radius: 20px;
-     font-size: 0.85rem;
-      font-weight: 600;
-   transition: all 0.3s ease;
-   align-self: flex-start;
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        align-self: flex-start;
     }
 
     .article-card:hover .card-badge {
-   transform: translateX(5px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        transform: translateX(5px);
+        box-shadow: var(--shadow-aurora);
     }
 
-    /* Y¸kleniyor Animasyonu */
+    /* Y√ºkleniyor Animasyonu */
     .loading-container {
-  text-align: center;
-  padding: 4rem 2rem;
+        text-align: center;
+        padding: 4rem 2rem;
     }
 
- .loading-spinner {
-width: 50px;
+    .loading-spinner {
+        width: 50px;
         height: 50px;
         border: 4px solid #f3f4f6;
-        border-top-color: #667eea;
+        border-top-color: #004225;
         border-radius: 50%;
- animation: spin 1s linear infinite;
-    margin: 0 auto 1.5rem;
-}
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1.5rem;
+    }
 
     @@keyframes spin {
         to { transform: rotate(360deg); }
-  }
+    }
 
-    /* Bo˛ ›Áerik */
+    /* Bo≈ü ƒ∞√ßerik */
     .empty-state {
-   text-align: center;
+        text-align: center;
         padding: 4rem 2rem;
-     background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
-  border-radius: 20px;
+        background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+        border-radius: 20px;
     }
 
     .empty-icon {
         font-size: 4rem;
-     margin-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
         opacity: 0.5;
     }
 
-    /* Hata Mesaj˝ */
+    /* Hata Mesajƒ± */
     .error-alert {
         background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
         color: white;
         padding: 2rem;
-    border-radius: 15px;
+        border-radius: 15px;
         box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
     }
 
- /* Responsive */
+    /* Responsive */
     @@media (max-width: 768px) {
-  .guide-hero h1 {
-    font-size: 2rem;
-     }
+        .guide-hero h1 {
+            font-size: 2rem;
+        }
 
         .guide-hero p {
-          font-size: 1rem;
-      }
+            font-size: 1rem;
+        }
 
-   .category-header h2 {
-   font-size: 1.5rem;
+        .category-header h2 {
+            font-size: 1.5rem;
         }
 
         .article-grid {
-          grid-template-columns: 1fr;
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -217,64 +231,64 @@ width: 50px;
 <div class="container my-5">
     <!-- Hero Section -->
     <div class="guide-hero">
-        <h1>&#x1F3EB; ‹niversite Rehberi</h1>
-        <p>‹niversiteye haz˝rl˝k s¸recinde ihtiyac˝n˝z olan t¸m bilgiler burada</p>
+        <h1>üéì √úniversite Rehberi</h1>
+        <p>√úniversiteye hazƒ±rlƒ±k s√ºrecinde ihtiyacƒ±nƒ±z olan t√ºm bilgiler burada</p>
     </div>
 
     @if (isLoading)
     {
-      <div class="loading-container">
-       <div class="loading-spinner"></div>
- <h3 style="color: #718096;">Rehber y¸kleniyor...</h3>
-   <p style="color: #a0aec0;">L¸tfen bekleyin</p>
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <h3 style="color: #718096;">Rehber y√ºkleniyor...</h3>
+            <p style="color: #a0aec0;">L√ºtfen bekleyin</p>
         </div>
     }
     else if (!string.IsNullOrEmpty(errorMessage))
     {
-    <div class="error-alert">
-   <h3>&#x26A0; Bir Hata Olu˛tu</h3>
-   <p>@errorMessage</p>
+        <div class="error-alert">
+            <h3>‚ö†Ô∏è Bir Hata Olu≈ütu</h3>
+            <p>@errorMessage</p>
         </div>
-  }
+    }
     else if (universityCategory != null && universityCategory.Articles.Any())
     {
-   <div class="category-section category-university">
-        <div class="category-header">
-      <span class="category-icon">&#x1F3EB;</span>
-    <h2>@universityCategory.Title</h2>
-     </div>
+        <div class="category-section category-university">
+            <div class="category-header">
+                <span class="category-icon">üéì</span>
+                <h2>@universityCategory.Title</h2>
+            </div>
 
-  <div class="article-grid">
-    @foreach (var article in universityCategory.Articles)
-        {
-           var articleIcon = article.Slug switch {
-        "universite-secimi-rehberi" => "&#x1F4DA;",
-        "bolum-rehberi-muhendislik" => "&#x1F4D8;",
-    "burs-mali-destek" => "&#x1F4B0;",
-       _ => "&#x1F4C4;"
-    };
+            <div class="article-grid">
+                @foreach (var article in universityCategory.Articles)
+                {
+                    var articleIcon = article.Slug switch {
+                        "universite-secimi-rehberi" => "üìö",
+                        "bolum-rehberi-muhendislik" => "üìò",
+                        "burs-mali-destek" => "üí∞",
+                        _ => "üìÑ"
+                    };
 
-<div class="article-card" @onclick="() => NavigateToArticle(universityCategory.Slug, article.Slug)">
-      <div class="card-gradient-bg"></div>
-  <div class="card-content">
-     <div class="card-icon">@((MarkupString)articleIcon)</div>
-           <h3 class="card-title">@article.Title</h3>
- <p class="card-summary">@article.Summary</p>
-    <span class="card-badge">
-   Devam˝n˝ Oku &#x2192;
-     </span>
-      </div>
-      </div>
-     }
-   </div>
- </div>
+                    <div class="article-card" @onclick="() => NavigateToArticle(universityCategory.Slug, article.Slug)">
+                        <div class="card-gradient-bg"></div>
+                        <div class="card-content">
+                            <div class="card-icon">@articleIcon</div>
+                            <h3 class="card-title">@article.Title</h3>
+                            <p class="card-summary">@article.Summary</p>
+                            <span class="card-badge">
+                                Devamƒ±nƒ± Oku ‚Üí
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     }
     else
     {
         <div class="empty-state">
-       <div class="empty-icon">&#x1F4ED;</div>
-   <h3 style="color: #4a5568;">Hen¸z ›Áerik Yok</h3>
-     <p style="color: #718096;">Yak˝nda rehber iÁerikleri eklenecek!</p>
+            <div class="empty-icon">üì≠</div>
+            <h3 style="color: #4a5568;">Hen√ºz ƒ∞√ßerik Yok</h3>
+            <p style="color: #718096;">Yakƒ±nda rehber i√ßerikleri eklenecek!</p>
         </div>
     }
 </div>
@@ -286,23 +300,23 @@ width: 50px;
 
     protected override async Task OnInitializedAsync()
     {
- try
+        try
         {
-   var categories = await Http.GetFromJsonAsync<List<ContentCategoryDto>>("api/content/all");
-  // Sadece "‹niversiteye Haz˝rl˝k" kategorisini al
+            var categories = await Http.GetFromJsonAsync<List<ContentCategoryDto>>("api/content/all");
+            // Sadece "√úniversiteye Hazƒ±rlƒ±k" kategorisini al
             universityCategory = categories?.FirstOrDefault(c => c.Slug == "universiteye-hazirlik");
-  }
-   catch (Exception ex)
-        {
-errorMessage = ex.Message;
-    }
-        finally
-{
-     isLoading = false;
         }
-}
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
-private void NavigateToArticle(string categorySlug, string articleSlug)
+    private void NavigateToArticle(string categorySlug, string articleSlug)
     {
         NavigationManager.NavigateTo($"/guide/{categorySlug}/{articleSlug}");
     }

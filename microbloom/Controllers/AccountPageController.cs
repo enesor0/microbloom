@@ -14,17 +14,20 @@ namespace microbloom.Controllers
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly KariyerDBContext _context;
         private readonly ILogger<AccountPageController> _logger;
 
         public AccountPageController(
             SignInManager<AppUser> signInManager,
             UserManager<AppUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             KariyerDBContext context,
             ILogger<AccountPageController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _roleManager = roleManager;
             _context = context;
             _logger = logger;
         }
@@ -113,6 +116,13 @@ namespace microbloom.Controllers
                 }
 
                 var targetRole = isCompanyAccount ? "Employer" : "JobSeeker";
+                
+                // Rol yoksa oluştur
+                if (!await _roleManager.RoleExistsAsync(targetRole))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(targetRole));
+                }
+                
                 var roleResult = await _userManager.AddToRoleAsync(user, targetRole);
                 if (!roleResult.Succeeded)
                 {
@@ -136,11 +146,10 @@ namespace microbloom.Controllers
                     await _userManager.UpdateAsync(user);
                 }
 
-                // Otomatik giri� yap
-                await _signInManager.SignInAsync(user, isPersistent: false);
-
                 _logger.LogInformation($"Register successful: {email}");
-                return Redirect(isCompanyAccount ? "/company-dashboard" : "/");
+                
+                // Kayıt başarılı - login sayfasına yönlendir (cookie timing sorununu önler)
+                return Redirect($"/account/login?SuccessMessage={Uri.EscapeDataString("Kayıt başarılı! Lütfen giriş yapın.")}");
             }
             catch (Exception ex)
             {

@@ -1,0 +1,676 @@
+@page "/career-test"
+@namespace microbloom.Pages
+
+<PageTitle>🎯 Kariyer Testi - microbloom</PageTitle>
+
+<style>
+    .test-hero {
+        background: linear-gradient(135deg, #004225, #1b4332);
+        padding: 4rem 2rem;
+        border-radius: var(--radius-2xl);
+        margin-bottom: 3rem;
+        color: white;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 66, 37, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .test-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .test-hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: white !important; position: relative; z-index: 1; }
+    .test-hero p { font-size: 1.1rem; opacity: 0.95; color: white !important; position: relative; z-index: 1; }
+
+    .test-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+        text-align: center;
+        height: 100%;
+    }
+
+    .test-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(45, 106, 79, 0.15);
+    }
+
+    .test-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .test-title { font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 1.2rem; }
+    .test-desc { color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem; }
+    .test-duration { color: #2d6a4f; font-weight: 600; font-size: 0.85rem; }
+
+    .start-btn {
+        background: linear-gradient(135deg, #2d6a4f, #004225);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .start-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(45, 106, 79, 0.4);
+        color: white;
+    }
+
+    /* Test Question Styles */
+    .question-container {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .question-progress {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .question-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #2d6a4f, #004225);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .question-number {
+        color: #2d6a4f;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .question-text {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 2rem;
+    }
+
+    .option-btn {
+        display: block;
+        width: 100%;
+        padding: 1rem 1.5rem;
+        margin-bottom: 0.75rem;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        text-align: left;
+        font-size: 1rem;
+        color: #4b5563;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .option-btn:hover {
+        border-color: #2d6a4f;
+        background: #f5f3ff;
+        transform: translateX(5px);
+    }
+
+    .option-btn.selected {
+        border-color: #2d6a4f;
+        background: linear-gradient(135deg, #2d6a4f, #004225);
+        color: white;
+    }
+
+    /* Result Styles */
+    .result-container {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .result-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .result-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .result-subtitle {
+        color: #2d6a4f;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .result-description {
+        color: #6b7280;
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto 2rem;
+    }
+
+    .career-suggestions {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .career-suggestions h5 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .career-tag {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2d6a4f, #004225);
+        color: white;
+        border-radius: 20px;
+        margin: 0.25rem;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="container my-5">
+    @if (!testStarted)
+    {
+        <div class="test-hero">
+            <h1>🎯 Kariyer Testi</h1>
+            <p>Kişiliğinizi analiz edin, size uygun kariyer yollarını keşfedin</p>
+        </div>
+
+        <!-- Test Türleri -->
+        <h2 class="h4 mb-4"><i class="bi bi-clipboard2-check me-2"></i>Mevcut Testler</h2>
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="test-card">
+                    <div class="test-icon">🧠</div>
+                    <h5 class="test-title">Kişilik Analizi</h5>
+                    <p class="test-desc">MBTI tabanlı kişilik testi ile güçlü ve zayıf yönlerinizi keşfedin</p>
+                    <div class="test-duration"><i class="bi bi-clock me-1"></i>10 soru • 3-5 dakika</div>
+                    <button class="btn start-btn" @onclick="() => StartTest(1)">Teste Başla</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="test-card">
+                    <div class="test-icon">💡</div>
+                    <h5 class="test-title">İlgi Alanı Testi</h5>
+                    <p class="test-desc">Holland kodları ile hangi iş alanlarına yatkın olduğunuzu bulun</p>
+                    <div class="test-duration"><i class="bi bi-clock me-1"></i>10 soru • 3-5 dakika</div>
+                    <button class="btn start-btn" @onclick="() => StartTest(2)">Teste Başla</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="test-card">
+                    <div class="test-icon">⚡</div>
+                    <h5 class="test-title">Çalışma Stili Testi</h5>
+                    <p class="test-desc">Ideal çalışma ortamınızı ve stilinizi keşfedin</p>
+                    <div class="test-duration"><i class="bi bi-clock me-1"></i>10 soru • 3-5 dakika</div>
+                    <button class="btn start-btn" @onclick="() => StartTest(3)">Teste Başla</button>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!testCompleted)
+    {
+        <!-- Test Soruları -->
+        <div class="question-container">
+            <div class="question-progress">
+                <div class="question-progress-bar" style="width: @(((currentQuestionIndex + 1) * 100 / currentQuestions.Count))%"></div>
+            </div>
+            
+            <div class="question-number">Soru @(currentQuestionIndex + 1) / @currentQuestions.Count</div>
+            <div class="question-text">@currentQuestions[currentQuestionIndex].Text</div>
+            
+            @foreach (var option in currentQuestions[currentQuestionIndex].Options)
+            {
+                <button class="option-btn @(selectedOption == option.Value ? "selected" : "")" 
+                        @onclick="() => SelectOption(option.Value)">
+                    @option.Text
+                </button>
+            }
+            
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-outline-secondary" @onclick="PreviousQuestion" disabled="@(currentQuestionIndex == 0)">
+                    <i class="bi bi-arrow-left me-2"></i>Önceki
+                </button>
+                <button class="btn start-btn" @onclick="NextQuestion" disabled="@(selectedOption == null)">
+                    @(currentQuestionIndex == currentQuestions.Count - 1 ? "Sonuçları Gör" : "Sonraki") <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Sonuçlar -->
+        <div class="question-container">
+            <div class="result-container">
+                <div class="result-icon">@resultData.Icon</div>
+                <h2 class="result-title">@resultData.Title</h2>
+                <div class="result-subtitle">@resultData.Subtitle</div>
+                <p class="result-description">@resultData.Description</p>
+                
+                <div class="career-suggestions">
+                    <h5><i class="bi bi-briefcase me-2"></i>Önerilen Kariyer Yolları</h5>
+                    @foreach (var career in resultData.Careers)
+                    {
+                        <span class="career-tag">@career</span>
+                    }
+                </div>
+                
+                <div class="mt-4">
+                    <button class="btn btn-outline-primary me-2" @onclick="ResetTest">
+                        <i class="bi bi-arrow-repeat me-2"></i>Başka Bir Test Yap
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool testStarted = false;
+    private bool testCompleted = false;
+    private int currentTestType = 0;
+    private int currentQuestionIndex = 0;
+    private string? selectedOption = null;
+    private List<string> answers = new();
+    private List<Question> currentQuestions = new();
+    private ResultData resultData = new();
+
+    // Question Model
+    private class Question
+    {
+        public string Text { get; set; } = "";
+        public List<Option> Options { get; set; } = new();
+    }
+
+    private class Option
+    {
+        public string Text { get; set; } = "";
+        public string Value { get; set; } = "";
+    }
+
+    private class ResultData
+    {
+        public string Icon { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Subtitle { get; set; } = "";
+        public string Description { get; set; } = "";
+        public List<string> Careers { get; set; } = new();
+    }
+
+    // Test 1: Kişilik Testi
+    private List<Question> personalityQuestions = new()
+    {
+        new Question { Text = "Yeni bir projede nasıl başlamayı tercih edersiniz?", Options = new() {
+            new Option { Text = "Önce detaylı bir plan yaparım", Value = "A" },
+            new Option { Text = "Hemen aksiyona geçerim", Value = "S" },
+            new Option { Text = "Takımla beyin fırtınası yaparım", Value = "D" },
+            new Option { Text = "Benzer projeleri araştırırım", Value = "K" }
+        }},
+        new Question { Text = "Stresli bir durumda nasıl davranırsınız?", Options = new() {
+            new Option { Text = "Mantıklı analiz yapar, çözüm ararım", Value = "A" },
+            new Option { Text = "Hızlı karar verir, harekete geçerim", Value = "S" },
+            new Option { Text = "Başkalarından destek alırım", Value = "D" },
+            new Option { Text = "Sakin kalır, adapte olurum", Value = "K" }
+        }},
+        new Question { Text = "Toplantılarda genellikle hangi rolü üstlenirsiniz?", Options = new() {
+            new Option { Text = "Analiz eden ve strateji belirleyen", Value = "A" },
+            new Option { Text = "Kararları uygulayan, organize eden", Value = "S" },
+            new Option { Text = "Uyumu sağlayan, arabulucu", Value = "D" },
+            new Option { Text = "Yeni fikirler öneren", Value = "K" }
+        }},
+        new Question { Text = "Hangi çalışma ortamı size daha uygun?", Options = new() {
+            new Option { Text = "Sessiz, bireysel çalışma alanı", Value = "A" },
+            new Option { Text = "Yapılandırılmış, düzenli ofis", Value = "S" },
+            new Option { Text = "Açık plan, işbirliğine uygun", Value = "D" },
+            new Option { Text = "Esnek, özgür çalışma ortamı", Value = "K" }
+        }},
+        new Question { Text = "Bir problemi çözerken tercih ettiğiniz yaklaşım?", Options = new() {
+            new Option { Text = "Veri odaklı, mantıksal analiz", Value = "A" },
+            new Option { Text = "Praktik, hızlı çözüm", Value = "S" },
+            new Option { Text = "Takım çalışması ve konsensüs", Value = "D" },
+            new Option { Text = "Yaratıcı, alışılmadık yöntemler", Value = "K" }
+        }},
+        new Question { Text = "Başarıyı nasıl tanımlarsınız?", Options = new() {
+            new Option { Text = "Uzmanlık ve bilgi birikimi", Value = "A" },
+            new Option { Text = "Somut sonuçlar ve başarılar", Value = "S" },
+            new Option { Text = "İlişkiler ve insanlara katkı", Value = "D" },
+            new Option { Text = "Özgürlük ve yaratıcılık", Value = "K" }
+        }},
+        new Question { Text = "Yeni bir beceri öğrenirken nasıl ilerlersiniz?", Options = new() {
+            new Option { Text = "Teorik altyapıyı önce öğrenirim", Value = "A" },
+            new Option { Text = "Yaparak, deneyerek öğrenirim", Value = "S" },
+            new Option { Text = "Birinden öğrenmek isterim", Value = "D" },
+            new Option { Text = "Kendi yöntemimi geliştiririm", Value = "K" }
+        }},
+        new Question { Text = "Liderlik tarzınız nasıldır?", Options = new() {
+            new Option { Text = "Stratejik ve vizyoner", Value = "A" },
+            new Option { Text = "Sonuç odaklı ve direktif", Value = "S" },
+            new Option { Text = "Destekleyici ve kapsayıcı", Value = "D" },
+            new Option { Text = "İlham verici ve esnek", Value = "K" }
+        }},
+        new Question { Text = "Geri bildirim almayı nasıl karşılarsınız?", Options = new() {
+            new Option { Text = "Objektif ve yapıcıysa memnuniyetle", Value = "A" },
+            new Option { Text = "Hızlı ve net olmasını isterim", Value = "S" },
+            new Option { Text = "Nazik ve destekleyici olmalı", Value = "D" },
+            new Option { Text = "Yaratıcılığımı kısıtlamamalı", Value = "K" }
+        }},
+        new Question { Text = "Ideal iş gününüz nasıl olurdu?", Options = new() {
+            new Option { Text = "Karmaşık problemler çözmek", Value = "A" },
+            new Option { Text = "Hedeflere ulaşmak, görevleri tamamlamak", Value = "S" },
+            new Option { Text = "İnsanlarla etkileşim, yardım etmek", Value = "D" },
+            new Option { Text = "Yeni projeler ve fikirler üzerinde çalışmak", Value = "K" }
+        }}
+    };
+
+    // Test 2: İlgi Alanı Testi (Holland Kodları)
+    private List<Question> interestQuestions = new()
+    {
+        new Question { Text = "Hangi aktivite size daha çekici geliyor?", Options = new() {
+            new Option { Text = "Makineleri tamir etmek veya inşa etmek", Value = "R" },
+            new Option { Text = "Bilimsel deneyler yapmak", Value = "I" },
+            new Option { Text = "Resim veya müzik yapmak", Value = "A" },
+            new Option { Text = "İnsanlara yardım etmek veya öğretmek", Value = "S" }
+        }},
+        new Question { Text = "Boş zamanlarınızda ne yapmayı tercih edersiniz?", Options = new() {
+            new Option { Text = "Bahçe işleri veya el işi", Value = "R" },
+            new Option { Text = "Kitap okumak veya belgesel izlemek", Value = "I" },
+            new Option { Text = "Yaratıcı projeler üzerinde çalışmak", Value = "A" },
+            new Option { Text = "Arkadaşlarla vakit geçirmek", Value = "S" }
+        }},
+        new Question { Text = "Okulda en çok hangi dersleri sevdiniz?", Options = new() {
+            new Option { Text = "Atölye, beden eğitimi", Value = "R" },
+            new Option { Text = "Matematik, fen bilimleri", Value = "I" },
+            new Option { Text = "Sanat, müzik, edebiyat", Value = "A" },
+            new Option { Text = "Sosyal bilgiler, psikoloji", Value = "S" }
+        }},
+        new Question { Text = "Hangi ortamda çalışmak istersiniz?", Options = new() {
+            new Option { Text = "Açık havada veya atölyede", Value = "R" },
+            new Option { Text = "Laboratuvar veya araştırma merkezi", Value = "I" },
+            new Option { Text = "Stüdyo veya yaratıcı ofis", Value = "A" },
+            new Option { Text = "Okul, hastane veya sosyal merkez", Value = "S" }
+        }},
+        new Question { Text = "Hangi tür problemler ilginizi çeker?", Options = new() {
+            new Option { Text = "Pratik, elle çözülebilen sorunlar", Value = "R" },
+            new Option { Text = "Karmaşık teorik problemler", Value = "I" },
+            new Option { Text = "Tasarım ve estetik sorunlar", Value = "A" },
+            new Option { Text = "İnsan ilişkileri sorunları", Value = "S" }
+        }},
+        new Question { Text = "Size göre ideal bir iş nasıl olmalı?", Options = new() {
+            new Option { Text = "Fiziksel aktivite ve somut sonuçlar içermeli", Value = "R" },
+            new Option { Text = "Analiz ve araştırma gerektirmeli", Value = "I" },
+            new Option { Text = "Yaratıcılık ve özgünlük sunmalı", Value = "A" },
+            new Option { Text = "İnsanlara fayda sağlamalı", Value = "S" }
+        }},
+        new Question { Text = "Hangi becerileriniz daha güçlü?", Options = new() {
+            new Option { Text = "El becerileri ve teknik yetenekler", Value = "R" },
+            new Option { Text = "Analitik düşünme ve problem çözme", Value = "I" },
+            new Option { Text = "Sanatsal ve yaratıcı yetenekler", Value = "A" },
+            new Option { Text = "İletişim ve empati", Value = "S" }
+        }},
+        new Question { Text = "Bir projede hangi rolü üstlenirdiniz?", Options = new() {
+            new Option { Text = "Teknik uygulama ve yapım", Value = "R" },
+            new Option { Text = "Araştırma ve analiz", Value = "I" },
+            new Option { Text = "Konsept ve tasarım", Value = "A" },
+            new Option { Text = "Koordinasyon ve iletişim", Value = "S" }
+        }},
+        new Question { Text = "Hangi tür başarı size daha tatmin edici gelir?", Options = new() {
+            new Option { Text = "Bir şey inşa etmek veya onarmak", Value = "R" },
+            new Option { Text = "Yeni bir şey keşfetmek veya anlamak", Value = "I" },
+            new Option { Text = "Güzel bir eser ortaya koymak", Value = "A" },
+            new Option { Text = "Birine yardım etmek", Value = "S" }
+        }},
+        new Question { Text = "Gelecekte kendinizi nerede görüyorsunuz?", Options = new() {
+            new Option { Text = "Teknik bir alanda uzman olarak", Value = "R" },
+            new Option { Text = "Bilim veya teknoloji alanında araştırmacı", Value = "I" },
+            new Option { Text = "Sanat veya medya sektöründe", Value = "A" },
+            new Option { Text = "Eğitim veya sağlık sektöründe", Value = "S" }
+        }}
+    };
+
+    // Test 3: Çalışma Stili Testi
+    private List<Question> workStyleQuestions = new()
+    {
+        new Question { Text = "Günün hangi saatlerinde en verimli çalışırsınız?", Options = new() {
+            new Option { Text = "Sabah erken saatlerde", Value = "E" },
+            new Option { Text = "Öğle saatlerinde", Value = "F" },
+            new Option { Text = "Akşam saatlerinde", Value = "R" },
+            new Option { Text = "Gece geç saatlerde", Value = "I" }
+        }},
+        new Question { Text = "Nasıl bir çalışma ortamı tercih edersiniz?", Options = new() {
+            new Option { Text = "Tamamen sessiz ve düzenli", Value = "E" },
+            new Option { Text = "Hafif müzikli, rahat", Value = "F" },
+            new Option { Text = "Canlı ve hareketli", Value = "R" },
+            new Option { Text = "Her yerde çalışabilirim", Value = "I" }
+        }},
+        new Question { Text = "Görevleri nasıl yönetirsiniz?", Options = new() {
+            new Option { Text = "Detaylı liste ve plan yaparım", Value = "E" },
+            new Option { Text = "Genel bir çerçeve belirlerim", Value = "F" },
+            new Option { Text = "Akışa bırakırım", Value = "R" },
+            new Option { Text = "Son dakikaya kadar beklerim", Value = "I" }
+        }},
+        new Question { Text = "Ekip çalışmasında tercih ettiğiniz stil?", Options = new() {
+            new Option { Text = "Tek başıma çalışmayı tercih ederim", Value = "E" },
+            new Option { Text = "Küçük gruplarla çalışırım", Value = "F" },
+            new Option { Text = "Büyük ekiplerle koordineli çalışırım", Value = "R" },
+            new Option { Text = "Duruma göre değişir", Value = "I" }
+        }},
+        new Question { Text = "Deadline'lara karşı tutumunuz nedir?", Options = new() {
+            new Option { Text = "Mutlaka önceden bitiririm", Value = "E" },
+            new Option { Text = "Tam zamanında teslim ederim", Value = "F" },
+            new Option { Text = "Bazen biraz gecikirim", Value = "R" },
+            new Option { Text = "Baskı altında daha iyi çalışırım", Value = "I" }
+        }},
+        new Question { Text = "Uzaktan çalışma hakkında ne düşünüyorsunuz?", Options = new() {
+            new Option { Text = "Kesinlikle tercih ederim", Value = "E" },
+            new Option { Text = "Hibrit model ideal", Value = "F" },
+            new Option { Text = "Ofisi tercih ederim", Value = "R" },
+            new Option { Text = "Fark etmez", Value = "I" }
+        }},
+        new Question { Text = "İş-yaşam dengesi sizin için ne kadar önemli?", Options = new() {
+            new Option { Text = "En öncelikli konu", Value = "E" },
+            new Option { Text = "Önemli ama esnek olabilirim", Value = "F" },
+            new Option { Text = "Kariyer için fedakarlık yapabilirim", Value = "R" },
+            new Option { Text = "Duruma göre değişir", Value = "I" }
+        }},
+        new Question { Text = "Yeni teknolojilere karşı tutumunuz?", Options = new() {
+            new Option { Text = "Hemen adapte olurum", Value = "E" },
+            new Option { Text = "Faydalıysa öğrenirim", Value = "F" },
+            new Option { Text = "Zorunlu olmadıkça değiştirmem", Value = "R" },
+            new Option { Text = "Klasik yöntemleri tercih ederim", Value = "I" }
+        }},
+        new Question { Text = "Çoklu görev (multitasking) yapar mısınız?", Options = new() {
+            new Option { Text = "Hayır, tek işe odaklanırım", Value = "E" },
+            new Option { Text = "2-3 iş arasında geçiş yapabilirim", Value = "F" },
+            new Option { Text = "Evet, birçok işi aynı anda yürütürüm", Value = "R" },
+            new Option { Text = "Duruma bağlı", Value = "I" }
+        }},
+        new Question { Text = "İş yerinde sosyal aktivitelere katılır mısınız?", Options = new() {
+            new Option { Text = "Nadiren, işime odaklanırım", Value = "E" },
+            new Option { Text = "Bazen, seçici davranırım", Value = "F" },
+            new Option { Text = "Evet, networkingi severim", Value = "R" },
+            new Option { Text = "Zorunlu olanlarına katılırım", Value = "I" }
+        }}
+    };
+
+    private void StartTest(int testType)
+    {
+        currentTestType = testType;
+        testStarted = true;
+        currentQuestionIndex = 0;
+        answers.Clear();
+        selectedOption = null;
+        
+        // Her test için farklı sorular
+        currentQuestions = testType switch
+        {
+            1 => personalityQuestions,
+            2 => interestQuestions,
+            3 => workStyleQuestions,
+            _ => personalityQuestions
+        };
+    }
+
+    private void SelectOption(string value)
+    {
+        selectedOption = value;
+    }
+
+    private void NextQuestion()
+    {
+        if (selectedOption != null)
+        {
+            if (answers.Count > currentQuestionIndex)
+                answers[currentQuestionIndex] = selectedOption;
+            else
+                answers.Add(selectedOption);
+
+            if (currentQuestionIndex < currentQuestions.Count - 1)
+            {
+                currentQuestionIndex++;
+                selectedOption = answers.Count > currentQuestionIndex ? answers[currentQuestionIndex] : null;
+            }
+            else
+            {
+                CalculateResults();
+            }
+        }
+    }
+
+    private void PreviousQuestion()
+    {
+        if (currentQuestionIndex > 0)
+        {
+            currentQuestionIndex--;
+            selectedOption = answers.Count > currentQuestionIndex ? answers[currentQuestionIndex] : null;
+        }
+    }
+
+    private void CalculateResults()
+    {
+        // Her test için farklı sonuç hesaplaması
+        if (currentTestType == 1)
+        {
+            // Kişilik Testi
+            var counts = new Dictionary<string, int> { {"A", 0}, {"S", 0}, {"D", 0}, {"K", 0} };
+            foreach (var answer in answers) { if (counts.ContainsKey(answer)) counts[answer]++; }
+            var dominant = counts.OrderByDescending(x => x.Value).First().Key;
+            
+            resultData = dominant switch
+            {
+                "A" => new ResultData {
+                    Icon = "🔬", Title = "Analist", Subtitle = "Stratejik Düşünür",
+                    Description = "Mantıklı, analitik ve detay odaklısınız. Karmaşık problemleri çözmekten keyif alıyorsunuz.",
+                    Careers = new List<string> { "Yazılım Mühendisi", "Veri Bilimci", "Strateji Uzmanı", "Araştırmacı" }
+                },
+                "S" => new ResultData {
+                    Icon = "🛡️", Title = "Koruyucu", Subtitle = "Güvenilir Uygulayıcı",
+                    Description = "Pratik, organize ve güvenilirsiniz. Sonuç odaklı çalışıyorsunuz.",
+                    Careers = new List<string> { "Proje Yöneticisi", "Operasyon Müdürü", "Muhasebeci", "Kalite Kontrol" }
+                },
+                "D" => new ResultData {
+                    Icon = "🤝", Title = "Diplomat", Subtitle = "İlişki Kurucusu",
+                    Description = "Empatik, destekleyici ve işbirlikçisiniz. İnsanlarla çalışmayı seviyorsunuz.",
+                    Careers = new List<string> { "İK Uzmanı", "Psikolog", "Öğretmen", "Müşteri İlişkileri" }
+                },
+                _ => new ResultData {
+                    Icon = "🚀", Title = "Kaşif", Subtitle = "Yaratıcı Vizyoner",
+                    Description = "Yenilikçi, esnek ve girişimcisiniz. Yeni fikirler üretmekten keyif alıyorsunuz.",
+                    Careers = new List<string> { "Girişimci", "Tasarımcı", "Pazarlama Uzmanı", "İçerik Üretici" }
+                }
+            };
+        }
+        else if (currentTestType == 2)
+        {
+            // İlgi Alanı Testi (Holland Kodları)
+            var counts = new Dictionary<string, int> { {"R", 0}, {"I", 0}, {"A", 0}, {"S", 0} };
+            foreach (var answer in answers) { if (counts.ContainsKey(answer)) counts[answer]++; }
+            var dominant = counts.OrderByDescending(x => x.Value).First().Key;
+            
+            resultData = dominant switch
+            {
+                "R" => new ResultData {
+                    Icon = "🔧", Title = "Gerçekçi (Realistic)", Subtitle = "Pratik ve El Becerikli",
+                    Description = "Somut işlerle uğraşmayı, makineler ve araçlarla çalışmayı seversiniz.",
+                    Careers = new List<string> { "Mühendis", "Teknisyen", "Pilot", "Şef", "Mimar" }
+                },
+                "I" => new ResultData {
+                    Icon = "🔬", Title = "Araştırmacı (Investigative)", Subtitle = "Analitik ve Meraklı",
+                    Description = "Bilimsel konuları araştırmayı, problem çözmeyi ve analiz etmeyi seversiniz.",
+                    Careers = new List<string> { "Bilim İnsanı", "Araştırmacı", "Doktor", "Programcı", "Analist" }
+                },
+                "A" => new ResultData {
+                    Icon = "🎨", Title = "Sanatsal (Artistic)", Subtitle = "Yaratıcı ve Özgün",
+                    Description = "Sanatsal ifade, yaratıcılık ve estetik sizin için önemli.",
+                    Careers = new List<string> { "Grafik Tasarımcı", "Yazar", "Müzisyen", "Fotoğrafçı", "Oyuncu" }
+                },
+                _ => new ResultData {
+                    Icon = "👥", Title = "Sosyal (Social)", Subtitle = "Yardımsever ve İletişimci",
+                    Description = "İnsanlara yardım etmek, öğretmek ve onlarla çalışmak sizi mutlu ediyor.",
+                    Careers = new List<string> { "Öğretmen", "Psikolog", "Sosyal Hizmet Uzmanı", "Hemşire", "Terapist" }
+                }
+            };
+        }
+        else
+        {
+            // Çalışma Stili Testi
+            var counts = new Dictionary<string, int> { {"E", 0}, {"F", 0}, {"R", 0}, {"I", 0} };
+            foreach (var answer in answers) { if (counts.ContainsKey(answer)) counts[answer]++; }
+            var dominant = counts.OrderByDescending(x => x.Value).First().Key;
+            
+            resultData = dominant switch
+            {
+                "E" => new ResultData {
+                    Icon = "📋", Title = "Planlayıcı", Subtitle = "Organize ve Disiplinli",
+                    Description = "Yapılandırılmış ortamları, net planları ve düzenli çalışmayı tercih ediyorsunuz.",
+                    Careers = new List<string> { "Proje Yöneticisi", "Operasyon Uzmanı", "Finans Analisti", "Muhasebeci" }
+                },
+                "F" => new ResultData {
+                    Icon = "⚖️", Title = "Dengeci", Subtitle = "Esnek ve Adaptif",
+                    Description = "İş-yaşam dengesine önem veriyorsunuz. Hibrit modellerde başarılı olursunuz.",
+                    Careers = new List<string> { "İK Uzmanı", "Danışman", "Eğitimci", "İçerik Stratejisti" }
+                },
+                "R" => new ResultData {
+                    Icon = "🌟", Title = "Sosyal Çalışan", Subtitle = "Enerjik ve İletişimci",
+                    Description = "Canlı ortamları, ekip çalışmasını ve networking'i seviyorsunuz.",
+                    Careers = new List<string> { "Satış Temsilcisi", "Pazarlama Uzmanı", "Etkinlik Yöneticisi", "İş Geliştirme" }
+                },
+                _ => new ResultData {
+                    Icon = "🌙", Title = "Bağımsız Çalışan", Subtitle = "Özerk ve Yaratıcı",
+                    Description = "Kendi temponuzda, bağımsız çalışmayı tercih ediyorsunuz. Gece kuşusunuz.",
+                    Careers = new List<string> { "Freelancer", "Yazılımcı", "Yazar", "Tasarımcı", "Araştırmacı" }
+                }
+            };
+        }
+        
+        testCompleted = true;
+    }
+
+    private void ResetTest()
+    {
+        testStarted = false;
+        testCompleted = false;
+        currentQuestionIndex = 0;
+        answers.Clear();
+        selectedOption = null;
+    }
+}

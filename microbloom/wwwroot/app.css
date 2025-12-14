@@ -1,725 +1,852 @@
-/* ========================================
-   ?? GLOBAL THEME VARIABLES & FOUNDATION
-   ======================================== */
+/* =========================================
+   AURORA FLOW DESIGN SYSTEM
+   Microbloom Premium Theme
+   ========================================= */
 
+/* =========================================
+   1. CSS VARIABLES & THEME TOKENS
+   ========================================= */
 :root {
-  /* ?? Primary Brand Colors - PARLAK TURKUAZ TEMA */
-  --theme-primary: #00CED1; /* Parlak Turkuaz (DarkTurquoise) */
-  --theme-primary-dark: #00B8BA; /* Turkuaz Koyu */
-  --theme-primary-light: #40E0D0; /* Turkuaz Açýk (Turquoise) */
-  
-  /* ?? Secondary Colors */
-  --theme-secondary: #3498db; /* Ýkincil Mavi */
-  --theme-success: #00CED1; /* Baþarý = Turkuaz */
-  --theme-danger: #e74c3c; /* Hata Kýrmýzý */
-  --theme-warning: #f39c12; /* Uyarý Turuncu */
-  --theme-info: #3498db; /* Bilgi Mavi */
-  
-  /* ?? Background & Text Colors */
-  --theme-background: #FFFFFF; /* Ana Zemin - Beyaz */
-  --theme-background-light: #f8f9fa; /* Açýk Arka Plan */
-  --theme-background-dark: #ecf0f1; /* Koyu Arka Plan */
-  
-  --theme-text-primary: #2C3E50; /* Ana Metin - Koyu Gri/Lacivert */
-  --theme-text-secondary: #7F8C8D; /* Ýkincil Metin - Gri */
-  --theme-text-light: #95a5a6; /* Açýk Metin */
-  
-  /* ?? Borders & Dividers */
-  --theme-border: #ECF0F1; /* Ýnce çizgiler */
-  --theme-border-dark: #bdc3c7; /* Koyu çizgiler */
-  
-  /* ?? Shadows */
-  --shadow-sm: 0 2px 4px rgba(0, 206, 209, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 206, 209, 0.12);
-  --shadow-lg: 0 10px 30px rgba(0, 206, 209, 0.15);
-  --shadow-xl: 0 20px 50px rgba(0, 206, 209, 0.2);
-  
-  /* ? Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* --- British Racing Green Palette --- */
+    --aurora-primary: #004225;
+    --aurora-primary-hover: #003018;
+    --aurora-primary-light: #1a5c3a;
+    --aurora-secondary: #2d6a4f;
+    --aurora-secondary-hover: #1b4332;
+    --aurora-accent: #40916c;
+    --aurora-accent-hover: #2d6a4f;
+
+    /* --- Semantic Colors --- */
+    --color-success: #10b981;
+    --color-success-hover: #059669;
+    --color-warning: #f59e0b;
+    --color-warning-hover: #d97706;
+    --color-danger: #ef4444;
+    --color-danger-hover: #dc2626;
+    --color-info: #3b82f6;
+
+    /* --- Light Theme (Default) --- */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --bg-tertiary: #e2e8f0;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-card-hover: rgba(255, 255, 255, 0.95);
+
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --text-inverse: #ffffff;
+
+    --border-primary: rgba(148, 163, 184, 0.3);
+    --border-secondary: rgba(148, 163, 184, 0.15);
+
+    /* --- Glass Effect --- */
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px rgba(0, 66, 37, 0.1);
+    --glass-blur: blur(16px);
+
+    /* --- Gradients --- */
+    --gradient-aurora: linear-gradient(135deg, #004225 0%, #1b4332 50%, #2d6a4f 100%);
+    --gradient-text: var(--gradient-aurora);
+    --gradient-aurora-soft: linear-gradient(135deg, rgba(0, 66, 37, 0.1) 0%, rgba(27, 67, 50, 0.1) 100%);
+    --gradient-body: linear-gradient(135deg, #f8fafc 0%, #d8f3dc 50%, #f1f5f9 100%);
+    --gradient-card-hover: linear-gradient(135deg, rgba(0, 66, 37, 0.05) 0%, rgba(27, 67, 50, 0.05) 100%);
+
+    /* --- Shadows --- */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-aurora: 0 10px 40px -10px rgba(0, 66, 37, 0.3);
+    --shadow-aurora-hover: 0 20px 50px -10px rgba(0, 66, 37, 0.4);
+
+    /* --- Spacing --- */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-2xl: 2rem;
+    --radius-full: 9999px;
+
+    /* --- Smooth Animations --- */
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-in-out-smooth: cubic-bezier(0.45, 0, 0.55, 1);
+
+    --transition-fast: 200ms var(--ease-smooth);
+    --transition-normal: 350ms var(--ease-smooth);
+    --transition-slow: 500ms var(--ease-out-expo);
+    --transition-theme: 400ms var(--ease-in-out-smooth);
 }
 
-/* ========================================
-   ?? BASE STYLES
-   ======================================== */
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* =========================================
+   2. GLOBAL SMOOTH THEME TRANSITION
+   ========================================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    transition:
+        color 400ms cubic-bezier(0.4, 0, 0.2, 1),
+        background-color 400ms cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 400ms cubic-bezier(0.4, 0, 0.2, 1),
+        fill 400ms cubic-bezier(0.4, 0, 0.2, 1),
+        stroke 400ms cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 400ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+/* Exclude animations from theme transition */
+.spinner-border,
+.loading-spinner,
+[class*="spinner"],
+[class*="loading"],
+.btn:active,
+.no-transition,
+.no-transition * {
+    transition: none !important;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
+/* =========================================
+   3. BASE STYLES
+   ========================================= */
 body {
-  background-color: var(--theme-background);
-  color: var(--theme-text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
-  font-size: 16px;
+    background: var(--gradient-body);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* ========================================
-   ?? EMOJI RENDERING - CRITICAL FIX
-   ======================================== */
-
-/* Force proper emoji rendering for ALL emoji elements */
-.emoji,
-span.emoji,
-.user-greeting .emoji,
-.dropdown-icon.emoji {
-  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'Twemoji Mozilla', 'EmojiOne Color', sans-serif !important;
-  font-style: normal !important;
-  font-weight: normal !important;
-  font-variant: normal !important;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 1;
+/* --- Typography --- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+    line-height: 1.25;
 }
 
-/* Emoji Rendering Fix for all elements */
-.user-greeting,
-.dropdown-icon,
-.nav-link,
-.btn,
-.dropdown-item {
-  font-family: 'Poppins', 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif !important;
+h1 {
+    font-size: 2.5rem;
 }
 
-/* ========================================
-   ?? ANIMATIONS - Göz Dolduran Efektler
-   ======================================== */
-
-/* Sayfa Geçiþ Animasyonu - Fade In */
-.page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn 400ms cubic-bezier(0.4, 0, 0.2, 1);
+h2 {
+    font-size: 2rem;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+h3 {
+    font-size: 1.5rem;
 }
 
-/* Interactive Card - Hover Kalkma Animasyonu */
-.interactive-card,
-.hover-lift {
-  transition: all var(--transition-normal);
-  cursor: pointer;
+h4 {
+    font-size: 1.25rem;
 }
 
-.interactive-card:hover,
-.hover-lift:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-xl);
+h5 {
+    font-size: 1.125rem;
 }
 
-/* Slidedown animasyonu */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
- opacity: 1;
-    transform: translateY(0);
-  }
+h6 {
+    font-size: 1rem;
 }
 
-/* Float animasyonu */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(20px);
-  }
+p {
+    color: var(--text-secondary);
 }
 
-/* Pulse animasyonu */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
+a {
+    color: var(--aurora-primary);
+    text-decoration: none;
 }
 
-/* Spinner animasyonu */
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+a:hover {
+    color: var(--aurora-primary-hover);
 }
 
-.spinner-border {
-  animation: spin 1s linear infinite;
+.gradient-text {
+    background: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-/* ========================================
-   ?? NAVBAR - Modern ve Temiz
-======================================== */
-
-.navbar-section {
-  background-color: var(--theme-background);
-  border-bottom: 1px solid var(--theme-border);
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 1030;
-  padding: 0.5rem 0;
+/* Lead text */
+.lead {
+    color: var(--text-secondary);
 }
 
-.navbar-section .navbar {
-  background-color: var(--theme-background) !important;
-  padding: 0.75rem 0;
+/* Small text */
+small,
+.small {
+    color: var(--text-muted);
 }
 
-.navbar .navbar-brand {
-  color: var(--theme-text-primary) !important;
-  font-weight: 700;
-  font-size: 1.5rem;
-  transition: all var(--transition-normal);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+/* Strong/Bold */
+strong,
+b,
+.fw-bold,
+.fw-semibold {
+    color: inherit;
 }
 
-.navbar .navbar-brand:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
+/* =========================================
+   4. GLASS CARDS
+   ========================================= */
+.card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--glass-shadow);
 }
 
-.navbar .navbar-brand img {
-  transition: all var(--transition-normal);
-  filter: drop-shadow(0 2px 4px rgba(0, 206, 209, 0.1));
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-aurora);
+    border-color: var(--aurora-primary-light) !important;
 }
 
-.navbar .navbar-brand:hover img {
-  filter: drop-shadow(0 4px 8px rgba(0, 206, 209, 0.2));
+.card-body,
+.card-header,
+.card-footer {
+    background: transparent !important;
+    border-color: var(--border-secondary) !important;
 }
 
-.navbar .nav-link {
-  color: var(--theme-text-primary) !important;
-  font-weight: 500;
-  font-size: 0.95rem;
-  transition: all var(--transition-normal);
-  position: relative;
-  padding: 0.625rem 1.25rem !important;
-  margin: 0 0.25rem;
-  border-radius: 0.5rem;
+.card-title {
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
-.navbar .nav-link:hover,
-.navbar .nav-link:focus {
-  color: var(--theme-primary) !important;
-  background-color: rgba(0, 206, 209, 0.08);
-  transform: translateY(-2px);
+.card-text {
+    color: var(--text-secondary);
 }
 
-/* User Greeting Style */
-.user-greeting {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-}
-
-/* Dropdown Menu */
-.dropdown-menu {
-  border: 1px solid var(--theme-border) !important;
-  box-shadow: var(--shadow-lg) !important;
-  border-radius: 0.75rem;
-  animation: slideDown 200ms ease;
-  padding: 0.5rem;
-  min-width: 220px;
-}
-
-/* Mega Dropdown - Kariyer Planlamasý */
-.mega-dropdown {
-min-width: 320px !important;
-  padding: 1rem;
-}
-
-.dropdown-section-header {
-  font-size: 0.75rem;
-font-weight: 700;
-  color: var(--theme-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0.5rem 1rem;
-  margin-top: 0.25rem;
-}
-
-.dropdown-section-header:first-child {
-  margin-top: 0;
-}
-
-.dropdown-item {
-  color: var(--theme-text-primary);
-  transition: all var(--transition-fast);
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  margin: 0.25rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.95rem;
-}
-
-/* ========================================
-   ?? BUTTONS - Animasyonlu ve Etkileyici
-   ======================================== */
-
+/* =========================================
+   5. BUTTONS
+   ========================================= */
 .btn {
-  font-weight: 600;
-  border-radius: 0.625rem;
-  padding: 0.75rem 1.5rem;
-  transition: all var(--transition-normal);
-  border: none;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  text-transform: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    border-radius: var(--radius-full);
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
 }
 
-/* Buton Týklama Animasyonu */
+.btn:hover {
+    transform: translateY(-2px);
+}
+
 .btn:active {
-  transform: scale(0.98);
+    transform: scale(0.97);
 }
 
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn:active::before {
-  width: 300px;
-  height: 300px;
-}
-
-/* Primary Button - TURKUAZ */
+/* Primary Button */
 .btn-primary {
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
-  border: none !important;
-  color: #fff !important;
-  box-shadow: var(--shadow-md);
+    background: var(--gradient-aurora) !important;
+    border: none !important;
+    color: var(--text-inverse) !important;
+    box-shadow: var(--shadow-aurora);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--theme-primary-dark) 0%, var(--theme-primary) 100%);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-aurora-hover);
+    filter: brightness(1.08);
+    color: var(--text-inverse) !important;
 }
 
-.btn-primary:disabled {
-  background: #bdc3c7 !important;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Outline Primary Button */
+/* Outline Primary */
 .btn-outline-primary {
-  color: var(--theme-primary) !important;
-  border: 2px solid var(--theme-primary) !important;
-  background-color: transparent !important;
+    background: transparent !important;
+    border: 2px solid var(--aurora-primary) !important;
+    color: var(--aurora-primary) !important;
 }
 
 .btn-outline-primary:hover {
-background: var(--theme-primary) !important;
-  color: #fff !important;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+    background: var(--aurora-primary) !important;
+    color: var(--text-inverse) !important;
+    box-shadow: var(--shadow-aurora);
 }
 
 /* Secondary Button */
 .btn-secondary {
-  background-color: #6c757d !important;
-  color: #fff !important;
+    background: var(--bg-tertiary) !important;
+    border: none !important;
+    color: var(--text-secondary) !important;
 }
 
 .btn-secondary:hover {
-  background-color: #5a6268 !important;
-  transform: translateY(-2px);
+    background: var(--bg-card-hover) !important;
+    color: var(--text-primary) !important;
 }
 
-/* Outline Secondary */
 .btn-outline-secondary {
-  color: #6c757d !important;
-  border: 2px solid #6c757d !important;
-  background-color: transparent !important;
+    background: transparent !important;
+    border: 2px solid var(--border-primary) !important;
+    color: var(--text-secondary) !important;
 }
 
 .btn-outline-secondary:hover {
-  background-color: #6c757d !important;
-  color: #fff !important;
-  transform: translateY(-2px);
+    background: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Success Button */
+.btn-success {
+    background: var(--color-success) !important;
+    border: none !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-success:hover {
+    background: var(--color-success-hover) !important;
+}
+
+/* Danger Button */
+.btn-danger {
+    background: var(--color-danger) !important;
+    border: none !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-danger:hover {
+    background: var(--color-danger-hover) !important;
+}
+
+/* Warning Button */
+.btn-warning {
+    background: var(--color-warning) !important;
+    border: none !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-warning:hover {
+    background: var(--color-warning-hover) !important;
 }
 
 /* Button Sizes */
-.btn-lg {
-  padding: 1rem 2.5rem;
-  font-size: 1.125rem;
-  border-radius: 0.75rem;
-}
-
 .btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
 }
 
-.btn.w-100 {
-  min-height: 48px;
+.btn-lg {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
 }
 
-/* ========================================
-   ?? FORMS - Modern ve Kullanýcý Dostu
-   ======================================== */
-
-.form-control,
-.form-select {
-  border: 2px solid var(--theme-border);
-  border-radius: 0.625rem;
-  color: var(--theme-text-primary);
-  background-color: var(--theme-background);
-  transition: all var(--transition-normal);
-  font-size: 1rem;
-  padding: 0.75rem 1.25rem;
-  font-family: inherit;
+/* =========================================
+   6. FORMS
+   ========================================= */
+.form-control {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border-primary) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary) !important;
 }
 
 .form-control::placeholder {
-  color: var(--theme-text-secondary);
-  opacity: 0.7;
+    color: var(--text-muted);
 }
 
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--theme-primary) !important;
-  box-shadow: 0 0 0 0.25rem rgba(0, 206, 209, 0.15) !important;
-  outline: none;
-  background-color: #fff;
+.form-control:focus {
+    background: var(--bg-card-hover) !important;
+    border-color: var(--aurora-primary) !important;
+    box-shadow: 0 0 0 4px rgba(0, 66, 37, 0.15) !important;
+    outline: none;
+}
+
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-card) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
 }
 
 .form-label {
-  font-weight: 600;
-  color: var(--theme-text-primary);
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-floating>label {
+    color: var(--text-muted) !important;
 }
 
 .form-text {
-  color: var(--theme-text-secondary);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+    color: var(--text-muted);
 }
 
-/* Input Group - Arama Çubuðu */
-.input-group {
-  transition: all var(--transition-normal);
+.input-group-text {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border-primary) !important;
+    color: var(--aurora-primary);
 }
 
-.input-group .input-group-text {
-  border: 2px solid var(--theme-border);
-  border-right: none;
-  background-color: var(--theme-background);
-  color: var(--theme-text-secondary);
-  font-size: 1.25rem;
-  padding: 0.75rem 1rem;
+/* =========================================
+   7. NAVBAR
+   ========================================= */
+.navbar {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--border-secondary);
+    padding: 0.75rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1050;
 }
 
-.input-group .form-control {
-  border-left: none;
+.nav-link {
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--radius-md);
 }
 
-.input-group:focus-within .input-group-text,
-.input-group:focus-within .form-control {
-  border-color: var(--theme-primary);
+.nav-link:hover {
+    color: var(--aurora-primary) !important;
+    background: var(--gradient-aurora-soft);
 }
 
-/* ========================================
-   ?? CARDS - Interactive ve Modern
- ======================================== */
-
-.card {
-  border: none;
-  border-radius: 1rem;
-  background-color: var(--theme-background);
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-normal);
-  overflow: hidden;
+.dropdown-menu {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: 0.5rem;
 }
 
-.card:hover {
-  box-shadow: var(--shadow-lg);
+.dropdown-item {
+    color: var(--text-secondary);
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-md);
 }
 
-.card-body {
-  padding: 1.75rem;
+.dropdown-item:hover {
+    background: var(--gradient-aurora-soft);
+    color: var(--aurora-primary);
 }
 
-.card-header {
-  background-color: var(--theme-background-light);
-  border-bottom: 1px solid var(--theme-border);
-  padding: 1.25rem 1.75rem;
-  font-weight: 600;
+.dropdown-divider {
+    border-color: var(--border-secondary);
 }
 
-.card-footer {
-  background-color: var(--theme-background-light);
-  border-top: 1px solid var(--theme-border);
-  padding: 1.25rem 1.75rem;
-}
-
-.card-title {
-  font-weight: 700;
-  color: var(--theme-text-primary);
-  margin-bottom: 0.75rem;
-  font-size: 1.25rem;
-}
-
-/* Job Card - Turkuaz Sol Kenar */
-.job-card {
-  border-left: 5px solid var(--theme-primary);
-  position: relative;
-}
-
-.job-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--theme-primary), var(--theme-primary-light));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--transition-normal);
-}
-
-.job-card:hover::before {
-  transform: scaleX(1);
-}
-
-/* ========================================
-   ?? ALERTS - Bilgilendirici
-   ======================================== */
-
+/* =========================================
+   8. ALERTS & BADGES
+   ========================================= */
 .alert {
-  border: 1px solid;
-  border-radius: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
-  animation: slideDown 300ms ease;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+    border-radius: var(--radius-lg);
+    border: none;
+    box-shadow: var(--shadow-sm);
+    color: var(--text-primary);
 }
 
 .alert-success {
-  background-color: #e0f7fa;
-  border-color: #b2ebf2;
-  color: #00838f;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
 }
 
 .alert-danger {
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-  color: #721c24;
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
 }
 
 .alert-warning {
-  background-color: #fff3cd;
-  border-color: #ffeeba;
-  color: #856404;
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-warning);
 }
 
 .alert-info {
-  background-color: #d1ecf1;
-  border-color: #bee5eb;
-  color: #0c5460;
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--color-info);
 }
-
-/* ========================================
-   ?? BADGES - Durumlar
-   ======================================== */
 
 .badge {
-  padding: 0.4em 0.75em;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 0.85rem;
+    padding: 0.5em 1em;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.8125rem;
 }
 
-.bg-primary {
-  background-color: var(--theme-primary) !important;
-  color: white;
+.badge.bg-primary {
+    background: var(--gradient-aurora) !important;
 }
 
-.bg-success {
-  background-color: var(--theme-primary) !important;
-  color: white;
+.badge.bg-success {
+    background: var(--color-success) !important;
 }
 
-.bg-warning {
-  background-color: var(--theme-warning) !important;
-  color: white;
+.badge.bg-danger {
+    background: var(--color-danger) !important;
 }
 
-.bg-danger {
-  background-color: var(--theme-danger) !important;
-color: white;
+.badge.bg-warning {
+    background: var(--color-warning) !important;
+    color: var(--text-primary) !important;
 }
 
-/* ========================================
-   ?? HERO SECTION - Etkileyici Giriþ
-   ======================================== */
-
-.hero-section {
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%);
-  color: white;
-  padding: 5rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-section::before {
-content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 600px;
-  height: 600px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  animation: float 6s ease-in-out infinite;
-}
-
-.hero-section::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -5%;
-  width: 500px;
-  height: 500px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  animation: float 8s ease-in-out infinite reverse;
-}
-
-.hero-section > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* ========================================
-   ?? FOOTER
-   ======================================== */
-
+/* =========================================
+   9. FOOTER
+   ========================================= */
 .footer {
-  border-top: 1px solid var(--theme-border);
-  background-color: var(--theme-background-light);
-  padding: 3rem 0 1.5rem;
-  margin-top: auto;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--border-secondary);
+    margin-top: auto;
 }
 
 .footer a {
-  color: var(--theme-primary);
-  text-decoration: none;
-  transition: all var(--transition-fast);
+    color: var(--text-muted);
 }
 
 .footer a:hover {
-  color: var(--theme-primary-dark);
-  text-decoration: underline;
+    color: var(--aurora-primary);
 }
 
-/* ========================================
-   ?? RESPONSIVE
- ======================================== */
+/* =========================================
+   11. LOADING & ANIMATIONS
+   ========================================= */
+.spinner-border {
+    color: var(--aurora-primary);
+}
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 500ms var(--ease-out-expo) forwards;
+}
+
+/* =========================================
+   12. TEXT COLOR UTILITIES
+   ========================================= */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-primary {
+    color: var(--aurora-primary) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.text-dark {
+    color: var(--text-primary) !important;
+}
+
+.text-light {
+    color: var(--text-muted) !important;
+}
+
+.text-body {
+    color: var(--text-primary) !important;
+}
+
+.text-black {
+    color: var(--text-primary) !important;
+}
+
+.text-black-50 {
+    color: var(--text-secondary) !important;
+}
+
+/* =========================================
+   13. BACKGROUND UTILITIES
+   ========================================= */
+.bg-light {
+    background: var(--bg-secondary) !important;
+}
+
+.bg-light-subtle {
+    background: var(--bg-secondary) !important;
+}
+
+.bg-primary-subtle {
+    background: var(--gradient-aurora-soft) !important;
+}
+
+.bg-aurora {
+    background: var(--gradient-aurora);
+}
+
+.bg-aurora-soft {
+    background: var(--gradient-aurora-soft);
+}
+
+/* =========================================
+   14. TABLE STYLES
+   ========================================= */
+.table {
+    color: var(--text-primary);
+}
+
+.table th {
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+.table td {
+    color: var(--text-secondary);
+    border-color: var(--border-secondary);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--gradient-aurora-soft);
+}
+
+.table-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* =========================================
+   15. LIST GROUP
+   ========================================= */
+.list-group-item {
+    background-color: var(--bg-card);
+    border-color: var(--border-secondary);
+    color: var(--text-primary);
+}
+
+.list-group-item:hover {
+    background-color: var(--gradient-aurora-soft);
+}
+
+/* =========================================
+   16. CUSTOM PAGE COMPONENTS
+   ========================================= */
+
+/* Welcome Card, Stat Card, Feature Card, Glass Card */
+.welcome-card,
+.stat-card,
+.feature-card,
+.glass-card,
+.job-card,
+.hero-card {
+    color: var(--text-primary);
+}
+
+/* Titles */
+.welcome-title,
+.stat-title,
+.feature-title,
+.hero-title,
+.section-title,
+.cta-title,
+.job-title,
+.card-title {
+    color: var(--text-primary);
+}
+
+/* Descriptions */
+.welcome-subtitle,
+.stat-desc,
+.feature-desc,
+.hero-subtitle,
+.section-subtitle,
+.cta-subtitle,
+.job-description,
+.card-text {
+    color: var(--text-secondary);
+}
+
+/* Links */
+.stat-link,
+.feature-link {
+    color: var(--aurora-primary);
+}
+
+/* =========================================
+   17. MODAL
+   ========================================= */
+.modal-content {
+    background: var(--glass-bg);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--border-secondary);
+}
+
+.modal-title {
+    color: var(--text-primary);
+}
+
+/* =========================================
+   18. BREADCRUMB & PAGINATION
+   ========================================= */
+.breadcrumb-item {
+    color: var(--text-muted);
+}
+
+.breadcrumb-item.active {
+    color: var(--text-primary);
+}
+
+.breadcrumb-item a {
+    color: var(--aurora-primary);
+}
+
+.page-link {
+    background: var(--bg-card);
+    border-color: var(--border-primary);
+    color: var(--text-secondary);
+}
+
+.page-link:hover {
+    background: var(--gradient-aurora-soft);
+    color: var(--aurora-primary);
+}
+
+.page-item.active .page-link {
+    background: var(--aurora-primary);
+    border-color: var(--aurora-primary);
+    color: white;
+}
+
+/* =========================================
+   19. SEARCH INPUTS
+   ========================================= */
+.search-input {
+    color: var(--text-primary);
+    background: transparent;
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-box {
+    background: var(--glass-bg);
+}
+
+/* =========================================
+   20. RESPONSIVE
+   ========================================= */
 @media (max-width: 768px) {
-  .hero-section {
-    padding: 3rem 0;
-  }
-  
-  .btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-  }
+    h1 {
+        font-size: 2rem;
+    }
 
-  .card-body {
-    padding: 1.25rem;
-  }
+    h2 {
+        font-size: 1.75rem;
+    }
 
-  .sticky-top {
-    position: relative !important;
-    top: auto !important;
-    margin-top: 1.5rem;
-  }
+    h3 {
+        font-size: 1.375rem;
+    }
 
-  .navbar .nav-link {
-    padding: 0.75rem 1rem !important;
-  }
+    .btn {
+        padding: 0.5rem 1.25rem;
+    }
 
-  .dropdown-menu {
-    min-width: 100%;
-  }
+    .card {
+        border-radius: var(--radius-lg) !important;
+    }
+
+    .card:hover {
+        transform: none;
+    }
 }
 
-/* ========================================
-   ??? UTILITY CLASSES
-   ======================================== */
+@media (prefers-reduced-motion: reduce) {
 
-.main-content {
-  flex: 1;
-  background-color: var(--theme-background);
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
 }
 
-.container {
-  max-width: 1200px;
+/* =========================================
+   21. PREMIUM AURORA FLOATING THEME
+   ========================================= */
+.aurora-bg-premium {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(-35deg, #0f172a, #003018, #1b4332, #2d6a4f);
+    background-size: 250% 250%;
+    animation: gradientBG 24s ease-in-out infinite;
+    will-change: background-position;
+    transform: translateZ(0);
+    z-index: -1;
 }
 
-.text-primary { color: var(--theme-primary) !important; }
-.text-muted { color: var(--theme-text-secondary) !important; }
-.shadow-sm { box-shadow: var(--shadow-sm) !important; }
-.shadow { box-shadow: var(--shadow-md) !important; }
-.shadow-lg { box-shadow: var(--shadow-lg) !important; }
-.border-0 { border: none !important; }
-.sticky-top { position: sticky !important; top: 90px !important; }
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.aurora-shapes-container {
+    display: none;
+}
+
+.auth-card-premium {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* =========================================
+   22. COMPANY & JOB STYLES
+   ========================================= */
+/* Company Name */
+.company-name {
+    color: var(--aurora-primary);
+}
+
+/* Post Date, Job Location */
+.post-date,
+.job-location {
+    color: var(--text-muted);
+}

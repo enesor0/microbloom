@@ -19,6 +19,10 @@ namespace microbloom.DTOs
         public string ConfirmPassword { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Kullanıcı adı 3-50 karakter arasında olmalıdır.")]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required]
         public string FirstName { get; set; } = string.Empty;
         public string? LastName { get; set; }
 

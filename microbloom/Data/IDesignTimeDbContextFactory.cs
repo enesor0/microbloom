@@ -19,7 +19,7 @@ namespace microbloom.Data
             
 
             var optionsBuilder = new DbContextOptionsBuilder<KariyerDBContext>();
-            optionsBuilder.UseSqlite(connectionString);
+            optionsBuilder.UseSqlServer(connectionString);
 
             return new KariyerDBContext(optionsBuilder.Options);
         }

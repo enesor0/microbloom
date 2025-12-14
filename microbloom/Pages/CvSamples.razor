@@ -4,171 +4,211 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-<PageTitle>&#x1F4C4; CV Örnekleri - microbloom</PageTitle>
+<PageTitle>ğŸ“„ CV Ã–rnekleri - microbloom</PageTitle>
 
 <style>
     .cv-hero {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-   padding: 3rem 2rem;
-   border-radius: 20px;
+        background: var(--gradient-aurora);
+        padding: 4rem 2rem;
+        border-radius: var(--radius-2xl);
         margin-bottom: 3rem;
-   color: white;
-  text-align: center;
-   box-shadow: 0 10px 40px rgba(240, 147, 251, 0.3);
+        color: white;
+        text-align: center;
+        box-shadow: var(--shadow-aurora);
+        position: relative;
+        overflow: hidden;
     }
+
+    .cv-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .cv-hero h1 { color: white !important; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+    .cv-hero p { color: white !important; font-size: 1.1rem; opacity: 0.95; }
 
     .cv-grid {
- display: grid;
-     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-   gap: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
     }
 
- .cv-card {
-  background: white;
-   border-radius: 15px;
-       overflow: hidden;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-transition: all 0.3s ease;
-        border: 2px solid transparent;
- height: 100%;
-   display: flex;
-   flex-direction: column;
+    .cv-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+        border: 1px solid var(--glass-border);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .cv-card:hover {
-    transform: translateY(-8px);
-      box-shadow: 0 15px 40px rgba(240, 147, 251, 0.25);
-        border-color: #f093fb;
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-aurora);
+        border-color: var(--aurora-primary-light);
     }
 
     .cv-icon-container {
- background: linear-gradient(135deg, #f093fb, #f5576c);
-     padding: 2rem;
- text-align: center;
+        background: var(--gradient-aurora-soft);
+        padding: 2rem;
+        text-align: center;
     }
 
- .cv-icon {
+    .cv-icon {
         font-size: 4rem;
-    margin-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--aurora-primary);
+    }
+
+    .cv-thumbnail {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: var(--radius-lg);
+        transition: transform 0.3s ease;
+    }
+
+    .cv-card:hover .cv-thumbnail {
+        transform: scale(1.05);
+    }
+
+    .cv-icon {
+        font-size: 4rem;
+        margin-bottom: 0.5rem;
     }
 
     .cv-content {
-     padding: 1.5rem;
-  flex: 1;
+        padding: 1.5rem;
+        flex: 1;
         display: flex;
- flex-direction: column;
+        flex-direction: column;
     }
 
     .cv-title {
         font-size: 1.25rem;
-   font-weight: 700;
- color: #2d3748;
-margin-bottom: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
         line-height: 1.4;
-  }
+    }
 
     .cv-description {
-  color: #718096;
-   font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
         line-height: 1.6;
- margin-bottom: 1.5rem;
- flex: 1;
+        margin-bottom: 1.5rem;
+        flex: 1;
     }
 
     .download-btn {
-     background: linear-gradient(135deg, #f093fb, #f5576c);
-    color: white;
-   border: none;
- padding: 0.75rem 1.5rem;
-        border-radius: 25px;
-    font-weight: 600;
-     cursor: pointer;
-    transition: all 0.3s ease;
+        background: var(--gradient-aurora);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-full);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
 
     .download-btn:hover {
- transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-aurora);
+        filter: brightness(1.1);
     }
 </style>
 
 <div class="container my-5">
     <div class="cv-hero">
-   <h1>&#x1F4C4; CV Örnekleri</h1>
-   <p>Profesyonel CV şablonlarını indirin ve özelleştirin</p>
+        <h1>ğŸ“„ CV Ã–rnekleri</h1>
+        <p>Profesyonel CV ÅŸablonlarÄ±nÄ± indirin ve Ã¶zelleÅŸtirin</p>
     </div>
 
     @if (isLoading)
     {
-   <div class="text-center py-5">
-     <div class="spinner-border" style="color: #f093fb;" role="status"></div>
-            <p class="mt-3 text-muted">CV örnekleri yükleniyor...</p>
+        <div class="text-center py-5">
+            <div class="spinner-border" style="color: #004225;" role="status"></div>
+            <p class="mt-3 text-muted">CV Ã¶rnekleri yÃ¼kleniyor...</p>
         </div>
     }
     else if (cvSamples != null && cvSamples.Any())
     {
-     <div class="cv-grid">
-       @foreach (var cv in cvSamples)
-     {
-<div class="cv-card">
-      <div class="cv-icon-container">
-         <div class="cv-icon">&#x1F4C4;</div>
- </div>
-<div class="cv-content">
-   <h3 class="cv-title">@cv.Title</h3>
-      <p class="cv-description">@cv.Description</p>
-     <button class="download-btn w-100" @onclick="() => DownloadCV(cv)">
-         &#x2B07; CV'yi İndir
-  </button>
-        </div>
- </div>
-       }
+        <div class="cv-grid">
+            @foreach (var cv in cvSamples)
+            {
+                <div class="cv-card">
+                    <div class="cv-icon-container">
+                        @if (!string.IsNullOrEmpty(cv.ThumbnailImageUrl))
+                        {
+                            <img src="@cv.ThumbnailImageUrl" alt="@cv.Title" class="cv-thumbnail" />
+                        }
+                        else
+                        {
+                            <div class="cv-icon">ğŸ“„</div>
+                        }
+                    </div>
+                    <div class="cv-content">
+                        <h3 class="cv-title">@cv.Title</h3>
+                        <p class="cv-description">@cv.Description</p>
+                        <button class="download-btn w-100" @onclick="() => DownloadCV(cv)">
+                            â¬‡ï¸ CV'yi Ä°ndir
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
 
-        <div class="alert alert-info mt-4" style="border-left: 4px solid #f093fb;">
-   <h5>&#x1F4A1; İpucu</h5>
+        <div class="alert alert-info mt-4" style="border-left: 4px solid #004225;">
+            <h5>ğŸ’¡ Ä°pucu</h5>
             <p style="margin: 0;">
-     CV'leri Microsoft Word veya Google Docs ile açıp kendi bilgilerinizle özelleştirebilirsiniz. 
-     Her pozisyon için CV'nizi güncelleyip başvurunuzu güçlendirin!
-     </p>
+                CV'leri Microsoft Word veya Google Docs ile aÃ§Ä±p kendi bilgilerinizle Ã¶zelleÅŸtirebilirsiniz. 
+                Her pozisyon iÃ§in CV'nizi gÃ¼ncelleyip baÅŸvurunuzu gÃ¼Ã§lendirin!
+            </p>
         </div>
     }
     else
     {
         <div class="text-center py-5">
-      <div style="font-size: 4rem; margin-bottom: 1rem;">&#x1F4ED;</div>
-            <h3>Henüz CV Örneği Yok</h3>
-   <p class="text-muted">Yakında profesyonel CV örnekleri eklenecek!</p>
+            <div style="font-size: 4rem; margin-bottom: 1rem;">ğŸ“­</div>
+            <h3>HenÃ¼z CV Ã–rneÄŸi Yok</h3>
+            <p class="text-muted">YakÄ±nda profesyonel CV Ã¶rnekleri eklenecek!</p>
         </div>
     }
 </div>
 
 @code {
-  private List<CvSampleDto>? cvSamples;
+    private List<CvSampleDto>? cvSamples;
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         try
- {
-     cvSamples = await Http.GetFromJsonAsync<List<CvSampleDto>>("api/cvsample");
+        {
+            cvSamples = await Http.GetFromJsonAsync<List<CvSampleDto>>("api/cvsample");
         }
         catch (Exception ex)
         {
-    Console.WriteLine($"Hata: {ex.Message}");
-       cvSamples = new List<CvSampleDto>();
-    }
-finally
-     {
-   isLoading = false;
-    }
+            Console.WriteLine($"Hata: {ex.Message}");
+            cvSamples = new List<CvSampleDto>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private void DownloadCV(CvSampleDto cv)
     {
-   // Not: Gerçek uygulamada dosya indirme işlemi yapılacak
-        // Şimdilik kullanıcıya bilgi mesajı gösterelim
-        Console.WriteLine($"CV İndiriliyor: {cv.Title}");
- // TODO: Gerçek dosya indirme implementasyonu
+        // Not: GerÃ§ek uygulamada dosya indirme iÅŸlemi yapÄ±lacak
+        // Åimdilik kullanÄ±cÄ±ya bilgi mesajÄ± gÃ¶sterelim
+        Console.WriteLine($"CV Ä°ndiriliyor: {cv.Title}");
+        // TODO: GerÃ§ek dosya indirme implementasyonu
     }
 }

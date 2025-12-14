@@ -1,83 +1,309 @@
 ﻿@page "/account/login"
+@layout microbloom.Shared.AuthLayout
 @namespace microbloom.Pages
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+@using System.Text.Json
 
 <PageTitle>🔑 Giriş Yap - microbloom</PageTitle>
 
-<div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-      <div class="card shadow-lg border-0">
-        <div class="card-body p-5">
-           <div class="text-center mb-4">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">🔑</div>
-          <h2 class="mb-2" style="font-weight: 800; color: var(--theme-primary);">Giriş Yap</h2>
-           <p class="text-muted">Hesabına giriş yaparak iş fırsatlarını keşfet</p>
+<!-- Premium Aurora Background -->
+<div class="auth-page">
+    <div class="aurora-bg-premium"></div>
+    <div class="aurora-shapes-container">
+        <div class="aurora-shape-premium aurora-shape-1-p"></div>
+        <div class="aurora-shape-premium aurora-shape-2-p"></div>
+        <div class="aurora-shape-premium aurora-shape-3-p"></div>
+    </div>
+    
+    <div class="container position-relative" style="z-index: 10;">
+        <div class="row justify-content-center align-items-center min-vh-100 py-5">
+            <div class="col-sm-10 col-md-8 col-lg-5 col-xl-4">
+                
+                <!-- Glass Card -->
+                <div class="auth-card-premium">
+                    <!-- Header -->
+                    <div class="auth-header">
+                        <div class="mb-4">
+                            <img src="/images/logo.svg" alt="microbloom" class="auth-logo" style="width: 240px; height: 240px; object-fit: contain; aspect-ratio: 1/1;" />
+                        </div>
+                        <h1 class="auth-title">Hoş Geldin</h1>
+                        <p class="auth-subtitle">Hesabına giriş yap ve kariyer yolculuğuna devam et</p>
                     </div>
-
-      @if (!string.IsNullOrEmpty(errorMessage))
-      {
-        <div class="alert alert-danger" role="alert">
-          @errorMessage
-        </div>
-      }
-
-       <form action="/account/login" method="post">
-        <input type="hidden" name="ReturnUrl" value="@returnUrl" />
-                <div class="mb-4">
-         <label for="email" class="form-label fw-bold">📧 E-posta Adresi</label>
-  <input id="email" name="Email" class="form-control" placeholder="ornek@example.com" autocomplete="username" required />
-             </div>
-
-    <div class="mb-4">
-          <label for="password" class="form-label fw-bold">🔒 Şifre</label>
-       <input id="password" name="Password" type="password" class="form-control" placeholder="Şifrenizi girin" autocomplete="current-password" required />
-   </div>
-
-           <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">
-   <span>🔑 Giriş Yap</span>
-     </button>
-
-        <div class="text-center mt-4 pt-3" style="border-top: 1px solid var(--theme-border);">
-      <p class="text-muted mb-0">
-            Hesabın yok mu?
-            <a href="/account/register" class="text-decoration-none fw-bold" style="color: var(--theme-primary);">
-             🚀 Hemen Kayıt Ol
-              </a>
-     </p>
-           </div>
-   </form>
-         </div>
+                    
+                    <!-- Success Message -->
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="alert alert-success d-flex align-items-center gap-2" role="alert">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                            </svg>
+                            <span>@successMessage</span>
+                        </div>
+                    }
+                    
+                    <!-- Error Message -->
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                            </svg>
+                            <span>@errorMessage</span>
+                        </div>
+                    }
+                    
+                    <!-- Login Form -->
+                    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" class="auth-form">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="form-floating mb-3">
+                            <InputText class="form-control" id="email" @bind-Value="loginModel.Email" 
+                                   placeholder="ornek@example.com" autocomplete="username" />
+                            <label for="email">E-posta Adresi</label>
+                            <ValidationMessage For="@(() => loginModel.Email)" class="text-danger small mt-1" />
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            <InputText type="password" class="form-control" id="password" @bind-Value="loginModel.Password" 
+                                   placeholder="Şifreniz" autocomplete="current-password" />
+                            <label for="password">Şifre</label>
+                            <ValidationMessage For="@(() => loginModel.Password)" class="text-danger small mt-1" />
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 btn-lg auth-submit" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                <span>Giriş Yapılıyor...</span>
+                            }
+                            else
+                            {
+                                <span>Giriş Yap</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                </svg>
+                            }
+                        </button>
+                    </EditForm>
+                    
+                    <!-- Footer -->
+                    <div class="auth-footer">
+                        <a href="/account/forgot-password" class="auth-link mb-3" style="display: block; color: #004225;">
+                            🔐 Şifremi Unuttum
+                        </a>
+                        <p>Hesabın yok mu?</p>
+                        <a href="/account/register" class="auth-link">
+                            <span>Hemen Kayıt Ol</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Back to Home -->
+                <div class="text-center mt-4">
+                    <a href="/" class="back-home">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                        <span>Ana Sayfaya Dön</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    /* Auth Page specific overrides to keep layout clean, global styles handled in app.css */
+    .auth-page {
+        position: relative;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    
+    /* Header */
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #004225, #2d6a4f);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem;
+        color: white;
+        box-shadow: 0 10px 25px -5px rgba(0, 66, 37, 0.4);
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+        margin: 0;
+    }
+    
+    /* Submit Button */
+    .auth-submit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    /* Footer */
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-secondary);
+    }
+    
+    .auth-footer p {
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        font-size: 0.9375rem;
+    }
+    
+    .auth-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        color: var(--aurora-primary);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 150ms ease;
+        text-decoration: none;
+    }
+    
+    .auth-link:hover {
+        color: var(--aurora-secondary);
+        gap: 0.625rem;
+    }
+    
+    /* Back Home Link */
+    .back-home {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 150ms ease;
+        text-decoration: none;
+    }
+    
+    .back-home:hover {
+        color: white;
+        gap: 0.75rem;
+    }
+    
+    /* Form Floating Overrides if needed, but app.css handles them well now */
+    .form-floating > .form-control {
+        height: 3.5rem;
+    }
+</style>
+
 @code {
-  private string returnUrl = "/";
-  private string? errorMessage;
+    private LoginDto loginModel = new();
+    private string returnUrl = "/";
+    private string? errorMessage;
+    private string? successMessage;
+    private bool isLoading = false;
+    private IJSObjectReference? module;
 
-  protected override void OnInitialized()
-  {
-    var uri = new Uri(NavigationManager.Uri);
-    var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
-
-    if (query.TryGetValue("ReturnUrl", out var returnParam) || query.TryGetValue("returnUrl", out returnParam))
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-      var decoded = Uri.UnescapeDataString(returnParam.ToString());
-      if (!string.IsNullOrWhiteSpace(decoded))
-      {
-        returnUrl = decoded.StartsWith('/') ? decoded : $"/{decoded}";
-      }
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
+        }
     }
 
-    if (query.TryGetValue("ErrorMessage", out var errorParam))
+    protected override void OnInitialized()
     {
-      var decodedError = Uri.UnescapeDataString(errorParam.ToString());
-      if (!string.IsNullOrWhiteSpace(decodedError))
-      {
-        errorMessage = decodedError;
-      }
+        var uri = new Uri(NavigationManager.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("ReturnUrl", out var returnParam) || query.TryGetValue("returnUrl", out returnParam))
+        {
+            var decoded = Uri.UnescapeDataString(returnParam.ToString());
+            if (!string.IsNullOrWhiteSpace(decoded))
+            {
+                returnUrl = decoded.StartsWith('/') ? decoded : $"/{decoded}";
+            }
+        }
+
+        if (query.TryGetValue("ErrorMessage", out var errorParam))
+        {
+            errorMessage = Uri.UnescapeDataString(errorParam.ToString());
+        }
+        
+        if (query.TryGetValue("SuccessMessage", out var successParam))
+        {
+            successMessage = Uri.UnescapeDataString(successParam.ToString());
+        }
     }
-  }
+
+    private async Task HandleLogin()
+    {
+        if (isLoading) return;
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            if (module != null)
+            {
+                var result = await module.InvokeAsync<JsonElement>("auth.login", "/api/account/login", loginModel, returnUrl);
+                
+                if (result.TryGetProperty("success", out var successInfo) && successInfo.GetBoolean())
+                {
+                    // Success handled in JS redirect
+                }
+                else
+                {
+                     if (result.TryGetProperty("message", out var msgInfo))
+                     {
+                         errorMessage = msgInfo.GetString();
+                     }
+                     else
+                     {
+                         errorMessage = "Giriş başarısız.";
+                     }
+                     isLoading = false;
+                     StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Bir hata oluştu: " + ex.Message;
+            isLoading = false;
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
 }

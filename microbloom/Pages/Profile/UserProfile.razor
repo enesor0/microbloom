@@ -1,0 +1,169 @@
+@page "/profile/{UserId}"
+@using microbloom.Entities
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authorization
+
+@inject UserManager<AppUser> UserManager
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+
+<PageTitle>@(_user?.FirstName) @(_user?.LastName) - Profil</PageTitle>
+
+<div class="container my-5">
+    @if (_isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+        </div>
+    }
+    else if (_user == null)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>Kullanıcı bulunamadı.
+        </div>
+        <button class="btn btn-outline-secondary" @onclick="GoBack">
+            <i class="bi bi-arrow-left me-2"></i>Geri Dön
+        </button>
+    }
+    else
+    {
+        <button class="btn btn-outline-secondary mb-4" @onclick="GoBack">
+            <i class="bi bi-arrow-left me-2"></i>Geri Dön
+        </button>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Profile Header -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-4 flex-wrap">
+                            <div class="profile-avatar">
+                                @if (!string.IsNullOrEmpty(_user.ProfilePictureUrl))
+                                {
+                                    <img src="@_user.ProfilePictureUrl" alt="Profil" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #004225;" />
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                        <span class="text-white fs-1">@GetInitial()</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="flex-grow-1">
+                                <h2 class="mb-1 fw-bold">@_user.FirstName @_user.LastName</h2>
+                                @if (!string.IsNullOrEmpty(_user.Title))
+                                {
+                                    <p class="text-muted mb-2"><i class="bi bi-briefcase me-1"></i> @_user.Title</p>
+                                }
+                                <p class="mb-2"><i class="bi bi-envelope me-1 text-primary"></i> @_user.Email</p>
+                                
+                                <div class="d-flex gap-3 flex-wrap mt-3">
+                                    @if (!string.IsNullOrEmpty(_user.LinkedInUrl))
+                                    {
+                                        <a href="@_user.LinkedInUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-linkedin me-1"></i>LinkedIn
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(_user.GitHubUrl))
+                                    {
+                                        <a href="@_user.GitHubUrl" target="_blank" class="btn btn-sm btn-outline-dark">
+                                            <i class="bi bi-github me-1"></i>GitHub
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(_user.WebsiteUrl))
+                                    {
+                                        <a href="@_user.WebsiteUrl" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-globe me-1"></i>Website
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio Section -->
+                @if (!string.IsNullOrEmpty(_user.Bio))
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Hakkında</h5>
+                            <p class="mb-0" style="white-space: pre-line;">@_user.Bio</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Skills Section -->
+                @if (!string.IsNullOrEmpty(_user.Skills))
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-lightning-fill me-2 text-warning"></i>Yetenekler</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var skill in _user.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">@skill.Trim()</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- CV Section -->
+                @if (!string.IsNullOrEmpty(_user.CvUrl))
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Özgeçmiş (CV)</h5>
+                            <a href="@_user.CvUrl" target="_blank" class="btn btn-outline-danger">
+                                <i class="bi bi-download me-2"></i>CV'yi Görüntüle / İndir
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
+    private AppUser? _user;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(UserId))
+            {
+                _user = await UserManager.FindByIdAsync(UserId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Profil yükleme hatası: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private string GetInitial()
+    {
+        if (_user?.FirstName?.Length > 0)
+            return _user.FirstName[0].ToString().ToUpper();
+        return "U";
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/view-applications");
+    }
+}

@@ -17,7 +17,18 @@ namespace microbloom.DTOs
         [StringLength(500, ErrorMessage = "Logo adresi 500 karakterden uzun olamaz.")]
         public string? LogoUrl { get; set; }
 
-        public int EmployeeCount { get; set; }
+        public string? EmployeeCount { get; set; }
         public int ActiveJobCount { get; set; }
+
+        // Yeni alanlar
+        public string? Industry { get; set; }
+        public int? FoundedYear { get; set; }
+        public string? Website { get; set; }
+        public string? ContactEmail { get; set; }
+        public string? Phone { get; set; }
+        public string? Location { get; set; }
+        public string? LinkedInUrl { get; set; }
+        public string? TwitterUrl { get; set; }
+        public string? InstagramUrl { get; set; }
     }
 }

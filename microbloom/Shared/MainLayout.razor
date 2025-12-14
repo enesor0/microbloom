@@ -1,165 +1,315 @@
-﻿@namespace microbloom.Shared
+@namespace microbloom.Shared
 @inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.JSInterop
+@using microbloom.Shared
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
 
-<head>
- <meta charset="utf-8">
-</head>
+<div class="page-layout d-flex flex-column min-vh-100">
+    <header class="glass-header sticky-top">
+        <div class="container-fluid px-4 h-100">
+            <div class="d-flex justify-content-between align-items-center h-100">
+                
+                <!-- Left Side: Logo & Nav Links -->
+                <div class="d-flex align-items-center gap-4">
+                    <a href="/" class="brand-logo text-decoration-none fw-bold fs-4 text-primary">microbloom</a>
+                    
+                    <!-- Desktop Navigation -->
+                    <nav class="d-none d-md-flex gap-3">
+                        <NavLink href="/" class="nav-link" Match="NavLinkMatch.All">Ana Sayfa</NavLink>
+                        <NavLink href="/jobs" class="nav-link">İlanlar</NavLink>
+                        <div class="nav-dropdown">
+                            <span class="nav-link dropdown-trigger">Kariyer Planlaması <i class="bi bi-chevron-down small"></i></span>
+                            <div class="nav-dropdown-menu">
+                                <a href="/guide" class="dropdown-item"><i class="bi bi-mortarboard me-2"></i>Üniversite Rehberi</a>
+                                <a href="/universities" class="dropdown-item"><i class="bi bi-bank2 me-2"></i>Üniversiteler</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="/salary-guide" class="dropdown-item"><i class="bi bi-currency-dollar me-2"></i>Maaş Rehberi</a>
+                                <a href="/career-test" class="dropdown-item"><i class="bi bi-clipboard-check me-2"></i>Kariyer Testi</a>
+                                <a href="/industry-analysis" class="dropdown-item"><i class="bi bi-graph-up me-2"></i>Sektör Analizi</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="/interview-prep" class="dropdown-item"><i class="bi bi-mic me-2"></i>Mülakat Hazırlığı</a>
+                                <a href="/mentorship" class="dropdown-item"><i class="bi bi-people me-2"></i>Mentorluk</a>
+                                <a href="/career-calendar" class="dropdown-item"><i class="bi bi-calendar-event me-2"></i>Kariyer Takvimi</a>
+                                <div class="dropdown-divider"></div>
+                                <a href="/cv-samples" class="dropdown-item"><i class="bi bi-file-earmark-person me-2"></i>CV Örnekleri</a>
+                            </div>
+                        </div>
+                        
+                        <AuthorizeView Roles="Employer">
+                            <Authorized>
+                                <NavLink href="/company-dashboard" class="nav-link text-primary fw-bold">
+                                    <i class="bi bi-building-fill me-1"></i> Şirket Paneli
+                                </NavLink>
+                            </Authorized>
+                        </AuthorizeView>
+                    </nav>
+                </div>
 
-<div class="page">
- <header class="navbar-section">
- <nav class="navbar navbar-expand-lg">
- <div class="container">
- <a class="navbar-brand" href="/">
- <img src="/images/logo.svg?v=9" alt="microbloom" style="height:45px; width: auto;">
- </a>
- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
- aria-controls="navbarNav" aria-expanded="false" aria-label="Menü">
- <span class="navbar-toggler-icon"></span>
- </button>
- <div class="collapse navbar-collapse" id="navbarNav">
- <ul class="navbar-nav ms-auto align-items-center">
- <li class="nav-item">
- <a class="nav-link" href="/">Ana Sayfa</a>
- </li>
- <li class="nav-item">
- <a class="nav-link" href="/jobs">İş İlanları</a>
- </li>
- 
- <!-- Kariyer Planlaması Dropdown -->
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" id="careerDropdown" role="button" 
-    data-bs-toggle="dropdown" aria-expanded="false">
-  Kariyer Planlaması
-         </a>
-     <ul class="dropdown-menu mega-dropdown" aria-labelledby="careerDropdown">
-      <li class="dropdown-section-header">
-       <strong>&#x1F3EB; ÜNİVERSİTEYE HAZIRLIK</strong>
-        </li>
-    <li>
-      <a class="dropdown-item" href="/guide">
- &#x1F4DA; Üniversite Rehberi
-       </a>
-    </li>
- <li>
-    <a class="dropdown-item" href="/universities">
- &#x1F3EB; Üniversiteler
-  </a>
-      </li>
-  <li><hr class="dropdown-divider"></li>
-  <li class="dropdown-section-header">
-      <strong>&#x1F4BC; İLK İŞİM VE PROFESYONEL HAYAT</strong>
-      </li>
-    <li>
-  <a class="dropdown-item" href="/career-guide">
-     &#x1F4BC; İş Hayatı Rehberi
-  </a>
-</li>
-     <li>
-          <a class="dropdown-item" href="/cv-samples">
-&#x1F4C4; CV Örnekleri
-          </a>
-    </li>
-    </ul>
-     </li>
- <AuthorizeView Context="authCtx">
- <Authorized>
- @if (authCtx.User.IsInRole("Employer"))
- {
- <li class="nav-item">
- <a class="nav-link" href="/company-dashboard">🏢 Şirket Paneli</a>
- </li>
- }
-   else if (authCtx.User.IsInRole("JobSeeker"))
-  {
-     <li class="nav-item">
-   <a class="nav-link" href="/my-applications">📄 Başvurularım</a>
-        </li>
- }
-   <li class="nav-item dropdown">
- <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
- data-bs-toggle="dropdown" aria-expanded="false">
- <span class="user-greeting">👤 @authCtx.User.Identity?.Name</span>
- </a>
- <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-  @if (authCtx.User.IsInRole("JobSeeker"))
-  {
- <li>
- <a class="dropdown-item" href="/my-applications">
-      📄 Başvurularım
- </a>
- </li>
-  }
-      @if (authCtx.User.IsInRole("Employer"))
-    {
- <li>
- <a class="dropdown-item" href="/company-dashboard">
-    🏢 Şirket Paneli
- </a>
- </li>
- <li>
- <a class="dropdown-item" href="/company/create-job">
-    🚀 Yeni İlan Oluştur
- </a>
- </li>
- }
- <li><hr class="dropdown-divider"></li>
- <li>
- <a class="dropdown-item" href="/account/logout">
- 🚪 Çıkış Yap
- </a>
- </li>
- </ul>
- </li>
- </Authorized>
- <NotAuthorized>
- <li class="nav-item">
- <a href="/account/login" class="btn btn-outline-primary btn-sm me-2">
-  🔑 Giriş
- </a>
- </li>
- <li class="nav-item">
- <a href="/account/register" class="btn btn-primary btn-sm">
-🚀 Kayıt Ol
- </a>
- </li>
- </NotAuthorized>
- </AuthorizeView>
- </ul>
- </div>
- </div>
- </nav>
- </header>
+                <!-- Right Side: User Menu / Auth Buttons -->
+                <div class="d-flex align-items-center gap-3">
+                    <AuthorizeView>
+                        <Authorized>
+                            <div class="dropdown">
+                                <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3 py-2 shadow-sm border-0" 
+                                        type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="bi bi-person-circle fs-5 text-primary"></span>
+                                    <span class="fw-medium">
+                                        @(context.User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? context.User.Identity?.Name)
+                                    </span>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2" style="font-size: 0.7em;">
+                                        @(context.User.IsInRole("Employer") ? "Şirket" : (context.User.IsInRole("Admin") ? "Admin" : "Üye"))
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2" aria-labelledby="userMenu">
+                                    <li>
+                                        <h6 class="dropdown-header">Hesabım</h6>
+                                    </li>
+                                    <li>
+                                        @if (context.User.IsInRole("Employer"))
+                                        {
+                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/view-applications">
+                                                <i class="bi bi-people-fill"></i> Başvuranlar
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/my-applications">
+                                                <i class="bi bi-card-checklist"></i> Başvurularım
+                                            </a>
+                                        }
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/profile">
+                                            <i class="bi bi-person-circle"></i> Profilim
+                                        </a>
+                                    </li>
+                                    <li>
+                                        @if (context.User.IsInRole("Employer"))
+                                        {
+                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/company/profile/edit">
+                                                <i class="bi bi-building-gear"></i> Şirket Profili Düzenle
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/profile/edit">
+                                                <i class="bi bi-person-gear"></i> Profil Düzenle
+                                            </a>
+                                        }
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <button class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger" @onclick="Logout">
+                                            <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a href="/account/login" class="btn btn-outline-primary rounded-pill px-4 me-2">Giriş Yap</a>
+                            <a href="/account/register" class="btn btn-primary rounded-pill px-4 text-white">Kayıt Ol</a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </header>
 
- <main class="main-content">
- @Body
- </main>
-
- <footer class="footer">
- <div class="container">
- <div class="row py-4">
- <div class="col-md-6 mb-4 mb-md-0">
- <div class="d-flex align-items-center mb-3">
- <img src="/images/logo.svg?v=9" alt="microbloom" style="height:40px; width: auto;">
- </div>
- <p class="text-muted mb-0" style="line-height:1.8;">
- Kariyer yolculuğunda en iyi iş fırsatlarını bulduğun platform.<br>
- Binlerce şirket ve başarılı aday tarafından güvenle kullanılıyor.
- </p>
- </div>
- <div class="col-md-6">
- <div class="text-md-end">
- <p class="text-muted small mb-2">
- <strong>microbloom</strong> - Profesyonel Kariyer Platformu
- </p>
- <p class="text-muted small mb-0">
- &copy;2025 microbloom. Tüm Hakları Saklıdır. | 
- <a href="#" class="text-decoration-none">Gizlilik</a> | 
- <a href="#" class="text-decoration-none">Şartlar</a>
- </p>
- </div>
- </div>
- </div>
- </div>
- </footer>
+    <main class="flex-grow-1">
+        <article class="content px-4 py-4">
+            @Body
+        </article>
+    </main>
+    
+    <footer class="footer mt-auto py-5 bg-light border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold text-primary mb-3">microbloom</h5>
+                    <p class="text-muted">Kariyer yolculuğunuzda yanınızdayız. En iyi iş ilanları ve kariyer fırsatları burada.</p>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Hızlı Linkler</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="footer-link">Ana Sayfa</a></li>
+                        <li><a href="/jobs" class="footer-link">İlanlar</a></li>
+                        <li><a href="/about" class="footer-link">Hakkımızda</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Kaynaklar</h6>
+                    <ul class="list-unstyled">
+                         <li><a href="/blog" class="footer-link">Blog</a></li>
+                         <li><a href="/help" class="footer-link">Yardım Merkezi</a></li>
+                    </ul>
+                </div>
+                 <div class="col-md-4 mb-4">
+                    <h6 class="fw-bold mb-3">İletişim</h6>
+                     <p class="text-muted mb-1"><i class="bi bi-envelope me-2"></i> info@microbloom.com</p>
+                     <p class="text-muted"><i class="bi bi-geo-alt me-2"></i> İstanbul, Türkiye</p>
+                </div>
+            </div>
+            <div class="row pt-4 border-top">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-muted small mb-0">&copy; @DateTime.Now.Year microbloom. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                     <div class="d-flex justify-content-center justify-content-md-end gap-3">
+                         <a href="#" class="text-muted"><i class="bi bi-linkedin fs-5"></i></a>
+                         <a href="#" class="text-muted"><i class="bi bi-twitter-x fs-5"></i></a>
+                         <a href="#" class="text-muted"><i class="bi bi-instagram fs-5"></i></a>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
+
+@code {
+    private async Task Logout()
+    {
+        // Call the API to sign out (clears cookies)
+        await JS.InvokeVoidAsync("fetch", "/api/Account/logout", new 
+        { 
+            method = "POST",
+            headers = new {
+                Accept = "application/json", 
+            }
+        });
+
+        // Update client-side state
+        if (AuthStateProvider is microbloom.Services.ServerAuthenticationStateProvider customProvider)
+        {
+            await customProvider.SignOutAsync();
+        }
+
+        // Force a reload to return to home state (fresh auth check)
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}
+
+<style>
+    :root {
+        --aurora-primary: #004225;
+        --aurora-secondary: #2d6a4f;
+    }
+
+    .glass-header {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255,255,255,0.4);
+        height: 4.5rem;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .nav-link {
+        color: #4b5563;
+        font-weight: 500;
+        transition: color 0.2s;
+        padding: 0.5rem 1rem;
+        border-radius: 99px;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+        color: var(--aurora-primary) !important;
+        background: rgba(0, 66, 37, 0.05);
+    }
+
+    /* Header Dropdown Styles */
+    .nav-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-trigger {
+        cursor: pointer;
+    }
+
+    .nav-dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 220px;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 0.5rem;
+        z-index: 1000;
+        padding-top: 1rem; /* Extra padding to bridge hover gap */
+    }
+
+    .nav-dropdown::before {
+        /* Invisible bridge between trigger and menu */
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        height: 1rem;
+        background: transparent;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu {
+        display: block;
+        animation: dropdownFade 0.2s ease;
+    }
+
+    .nav-dropdown-menu .dropdown-item {
+        display: block;
+        padding: 0.6rem 1rem;
+        color: #4b5563;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .nav-dropdown-menu .dropdown-item:hover {
+        background: rgba(0, 66, 37, 0.1);
+        color: var(--aurora-primary);
+        transform: translateX(4px);
+    }
+
+    .nav-dropdown-menu .dropdown-divider {
+        height: 1px;
+        margin: 0.5rem 0;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    @@keyframes dropdownFade {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .footer-link {
+        text-decoration: none;
+        color: #6c757d;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+        position: relative;
+        transition: color 0.3s ease;
+    }
+    .footer-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background-color: var(--aurora-primary);
+        transition: width 0.3s ease;
+    }
+    .footer-link:hover {
+        color: var(--aurora-primary);
+    }
+    .footer-link:hover::after {
+        width: 100%;
+    }
+</style>

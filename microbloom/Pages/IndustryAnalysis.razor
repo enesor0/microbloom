@@ -1,0 +1,230 @@
+@page "/industry-analysis"
+@namespace microbloom.Pages
+
+<PageTitle>📈 Sektör Analizi - microbloom</PageTitle>
+
+<style>
+    .industry-hero {
+        background: linear-gradient(135deg, #004225, #1b4332);
+        padding: 4rem 2rem;
+        border-radius: var(--radius-2xl);
+        margin-bottom: 3rem;
+        color: white;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 66, 37, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .industry-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .industry-hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: white !important; position: relative; z-index: 1; }
+    .industry-hero p { color: white !important; opacity: 0.95; position: relative; z-index: 1; }
+
+    .trend-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .trend-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .trend-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .trend-title { font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+    .trend-growth { font-weight: 600; font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .trend-growth.positive { color: #10b981; }
+    .trend-growth.negative { color: #ef4444; }
+    .trend-desc { color: #6b7280; font-size: 0.9rem; }
+
+    .stat-box {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .stat-number { font-size: 2.5rem; font-weight: 700; color: #004225; }
+    .stat-label { color: #64748b; font-size: 0.9rem; }
+
+    .skill-demand {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .skill-bar {
+        height: 24px;
+        background: #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .skill-progress {
+        height: 100%;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        padding-left: 1rem;
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .skill-python { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+    .skill-js { background: linear-gradient(90deg, #52b788, #40916c); }
+    .skill-cloud { background: linear-gradient(90deg, #10b981, #059669); }
+    .skill-ai { background: linear-gradient(90deg, #2d6a4f, #1b4332); }
+    .skill-data { background: linear-gradient(90deg, #40916c, #2d6a4f); }
+</style>
+
+<div class="container my-5">
+    <div class="industry-hero">
+        <h1>📈 Sektör Analizi</h1>
+        <p>Türkiye'deki iş piyasası trendleri ve geleceğin meslekleri</p>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">+23%</div>
+                <div class="stat-label">Teknoloji istihdamı (yıllık)</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">150K+</div>
+                <div class="stat-label">Açık yazılım pozisyonu</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">₺45K</div>
+                <div class="stat-label">Ortalama teknoloji maaşı</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">65%</div>
+                <div class="stat-label">Uzaktan çalışma oranı</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sektör Trendleri -->
+    <h2 class="h4 mb-4"><i class="bi bi-graph-up me-2"></i>Büyüyen Sektörler</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="trend-card">
+                <div class="trend-icon">🤖</div>
+                <h5 class="trend-title">Yapay Zeka</h5>
+                <div class="trend-growth positive">+45%</div>
+                <p class="trend-desc">ML, NLP ve otomasyon alanlarında çok yüksek talep</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="trend-card">
+                <div class="trend-icon">☁️</div>
+                <h5 class="trend-title">Cloud Computing</h5>
+                <div class="trend-growth positive">+38%</div>
+                <p class="trend-desc">AWS, Azure ve GCP uzmanlarına artan talep</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="trend-card">
+                <div class="trend-icon">🔒</div>
+                <h5 class="trend-title">Siber Güvenlik</h5>
+                <div class="trend-growth positive">+32%</div>
+                <p class="trend-desc">Güvenlik uzmanları için kritik dönem</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="trend-card">
+                <div class="trend-icon">🌱</div>
+                <h5 class="trend-title">Yeşil Enerji</h5>
+                <div class="trend-growth positive">+28%</div>
+                <p class="trend-desc">Sürdürülebilirlik uzmanları arıyor</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="trend-card">
+                <div class="trend-icon">🎮</div>
+                <h5 class="trend-title">Oyun & Metaverse</h5>
+                <div class="trend-growth positive">+25%</div>
+                <p class="trend-desc">3D, Unity ve Unreal geliştiriciler</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="trend-card">
+                <div class="trend-icon">🏥</div>
+                <h5 class="trend-title">HealthTech</h5>
+                <div class="trend-growth positive">+22%</div>
+                <p class="trend-desc">Dijital sağlık çözümleri büyüyor</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- En Çok Aranan Yetenekler -->
+    <h2 class="h4 mb-4"><i class="bi bi-star me-2"></i>En Çok Aranan Yetenekler (2024)</h2>
+    <div class="skill-demand">
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold">Python</span>
+                <span>92%</span>
+            </div>
+            <div class="skill-bar">
+                <div class="skill-progress skill-python" style="width: 92%">En çok aranan</div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold">JavaScript/TypeScript</span>
+                <span>88%</span>
+            </div>
+            <div class="skill-bar">
+                <div class="skill-progress skill-js" style="width: 88%"></div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold">Cloud (AWS/Azure/GCP)</span>
+                <span>85%</span>
+            </div>
+            <div class="skill-bar">
+                <div class="skill-progress skill-cloud" style="width: 85%"></div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold">AI/Machine Learning</span>
+                <span>78%</span>
+            </div>
+            <div class="skill-bar">
+                <div class="skill-progress skill-ai" style="width: 78%"></div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold">Data Analysis/SQL</span>
+                <span>75%</span>
+            </div>
+            <div class="skill-bar">
+                <div class="skill-progress skill-data" style="width: 75%"></div>
+            </div>
+        </div>
+    </div>
+</div>

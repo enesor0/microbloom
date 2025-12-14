@@ -1,0 +1,240 @@
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="nav-menu glass-sidebar h-100">
+    <div class="top-row navbar navbar-dark">
+        <div class="container-fluid d-flex justify-content-center py-3">
+             <!-- Brand/Logo area if needed, distinct from MainLayout -->
+             <span class="navbar-brand-text d-md-none">Menu</span>
+             <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+        <nav class="flex-column nav-pills p-3 gap-2">
+            <div class="nav-item">
+                <NavLink class="nav-link d-flex align-items-center gap-3" href="" Match="NavLinkMatch.All">
+                    <i class="bi bi-house-door-fill fs-5"></i>
+                    <span>Ana Sayfa</span>
+                </NavLink>
+            </div>
+            <div class="nav-item">
+                <NavLink class="nav-link d-flex align-items-center gap-3" href="jobs">
+                    <i class="bi bi-briefcase-fill fs-5"></i>
+                    <span>İş İlanları</span>
+                </NavLink>
+            </div>
+            <div class="nav-item dropdown-hover">
+                <div class="nav-link d-flex align-items-center gap-3 dropdown-toggle-nav">
+                    <i class="bi bi-compass-fill fs-5"></i>
+                    <span>Kariyer Planlaması</span>
+                    <i class="bi bi-chevron-down ms-auto small"></i>
+                </div>
+                <div class="dropdown-menu-hover">
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="guide">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>Üniversite Rehberi</span>
+                    </NavLink>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="universities">
+                        <i class="bi bi-bank2"></i>
+                        <span>Üniversiteler</span>
+                    </NavLink>
+                    <div class="dropdown-divider"></div>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="salary-guide">
+                        <i class="bi bi-currency-dollar"></i>
+                        <span>Maaş Rehberi</span>
+                    </NavLink>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="career-test">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>Kariyer Testi</span>
+                    </NavLink>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="industry-analysis">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Sektör Analizi</span>
+                    </NavLink>
+                    <div class="dropdown-divider"></div>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="interview-prep">
+                        <i class="bi bi-mic"></i>
+                        <span>Mülakat Hazırlığı</span>
+                    </NavLink>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="mentorship">
+                        <i class="bi bi-people"></i>
+                        <span>Mentorluk</span>
+                    </NavLink>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="career-calendar">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>Kariyer Takvimi</span>
+                    </NavLink>
+                    <div class="dropdown-divider"></div>
+                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="cv-samples">
+                        <i class="bi bi-file-earmark-person"></i>
+                        <span>CV Örnekleri</span>
+                    </NavLink>
+                </div>
+            </div>
+
+            <AuthorizeView Roles="Employer">
+                <Authorized>
+                     <div class="nav-item mt-3">
+                        <small class="text-uppercase text-muted fw-bold ps-3 mb-2 d-block" style="font-size: 0.75rem;">Şirket</small>
+                        <NavLink class="nav-link d-flex align-items-center gap-3" href="company-dashboard">
+                            <i class="bi bi-building-fill fs-5"></i>
+                            <span>Şirket Paneli</span>
+                        </NavLink>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+
+             <!-- JobSeeker için Başvurularım -->
+             <AuthorizeView Roles="JobSeeker">
+                <Authorized>
+                     <div class="nav-item mt-3">
+                        <small class="text-uppercase text-muted fw-bold ps-3 mb-2 d-block" style="font-size: 0.75rem;">Hesap</small>
+                        <NavLink class="nav-link d-flex align-items-center gap-3" href="my-applications">
+                            <i class="bi bi-card-checklist fs-5"></i>
+                            <span>Başvurularım</span>
+                        </NavLink>
+                        <NavLink class="nav-link d-flex align-items-center gap-3" href="profile/edit">
+                            <i class="bi bi-person-circle fs-5"></i>
+                            <span>Profilim</span>
+                        </NavLink>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+
+            <!-- Employer için Başvuranlar -->
+            <AuthorizeView Roles="Employer">
+                <Authorized>
+                     <div class="nav-item mt-3">
+                        <small class="text-uppercase text-muted fw-bold ps-3 mb-2 d-block" style="font-size: 0.75rem;">Hesap</small>
+                        <NavLink class="nav-link d-flex align-items-center gap-3" href="view-applications">
+                            <i class="bi bi-people-fill fs-5"></i>
+                            <span>Başvuranlar</span>
+                        </NavLink>
+                        <NavLink class="nav-link d-flex align-items-center gap-3" href="company/profile/edit">
+                            <i class="bi bi-building-gear fs-5"></i>
+                            <span>Şirket Profili</span>
+                        </NavLink>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+
+        </nav>
+    </div>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
+
+<style>
+    .glass-sidebar {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-right: 1px solid rgba(255,255,255,0.5);
+        height: 100vh;
+    }
+
+    .nav-link {
+        color: #4b5563 !important;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+    }
+
+    .nav-link:hover {
+        background: rgba(0, 66, 37, 0.1); /* british racing green alpha */
+        color: #004225 !important; /* british racing green */
+        transform: translateX(4px);
+    }
+
+    .nav-link.active {
+        background: linear-gradient(135deg, #004225, #2d6a4f);
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(0, 66, 37, 0.3);
+    }
+    
+    .nav-link.active i {
+        color: white !important;
+    }
+
+    .bi {
+        transition: transform 0.3s ease;
+    }
+    .nav-link:hover .bi {
+        transform: scale(1.1);
+    }
+
+    /* Hover Dropdown Styles */
+    .dropdown-hover {
+        position: relative;
+    }
+
+    .dropdown-toggle-nav {
+        cursor: pointer;
+    }
+
+    .dropdown-menu-hover {
+        display: none;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 0.5rem;
+        margin-top: 0.25rem;
+        margin-left: 1rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .dropdown-hover:hover .dropdown-menu-hover {
+        display: block;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .dropdown-item {
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        color: #4b5563;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(0, 66, 37, 0.1);
+        color: #004225;
+        transform: translateX(4px);
+    }
+
+    .dropdown-divider {
+        margin: 0.5rem 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@media (max-width: 640.98px) {
+        .glass-sidebar {
+            height: auto;
+            border-right: none;
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+        }
+    }
+
+    @@media (min-width: 641px) {
+        .collapse {
+            display: block !important;
+        }
+    }
+</style>

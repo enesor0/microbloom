@@ -1,0 +1,21 @@
+@inherits LayoutComponentBase
+@namespace microbloom.Shared
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<div class="auth-layout">
+    <main>
+        @Body
+    </main>
+</div>
+
+<style>
+    .auth-layout {
+        min-height: 100vh;
+        width: 100%;
+        position: relative;
+    }
+</style>
+
+@code {
+}

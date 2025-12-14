@@ -1,0 +1,269 @@
+@page "/profile/edit"
+@using microbloom.DTOs
+@using System.Net.Http.Headers
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>Profil Düzenle - microbloom</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 glass-morphism">
+            <div class="card-body p-4">
+                <h4 class="card-title mb-4">Profilini Düzenle</h4>
+
+                @if (isLoading)
+                {
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="@profileModel" OnValidSubmit="HandleSubmit">
+                        @* DataAnnotationsValidator removed for debugging *@
+
+                        <!-- Profile Picture -->
+                        <div class="mb-4 text-center">
+                            <div class="profile-pic-container mb-3">
+                                @if (!string.IsNullOrEmpty(profileModel.ProfilePictureUrl))
+                                {
+                                    <img src="@profileModel.ProfilePictureUrl" alt="Profil Fotosu" class="rounded-circle profile-pic" />
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle profile-pic bg-secondary d-flex align-items-center justify-content-center text-white fs-1">
+                                        @profileModel.FirstName.FirstOrDefault()
+                                    </div>
+                                }
+                            </div>
+                            <div class="d-inline-block">
+                                <label for="profilePicInput" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-camera"></i> Fotoğraf Yükle
+                                </label>
+                                <InputFile OnChange="@UploadProfilePicture" id="profilePicInput" class="d-none" accept=".jpg,.jpeg,.png" />
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Ad</label>
+                                <InputText @bind-Value="profileModel.FirstName" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Soyad</label>
+                                <InputText @bind-Value="profileModel.LastName" class="form-control" />
+                            </div>
+                            
+                             <div class="col-12">
+                                <label class="form-label">Ünvan / Meslek</label>
+                                <InputText @bind-Value="profileModel.Title" class="form-control" placeholder="Örn: Yazılım Geliştirici" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Hakkımda (Biyografi)</label>
+                                <InputTextArea @bind-Value="profileModel.Bio" class="form-control" rows="4" placeholder="Kendinizden bahsedin..." />
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Yetenekler</label>
+                                <InputText @bind-Value="profileModel.Skills" class="form-control" placeholder="C#, Blazor, SQL (Virgülle ayırın)" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-linkedin"></i> LinkedIn</label>
+                                <InputText @bind-Value="profileModel.LinkedInUrl" class="form-control" placeholder="https://linkedin.com/in/..." />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-github"></i> GitHub</label>
+                                <InputText @bind-Value="profileModel.GitHubUrl" class="form-control" placeholder="https://github.com/..." />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label"><i class="bi bi-globe"></i> Website</label>
+                                <InputText @bind-Value="profileModel.WebsiteUrl" class="form-control" placeholder="https://..." />
+                            </div>
+
+                             <!-- CV Upload -->
+                            <div class="col-12 mt-4">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Özgeçmiş (CV)</h6>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                @if (!string.IsNullOrEmpty(profileModel.CvUrl))
+                                                {
+                                                     <a href="@profileModel.CvUrl" target="_blank" class="text-decoration-none">
+                                                        <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
+                                                        Mevcut CV'yi Görüntüle
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted small">Henüz CV yüklenmedi.</span>
+                                                }
+                                            </div>
+                                            <div>
+                                                 <label for="cvInput" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-upload"></i> CV Yükle/Güncelle
+                                                </label>
+                                                <InputFile OnChange="@UploadCv" id="cvInput" class="d-none" accept=".pdf,.doc,.docx" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary px-4" disabled="@isSaving">
+                                @if (isSaving)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Kaydediliyor...</span>
+                                }
+                                else
+                                {
+                                    <span>Değişiklikleri Kaydet</span>
+                                }
+                            </button>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(statusMessage))
+                        {
+                            <div class="alert alert-success mt-3" role="alert">
+                                @statusMessage
+                            </div>
+                        }
+                    </EditForm>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .glass-morphism {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .profile-pic {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .profile-pic-container {
+        display: inline-block;
+    }
+</style>
+
+@code {
+    private UserProfileDto profileModel = new();
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string? statusMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try 
+        {
+            var response = await Http.GetFromJsonAsync<UserProfileDto>("api/profile");
+            if (response != null)
+            {
+                profileModel = response;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading profile: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        isSaving = true;
+        statusMessage = null;
+        try
+        {
+            var response = await Http.PutAsJsonAsync("api/profile", profileModel);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = "Profil başarıyla güncellendi!";
+                 // Brief delay to show success, then clear
+                 await Task.Delay(3000);
+                 statusMessage = null;
+                 StateHasChanged();
+            }
+            else
+            {
+                 // Handle error - show response details
+                 var errorContent = await response.Content.ReadAsStringAsync();
+                 statusMessage = $"Hata: {response.StatusCode} - {errorContent}";
+                 Console.WriteLine($"Profile update error: {response.StatusCode} - {errorContent}");
+            }
+        }
+        catch(Exception ex)
+        {
+             statusMessage = $"Hata: {ex.Message}";
+             Console.WriteLine($"Error saving: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task UploadProfilePicture(InputFileChangeEventArgs e)
+    {
+        await UploadFile(e.File, "api/profile/upload-picture", (url) => profileModel.ProfilePictureUrl = url);
+    }
+
+    private async Task UploadCv(InputFileChangeEventArgs e)
+    {
+         await UploadFile(e.File, "api/profile/upload-cv", (url) => profileModel.CvUrl = url);
+    }
+
+    private async Task UploadFile(IBrowserFile file, string endpoint, Action<string> updateUrlAction)
+    {
+        // Max 5MB
+        long maxFileSize = 1024 * 1024 * 5; 
+        
+        try
+        {
+            using var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+            
+            content.Add(fileContent, "file", file.Name);
+
+            var response = await Http.PostAsync(endpoint, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<UploadResult>();
+                if (result != null && !string.IsNullOrEmpty(result.Url))
+                {
+                    updateUrlAction(result.Url);
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+             Console.WriteLine($"Upload error: {ex.Message}");
+        }
+    }
+
+    private class UploadResult { public string Url { get; set; } = ""; }
+}

@@ -1,0 +1,256 @@
+@page "/profile"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+@using microbloom.DTOs
+@using microbloom.Entities
+@using microbloom.Services.Interfaces
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<AppUser> UserManager
+@inject ICompanyService CompanyService
+
+<PageTitle>👤 Profilim - microbloom</PageTitle>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            @if (isLoading)
+            {
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Profil yükleniyor...</p>
+                </div>
+            }
+            else if (userProfile == null)
+            {
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Profil bilgileri yüklenemedi.
+                </div>
+            }
+            else
+            {
+                <!-- Profile Header -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-4 flex-wrap">
+                            <div class="profile-avatar">
+                                @if (!string.IsNullOrEmpty(userProfile.ProfilePictureUrl))
+                                {
+                                    <img src="@userProfile.ProfilePictureUrl" alt="Profil" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #004225;" />
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                        <span class="text-white fs-1">@GetInitial()</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="flex-grow-1">
+                                <h2 class="mb-1 fw-bold">@userProfile.FirstName @userProfile.LastName</h2>
+                                @if (!string.IsNullOrEmpty(userProfile.Title))
+                                {
+                                    <p class="text-muted mb-2"><i class="bi bi-briefcase me-1"></i> @userProfile.Title</p>
+                                }
+                                <p class="mb-2"><i class="bi bi-envelope me-1 text-primary"></i> @userProfile.Email</p>
+                                <div class="d-flex gap-3 flex-wrap">
+                                    @if (!string.IsNullOrEmpty(userProfile.LinkedInUrl))
+                                    {
+                                        <a href="@userProfile.LinkedInUrl" target="_blank" class="text-primary fs-5" title="LinkedIn">
+                                            <i class="bi bi-linkedin"></i>
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(userProfile.GitHubUrl))
+                                    {
+                                        <a href="@userProfile.GitHubUrl" target="_blank" class="text-dark fs-5" title="GitHub">
+                                            <i class="bi bi-github"></i>
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(userProfile.WebsiteUrl))
+                                    {
+                                        <a href="@userProfile.WebsiteUrl" target="_blank" class="text-success fs-5" title="Website">
+                                            <i class="bi bi-globe"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                            <div>
+                                <a href="/profile/edit" class="btn btn-outline-primary">
+                                    <i class="bi bi-pencil me-2"></i>Kişisel Bilgileri Düzenle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (isEmployer)
+                {
+                    <!-- Employer Specific Content -->
+                    <div class="card border-0 shadow-sm mb-4 bg-light-subtle">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0 text-success"><i class="bi bi-building me-2"></i>Şirket Hesabı</h5>
+                                <a href="/company-dashboard" class="btn btn-success">
+                                    <i class="bi bi-speedometer2 me-2"></i>Şirket Paneline Git
+                                </a>
+                            </div>
+                            
+                            @if(companyProfile != null)
+                            {
+                                <div class="d-flex align-items-center p-3 bg-white rounded border">
+                                    @if(!string.IsNullOrEmpty(companyProfile.LogoUrl))
+                                    {
+                                        <img src="@companyProfile.LogoUrl" alt="Company Logo" class="me-3 rounded" style="width: 50px; height: 50px; object-fit: contain;" />
+                                    }
+                                    else
+                                    {
+                                        <span class="me-3 fs-2">🏢</span>
+                                    }
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">@companyProfile.Name</h6>
+                                        <small class="text-muted">@companyProfile.Location</small>
+                                    </div>
+                                    <div class="ms-auto">
+                                        <a href="/company/profile/edit" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil me-1"></i>Şirketi Düzenle
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info mb-0">
+                                    Henüz bir şirket profili oluşturmadınız veya bir şirkete bağlı değilsiniz.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Job Seeker Specific Content -->
+
+                    <!-- Bio Section -->
+                    @if (!string.IsNullOrEmpty(userProfile.Bio))
+                    {
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Hakkımda</h5>
+                                <p class="mb-0" style="white-space: pre-line;">@userProfile.Bio</p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Skills Section -->
+                    @if (!string.IsNullOrEmpty(userProfile.Skills))
+                    {
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3"><i class="bi bi-lightning-fill me-2 text-warning"></i>Yetenekler</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var skill in userProfile.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">@skill.Trim()</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- CV Section -->
+                    @if (!string.IsNullOrEmpty(userProfile.CvUrl))
+                    {
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Özgeçmiş (CV)</h5>
+                                <a href="@userProfile.CvUrl" target="_blank" class="btn btn-outline-danger">
+                                    <i class="bi bi-download me-2"></i>CV'yi Görüntüle / İndir
+                                </a>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Empty State for incomplete profile (only for job seekers) -->
+                    @if (string.IsNullOrEmpty(userProfile.Bio) && string.IsNullOrEmpty(userProfile.Skills) && string.IsNullOrEmpty(userProfile.CvUrl))
+                    {
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-5 text-center">
+                                <i class="bi bi-person-plus text-muted" style="font-size: 4rem;"></i>
+                                <h4 class="mt-3">Profilinizi Tamamlayın</h4>
+                                <p class="text-muted">Yeteneklerinizi, biyografinizi ve CV'nizi ekleyerek işverenlerin sizi daha kolay bulmasını sağlayın.</p>
+                                <a href="/profile/edit" class="btn btn-primary">
+                                    <i class="bi bi-pencil me-2"></i>Profili Düzenle
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private UserProfileDto? userProfile;
+    private CompanyProfileDto? companyProfile;
+    private bool isLoading = true;
+    private bool isEmployer = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                // Check Role
+                isEmployer = user.IsInRole("Employer");
+
+                // Get User Profile
+                // Since this is a Blazor Server app, we might want to use a service instead of HttpClient if possible,
+                // but checking original code it used HttpClient. Sticking to HttpClient for UserProfile for now to assume reuse of existing API,
+                // OR better, since we have direct access to UserManager, let's try to get data directly if API is unavailable or for consistency.
+                // However, the original code used Http.GetFromJsonAsync<UserProfileDto>("api/profile").
+                // Let's stick to the pattern used in the file I'm modifying, but effectively we should be consistent.
+                // Given I don't see `IUserProfileService` injected in the imports list I generated, I will stick to HttpClient for UserProfile to minimize changes,
+                // or better, I can manually map from AppUser if I fetch it.
+                // Actually, let's keep it simple and use HttpClient as it was, but for Company data use CompanyService.
+                
+                userProfile = await Http.GetFromJsonAsync<UserProfileDto>("api/profile");
+
+                if (isEmployer)
+                {
+                    var appUser = await UserManager.GetUserAsync(user);
+                    if (appUser?.CompanyId != null)
+                    {
+                        companyProfile = await CompanyService.GetCompanyProfileAsync(appUser.CompanyId.Value);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading profile: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetInitial()
+    {
+        if (userProfile?.FirstName?.Length > 0)
+            return userProfile.FirstName[0].ToString().ToUpper();
+        return "U";
+    }
+}

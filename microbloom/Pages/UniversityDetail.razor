@@ -4,153 +4,153 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-<PageTitle>@(university?.Name ?? "‹niversite") - microbloom</PageTitle>
+<PageTitle>@(university?.Name ?? "√úniversite") - microbloom</PageTitle>
 
 <style>
     .uni-detail-hero {
-     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 3rem 2rem;
-     border-radius: 20px;
-  margin-bottom: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
         color: white;
         box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
     }
 
     .uni-info-card {
-      background: white;
-   padding: 2rem;
+        background: white;
+        padding: 2rem;
         border-radius: 15px;
-     box-shadow: 0 5px 20px rgba(0,0,0,0.08);
- margin-bottom: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
     }
 
     .info-row {
-      display: flex;
-     align-items: center;
+        display: flex;
+        align-items: center;
         gap: 1rem;
-    padding: 1rem 0;
-     border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 0;
+        border-bottom: 1px solid #e2e8f0;
     }
 
     .info-row:last-child {
-   border-bottom: none;
+        border-bottom: none;
     }
 
     .department-table {
         background: white;
- border-radius: 15px;
-  overflow: hidden;
-     box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-}
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
 
     .score-type-badge {
         display: inline-block;
-      padding: 0.3rem 0.8rem;
-   border-radius: 15px;
-     font-size: 0.85rem;
-  font-weight: 600;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
     }
 
- .say { background: #e3f2fd; color: #1976d2; }
+    .say { background: #e3f2fd; color: #1976d2; }
     .ea { background: #f3e5f5; color: #7b1fa2; }
     .soz { background: #fff3e0; color: #e65100; }
 </style>
 
 <div class="container my-5">
-@if (isLoading)
+    @if (isLoading)
     {
-   <div class="text-center py-5">
-          <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-3">Y¸kleniyor...</p>
-      </div>
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3">Y√ºkleniyor...</p>
+        </div>
     }
     else if (university == null)
     {
-      <div class="alert alert-danger">
-     &#x26A0; ‹niversite bulunamad˝.
+        <div class="alert alert-danger">
+            ‚ö†Ô∏è √úniversite bulunamadƒ±.
         </div>
     }
     else
     {
-   <div class="uni-detail-hero">
-  <a href="/universities" class="btn btn-light btn-sm mb-3">&#x2190; Geri Dˆn</a>
-  <h1>&#x1F3EB; @university.Name</h1>
-   <p style="font-size: 1.2rem; margin: 0;">@university.City</p>
+        <div class="uni-detail-hero">
+            <a href="/universities" class="btn btn-light btn-sm mb-3">‚Üê Geri D√∂n</a>
+            <h1>üè´ @university.Name</h1>
+            <p style="font-size: 1.2rem; margin: 0;">@university.City</p>
         </div>
 
         <div class="uni-info-card">
-            <h3 class="mb-3">&#x2139; ‹niversite Bilgileri</h3>
-   <div class="info-row">
-      <span style="font-size: 1.5rem;">&#x1F3DB;</span>
-     <div>
- <strong>T¸r:</strong>
-         <span>@(university.IsStateUniversity ? "Devlet ‹niversitesi" : "Vak˝f ‹niversitesi")</span>
-         </div>
-   </div>
-   <div class="info-row">
-  <span style="font-size: 1.5rem;">&#x1F4CD;</span>
- <div>
-      <strong>ﬁehir:</strong>
-    <span>@university.City</span>
-        </div>
- </div>
-      <div class="info-row">
-       <span style="font-size: 1.5rem;">&#x1F4DA;</span>
-           <div>
-       <strong>Toplam Bˆl¸m:</strong>
-  <span>@university.Departments.Count</span>
-</div>
-   </div>
-         @if (!string.IsNullOrEmpty(university.WebSite))
-   {
-      <div class="info-row">
-          <span style="font-size: 1.5rem;">&#x1F517;</span>
-       <div>
-       <strong>Web Sitesi:</strong>
-           <a href="@university.WebSite" target="_blank">@university.WebSite</a>
-     </div>
-        </div>
-        }
+            <h3 class="mb-3">‚ÑπÔ∏è √úniversite Bilgileri</h3>
+            <div class="info-row">
+                <span style="font-size: 1.5rem;">üèõÔ∏è</span>
+                <div>
+                    <strong>T√ºr:</strong>
+                    <span>@(university.IsStateUniversity ? "Devlet √úniversitesi" : "Vakƒ±f √úniversitesi")</span>
+                </div>
+            </div>
+            <div class="info-row">
+                <span style="font-size: 1.5rem;">üìç</span>
+                <div>
+                    <strong>≈ûehir:</strong>
+                    <span>@university.City</span>
+                </div>
+            </div>
+            <div class="info-row">
+                <span style="font-size: 1.5rem;">üìö</span>
+                <div>
+                    <strong>Toplam B√∂l√ºm:</strong>
+                    <span>@university.Departments.Count</span>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(university.WebSite))
+            {
+                <div class="info-row">
+                    <span style="font-size: 1.5rem;">üîó</span>
+                    <div>
+                        <strong>Web Sitesi:</strong>
+                        <a href="@university.WebSite" target="_blank">@university.WebSite</a>
+                    </div>
+                </div>
+            }
         </div>
 
-  @if (university.Departments.Any())
+        @if (university.Departments.Any())
         {
             <div class="department-table">
-    <div style="padding: 1.5rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
-    <h3 style="margin: 0;">&#x1F4DA; Bˆl¸mler ve Taban Puanlar</h3>
-       </div>
-             <div class="table-responsive">
-   <table class="table table-hover mb-0">
-  <thead class="table-light">
-       <tr>
-      <th>Bˆl¸m Ad˝</th>
-    <th>Puan T¸r¸</th>
-        <th>Taban Puan</th>
-     <th>Taban S˝ralama</th>
-        </tr>
-     </thead>
-       <tbody>
-     @foreach (var dept in university.Departments.OrderByDescending(d => d.LastYearBaseScore))
-       {
-    <tr>
-     <td><strong>@dept.Name</strong></td>
-      <td>
-   <span class="score-type-badge @dept.ScoreType.ToLower()">
-   @dept.ScoreType
-            </span>
-      </td>
-         <td>
-      <strong style="color: #667eea;">@dept.LastYearBaseScore.ToString("F2")</strong>
-   </td>
-       <td>@dept.LastYearBaseRanking.ToString("N0")</td>
-   </tr>
-    }
-    </tbody>
-      </table>
-   </div>
+                <div style="padding: 1.5rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                    <h3 style="margin: 0;">üìö B√∂l√ºmler ve Taban Puanlar</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>B√∂l√ºm Adƒ±</th>
+                                <th>Puan T√ºr√º</th>
+                                <th>Taban Puan</th>
+                                <th>Taban Sƒ±ralama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var dept in university.Departments.OrderByDescending(d => d.LastYearBaseScore))
+                            {
+                                <tr>
+                                    <td><strong>@dept.Name</strong></td>
+                                    <td>
+                                        <span class="score-type-badge @dept.ScoreType.ToLower()">
+                                            @dept.ScoreType
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong style="color: #667eea;">@dept.LastYearBaseScore.ToString("F2")</strong>
+                                    </td>
+                                    <td>@dept.LastYearBaseRanking.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
-  }
-   }
+        }
+    }
 </div>
 
 @code {
@@ -161,18 +161,18 @@
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
-  {
-   try
-      {
- university = await Http.GetFromJsonAsync<UniversityDetailDto>($"api/university/{Id}");
+    {
+        try
+        {
+            university = await Http.GetFromJsonAsync<UniversityDetailDto>($"api/university/{Id}");
         }
         catch (Exception ex)
         {
- Console.WriteLine($"Hata: {ex.Message}");
-}
-  finally
- {
-       isLoading = false;
-      }
+            Console.WriteLine($"Hata: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 }

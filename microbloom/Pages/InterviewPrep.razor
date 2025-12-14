@@ -1,0 +1,181 @@
+@page "/interview-prep"
+@namespace microbloom.Pages
+
+<PageTitle>🎤 Mülakat Hazırlığı - microbloom</PageTitle>
+
+<style>
+    .interview-hero {
+        background: linear-gradient(135deg, #004225, #1b4332);
+        padding: 4rem 2rem;
+        border-radius: var(--radius-2xl);
+        margin-bottom: 3rem;
+        color: white;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 66, 37, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .interview-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .interview-hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: white !important; position: relative; z-index: 1; }
+    .interview-hero p { color: white !important; opacity: 0.95; position: relative; z-index: 1; }
+
+    .question-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #004225;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .question-card:hover { transform: translateX(5px); }
+    .question-title { font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; }
+    .question-category { color: #004225; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .question-hint { color: #6b7280; font-size: 0.9rem; }
+
+    .tip-card {
+        background: linear-gradient(135deg, #d8f3dc, #95d5b2);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .tip-card h5 { color: #003018; font-weight: 700; }
+    .tip-card p { color: #1b4332; margin-bottom: 0; }
+
+    .stage-timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .stage-timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, #004225, #1b4332);
+    }
+
+    .stage-item {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+
+    .stage-item::before {
+        content: '';
+        position: absolute;
+        left: -24px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        background: #004225;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #004225;
+    }
+
+    .stage-title { font-weight: 700; color: #1f2937; }
+    .stage-desc { color: #6b7280; font-size: 0.9rem; }
+</style>
+
+<div class="container my-5">
+    <div class="interview-hero">
+        <h1>🎤 Mülakat Hazırlığı</h1>
+        <p>Sık sorulan sorular, ipuçları ve mülakat süreçleri</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Sık Sorulan Sorular -->
+            <h2 class="h4 mb-4"><i class="bi bi-question-circle me-2"></i>Sık Sorulan Sorular</h2>
+            
+            <div class="question-card">
+                <div class="question-category">Genel</div>
+                <h5 class="question-title">"Kendinizden bahseder misiniz?"</h5>
+                <p class="question-hint">💡 Kısa ve öz olun. Eğitim, deneyim ve neden bu pozisyona uygun olduğunuzu vurgulayın.</p>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-category">Motivasyon</div>
+                <h5 class="question-title">"Neden bu şirkette çalışmak istiyorsunuz?"</h5>
+                <p class="question-hint">💡 Şirket hakkında araştırma yapın. Değerlerini ve kültürünü öğrenin.</p>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-category">Güçlü Yönler</div>
+                <h5 class="question-title">"Güçlü ve zayıf yönleriniz neler?"</h5>
+                <p class="question-hint">💡 Zayıf yönlerinizi nasıl geliştirdiğinizi de anlatın.</p>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-category">Gelecek</div>
+                <h5 class="question-title">"5 yıl sonra kendinizi nerede görüyorsunuz?"</h5>
+                <p class="question-hint">💡 Kariyer hedeflerinizi şirketin büyümesiyle ilişkilendirin.</p>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-category">Problem Çözme</div>
+                <h5 class="question-title">"Zor bir durumla nasıl başa çıktınız?"</h5>
+                <p class="question-hint">💡 STAR metodunu kullanın: Situation, Task, Action, Result</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- İpuçları -->
+            <h2 class="h4 mb-4"><i class="bi bi-lightbulb me-2"></i>Altın İpuçları</h2>
+            
+            <div class="tip-card">
+                <h5>👔 Görünüm</h5>
+                <p>Profesyonel ve düzgün giyinin. Şirket kültürünü araştırın.</p>
+            </div>
+            
+            <div class="tip-card">
+                <h5>⏰ Zamanlama</h5>
+                <p>10-15 dakika erken gidin. Geç kalmak olumsuz izlenim yaratır.</p>
+            </div>
+            
+            <div class="tip-card">
+                <h5>📝 Araştırma</h5>
+                <p>Şirket, sektör ve pozisyon hakkında detaylı bilgi edinin.</p>
+            </div>
+            
+            <div class="tip-card">
+                <h5>❓ Sorular</h5>
+                <p>Mülakat sonunda sormak için 2-3 soru hazırlayın.</p>
+            </div>
+
+            <!-- Mülakat Aşamaları -->
+            <h2 class="h4 mb-4 mt-5"><i class="bi bi-diagram-3 me-2"></i>Mülakat Aşamaları</h2>
+            <div class="stage-timeline">
+                <div class="stage-item">
+                    <div class="stage-title">1. Telefon Görüşmesi</div>
+                    <div class="stage-desc">İK ile ön değerlendirme</div>
+                </div>
+                <div class="stage-item">
+                    <div class="stage-title">2. Teknik Mülakat</div>
+                    <div class="stage-desc">Beceri ve yetkinlik değerlendirmesi</div>
+                </div>
+                <div class="stage-item">
+                    <div class="stage-title">3. Yönetici Görüşmesi</div>
+                    <div class="stage-desc">Kültür ve takım uyumu</div>
+                </div>
+                <div class="stage-item">
+                    <div class="stage-title">4. Teklif Aşaması</div>
+                    <div class="stage-desc">Maaş ve yan haklar müzakeresi</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

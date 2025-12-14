@@ -4,110 +4,139 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
-<PageTitle>&#x1F4BC; ›˛ Hayat˝ Rehberi - microbloom</PageTitle>
+<PageTitle>üíº ƒ∞≈ü Hayatƒ± Rehberi - microbloom</PageTitle>
 
 <style>
-    /* Modern Tasar˝m Stilleri */
+    /* Modern Tasarƒ±m Stilleri */
     .guide-hero {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      padding: 3rem 2rem;
-        border-radius: 20px;
-     margin-bottom: 3rem;
-      color: white;
+        background: var(--gradient-aurora);
+        padding: 4rem 2rem;
+        border-radius: var(--radius-2xl);
+        margin-bottom: 3rem;
+        color: white;
         text-align: center;
-      box-shadow: 0 10px 40px rgba(240, 147, 251, 0.3);
+        box-shadow: var(--shadow-aurora);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .guide-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
     }
 
     .guide-hero h1 {
         font-size: 2.5rem;
         font-weight: 700;
-   margin-bottom: 1rem;
-     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        color: white !important;
     }
 
     .guide-hero p {
         font-size: 1.1rem;
-     opacity: 0.95;
+        opacity: 0.95;
         margin-bottom: 0;
+        color: white !important;
     }
 
     .category-section {
- margin-bottom: 4rem;
+        margin-bottom: 4rem;
+    }
+
+    .nav-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+    }
+
+    .nav-card:hover {
+        background: var(--gradient-aurora-soft);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-aurora);
+    }
+
+    .quick-nav .btn {
+        border-radius: var(--radius-lg);
     }
 
     .category-header {
         display: flex;
-  align-items: center;
-    margin-bottom: 2rem;
+        align-items: center;
+        margin-bottom: 2rem;
         padding-bottom: 1rem;
         border-bottom: 3px solid;
-        border-image: linear-gradient(90deg, #f093fb, #f5576c) 1;
+        border-image: linear-gradient(90deg, #004225, #2d6a4f) 1;
     }
 
     .category-header h2 {
         font-size: 1.8rem;
         font-weight: 700;
         margin: 0;
-        background: linear-gradient(135deg, #f093fb, #f5576c);
+        background: var(--gradient-text);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-  }
-
-    .category-icon {
-   font-size: 2rem;
-        margin-right: 1rem;
-     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
     }
 
- /* Grid D¸zeni */
+    .category-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+    }
+
+    /* Grid D√ºzeni */
     .article-grid {
-      display: grid;
+        display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
+        gap: 1.5rem;
     }
 
     /* Kart Stilleri */
     .article-card {
-        background: white;
-        border-radius: 15px;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        border-radius: var(--radius-xl);
         overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--glass-shadow);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-     position: relative;
-     border: 2px solid transparent;
-     height: 100%;
-display: flex;
+        cursor: pointer;
+        position: relative;
+        border: 1px solid var(--glass-border);
+        height: 100%;
+        display: flex;
         flex-direction: column;
     }
 
     .article-card:hover {
         transform: translateY(-8px);
-     box-shadow: 0 15px 40px rgba(240, 147, 251, 0.25);
-   border-color: #f093fb;
+        box-shadow: 0 15px 40px rgba(240, 147, 251, 0.25);
+        border-color: #004225;
     }
 
     .card-gradient-bg {
-   position: absolute;
+        position: absolute;
         top: 0;
-     left: 0;
-  right: 0;
+        left: 0;
+        right: 0;
         height: 5px;
-     background: linear-gradient(90deg, #f093fb, #f5576c);
+        background: var(--gradient-aurora);
     }
 
- .card-content {
+    .card-content {
         padding: 1.75rem;
-  flex: 1;
- display: flex;
-   flex-direction: column;
-  }
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
     .card-icon {
-      font-size: 2.5rem;
-   margin-bottom: 1rem;
-   display: inline-block;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        display: inline-block;
         transition: transform 0.3s ease;
     }
 
@@ -117,75 +146,75 @@ display: flex;
 
     .card-title {
         font-size: 1.25rem;
-   font-weight: 700;
-  color: #2d3748;
-    margin-bottom: 0.75rem;
-  line-height: 1.4;
-  }
-
-    .card-summary {
-     color: #718096;
-     font-size: 0.9rem;
-        line-height: 1.6;
-        margin-bottom: 1.25rem;
-   flex: 1;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
     }
 
- .card-badge {
+    .card-summary {
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+        flex: 1;
+    }
+
+    .card-badge {
         display: inline-flex;
         align-items: center;
-  padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, #f093fb, #f5576c);
+        padding: 0.5rem 1rem;
+        background: var(--gradient-aurora);
         color: white;
-        border-radius: 20px;
-    font-size: 0.85rem;
-      font-weight: 600;
-   transition: all 0.3s ease;
-   align-self: flex-start;
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        align-self: flex-start;
     }
 
     .article-card:hover .card-badge {
         transform: translateX(5px);
-        box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+        box-shadow: var(--shadow-aurora);
     }
 
-    /* Y¸kleniyor Animasyonu */
+    /* Y√ºkleniyor Animasyonu */
     .loading-container {
-  text-align: center;
+        text-align: center;
         padding: 4rem 2rem;
     }
 
- .loading-spinner {
-width: 50px;
-  height: 50px;
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
         border: 4px solid #f3f4f6;
-     border-top-color: #f093fb;
+        border-top-color: #004225;
         border-radius: 50%;
         animation: spin 1s linear infinite;
-    margin: 0 auto 1.5rem;
-}
+        margin: 0 auto 1.5rem;
+    }
 
- @@keyframes spin {
+    @@keyframes spin {
         to { transform: rotate(360deg); }
-  }
+    }
 
-    /* Bo˛ ›Áerik */
+    /* Bo≈ü ƒ∞√ßerik */
     .empty-state {
-   text-align: center;
+        text-align: center;
         padding: 4rem 2rem;
         background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
-  border-radius: 20px;
+        border-radius: 20px;
     }
 
     .empty-icon {
-      font-size: 4rem;
-     margin-bottom: 1.5rem;
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
         opacity: 0.5;
     }
 
-    /* Hata Mesaj˝ */
+    /* Hata Mesajƒ± */
     .error-alert {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
         color: white;
         padding: 2rem;
         border-radius: 15px;
@@ -194,88 +223,133 @@ width: 50px;
 
     /* Responsive */
     @@media (max-width: 768px) {
-  .guide-hero h1 {
-  font-size: 2rem;
-     }
+        .guide-hero h1 {
+            font-size: 2rem;
+        }
 
         .guide-hero p {
-      font-size: 1rem;
-      }
+            font-size: 1rem;
+        }
 
-   .category-header h2 {
-          font-size: 1.5rem;
-  }
+        .category-header h2 {
+            font-size: 1.5rem;
+        }
 
         .article-grid {
-          grid-template-columns: 1fr;
-     }
+            grid-template-columns: 1fr;
+        }
+    }
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>
 
 <div class="container my-5">
     <!-- Hero Section -->
     <div class="guide-hero">
-        <h1>&#x1F4BC; ›˛ Hayat˝ Rehberi</h1>
-<p>›lk i˛iniz ve profesyonel kariyeriniz iÁin ihtiyac˝n˝z olan t¸m bilgiler</p>
+        <h1>üíº ƒ∞≈ü Hayatƒ± Rehberi</h1>
+    </div>
+
+    <!-- Quick Navigation Menu (Hamburger Style) -->
+    <div class="quick-nav mb-4">
+        <button class="btn btn-outline-primary btn-lg w-100 d-flex justify-content-between align-items-center" 
+                type="button" data-bs-toggle="collapse" data-bs-target="#guideQuickNav">
+            <span><i class="bi bi-list me-2"></i>Hƒ±zlƒ± Eri≈üim Men√ºs√º</span>
+            <i class="bi bi-chevron-down"></i>
+        </button>
+        <div class="collapse show" id="guideQuickNav">
+            <div class="card glass-card border-0 mt-2 p-3">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="/guide" class="nav-card text-decoration-none d-block p-3 rounded-3 text-center">
+                            <i class="bi bi-mortarboard-fill fs-2 text-primary"></i>
+                            <h6 class="mt-2 mb-0 text-dark">√úniversite Rehberi</h6>
+                            <small class="text-muted">√úniversite ve b√∂l√ºm se√ßimi</small>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/universities" class="nav-card text-decoration-none d-block p-3 rounded-3 text-center">
+                            <i class="bi bi-bank2 fs-2 text-success"></i>
+                            <h6 class="mt-2 mb-0 text-dark">√úniversiteler</h6>
+                            <small class="text-muted">T√ºm √ºniversiteleri ke≈üfet</small>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/cv-samples" class="nav-card text-decoration-none d-block p-3 rounded-3 text-center">
+                            <i class="bi bi-file-earmark-person fs-2 text-warning"></i>
+                            <h6 class="mt-2 mb-0 text-dark">CV √ñrnekleri</h6>
+                            <small class="text-muted">Profesyonel CV ≈üablonlarƒ±</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     @if (isLoading)
     {
-      <div class="loading-container">
-       <div class="loading-spinner"></div>
- <h3 style="color: #718096;">Rehber y¸kleniyor...</h3>
-   <p style="color: #a0aec0;">L¸tfen bekleyin</p>
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <h3 style="color: #718096;">Rehber y√ºkleniyor...</h3>
+            <p style="color: #a0aec0;">L√ºtfen bekleyin</p>
         </div>
     }
     else if (!string.IsNullOrEmpty(errorMessage))
     {
-   <div class="error-alert">
-  <h3>&#x26A0; Bir Hata Olu˛tu</h3>
-   <p>@errorMessage</p>
+        <div class="error-alert">
+            <h3>‚ö†Ô∏è Bir Hata Olu≈ütu</h3>
+            <p>@errorMessage</p>
         </div>
     }
     else if (careerCategory != null && careerCategory.Articles.Any())
     {
-      <div class="category-section">
-         <div class="category-header">
-            <span class="category-icon">&#x1F4BC;</span>
-    <h2>@careerCategory.Title</h2>
-     </div>
+        <div class="category-section">
+            <div class="category-header">
+                <span class="category-icon">üíº</span>
+                <h2>@careerCategory.Title</h2>
+            </div>
 
-  <div class="article-grid">
-           @for (int j = 0; j < careerCategory.Articles.Count; j++)
-        {
-    var article = careerCategory.Articles[j];
-  
-          // Makale ikonlar˝
-var articleIcon = j switch {
-        0 => "&#x1F4C4;",
-        1 => "&#x1F3AF;",
-2 => "&#x1F680;",
-   _ => "&#x1F4C4;"
-              };
+            <div class="article-grid">
+                @for (int j = 0; j < careerCategory.Articles.Count; j++)
+                {
+                    var article = careerCategory.Articles[j];
+                    
+                    // Makale ikonlarƒ±
+                    var articleIcon = j switch {
+                        0 => "üìÑ",
+                        1 => "üéØ",
+                        2 => "üöÄ",
+                        _ => "üìÑ"
+                    };
 
-<div class="article-card" @onclick="() => NavigateToArticle(careerCategory.Slug, article.Slug)">
-         <div class="card-gradient-bg"></div>
-  <div class="card-content">
-     <div class="card-icon">@((MarkupString)articleIcon)</div>
-           <h3 class="card-title">@article.Title</h3>
-        <p class="card-summary">@article.Summary</p>
-      <span class="card-badge">
-          Devam˝n˝ Oku &#x2192;
-        </span>
-      </div>
-    </div>
-  }
-   </div>
- </div>
+                    <div class="article-card" @onclick="() => NavigateToArticle(careerCategory.Slug, article.Slug)" style="animation: fadeInUp 0.5s ease backwards; animation-delay: @(j * 150)ms;">
+                        <div class="card-gradient-bg"></div>
+                        <div class="card-content">
+                            <div class="card-icon">@articleIcon</div>
+                            <h3 class="card-title">@article.Title</h3>
+                            <p class="card-summary">@article.Summary</p>
+                            <span class="card-badge">
+                                Devamƒ±nƒ± Oku ‚Üí
+                            </span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     }
     else
     {
         <div class="empty-state">
-  <div class="empty-icon">&#x1F4ED;</div>
-     <h3 style="color: #4a5568;">Hen¸z ›Áerik Yok</h3>
-     <p style="color: #718096;">Yak˝nda rehber iÁerikleri eklenecek!</p>
+            <div class="empty-icon">üì≠</div>
+            <h3 style="color: #4a5568;">Hen√ºz ƒ∞√ßerik Yok</h3>
+            <p style="color: #718096;">Yakƒ±nda rehber i√ßerikleri eklenecek!</p>
         </div>
     }
 </div>
@@ -287,23 +361,23 @@ var articleIcon = j switch {
 
     protected override async Task OnInitializedAsync()
     {
-      try
+        try
         {
-   var categories = await Http.GetFromJsonAsync<List<ContentCategoryDto>>("api/content/all");
- // Sadece "›lk ›˛im ve Profesyonel Hayat" kategorisini al
-        careerCategory = categories?.FirstOrDefault(c => c.Slug == "profesyonel-hayat");
+            var categories = await Http.GetFromJsonAsync<List<ContentCategoryDto>>("api/content/all");
+            // Sadece "ƒ∞lk ƒ∞≈üim ve Profesyonel Hayat" kategorisini al
+            careerCategory = categories?.FirstOrDefault(c => c.Slug == "profesyonel-hayat");
         }
         catch (Exception ex)
         {
-       errorMessage = ex.Message;
-    }
- finally
+            errorMessage = ex.Message;
+        }
+        finally
         {
-     isLoading = false;
+            isLoading = false;
         }
     }
 
-private void NavigateToArticle(string categorySlug, string articleSlug)
+    private void NavigateToArticle(string categorySlug, string articleSlug)
     {
         NavigationManager.NavigateTo($"/guide/{categorySlug}/{articleSlug}");
     }

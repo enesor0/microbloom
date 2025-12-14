@@ -1,0 +1,496 @@
+@page "/account/register"
+@layout microbloom.Shared.AuthLayout
+@namespace microbloom.Pages
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Text.Json
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<PageTitle>🚀 Kayıt Ol - microbloom</PageTitle>
+
+<!-- Premium Aurora Background -->
+<div class="auth-page">
+    <div class="aurora-bg-premium"></div>
+    <div class="aurora-shapes-container">
+        <div class="aurora-shape-premium aurora-shape-1-p"></div>
+        <div class="aurora-shape-premium aurora-shape-2-p"></div>
+        <div class="aurora-shape-premium aurora-shape-3-p"></div>
+    </div>
+    
+    <div class="container position-relative" style="z-index: 10;">
+        <div class="row justify-content-center align-items-center py-5" style="min-height: 100vh;">
+            <div class="col-sm-11 col-md-10 col-lg-8 col-xl-6">
+                
+                <!-- Glass Card -->
+                <div class="auth-card-premium">
+                    <!-- Header -->
+                    <div class="auth-header">
+                        <div class="mb-4">
+                            <img src="/images/logo.svg" alt="microbloom" class="auth-logo" style="width: 240px; height: 240px; object-fit: contain; aspect-ratio: 1/1;" />
+                        </div>
+                        <h1 class="auth-title">Hesap Oluştur</h1>
+                        <p class="auth-subtitle">microbloom'a katıl ve kariyer fırsatlarını keşfet</p>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                            </svg>
+                            <span>@errorMessage</span>
+                        </div>
+                    }
+                    
+                    <!-- Register Form -->
+                    <EditForm Model="@registerModel" OnValidSubmit="HandleRegister" class="auth-form">
+                        <DataAnnotationsValidator />
+                        
+                        <!-- Account Type Selection -->
+                        <div class="account-type-selector mb-4">
+                            <label class="form-label fw-semibold mb-3">Hesap Türü</label>
+                            <div class="account-type-options">
+                                <label class="account-type-option" @onclick="@(() => SetAccountType("JobSeeker"))">
+                                    <input type="radio" name="AccountType" checked="@(registerModel.AccountType == "JobSeeker")" readonly />
+                                    <div class="option-content">
+                                        <div class="option-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="option-label">Bireysel</span>
+                                        <span class="option-desc">İş Arayan</span>
+                                    </div>
+                                </label>
+                                <label class="account-type-option" @onclick="@(() => SetAccountType("Employer"))">
+                                    <input type="radio" name="AccountType" checked="@(registerModel.AccountType == "Employer")" readonly />
+                                    <div class="option-content">
+                                        <div class="option-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/>
+                                                <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3V1z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="option-label">Şirket</span>
+                                        <span class="option-desc">İşveren</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <ValidationMessage For="@(() => registerModel.AccountType)" class="text-danger small mt-1" />
+                        </div>
+                        
+                        <!-- Basic Info -->
+                        <div class="form-floating mb-3">
+                            <InputText class="form-control" id="userName" @bind-Value="registerModel.UserName" 
+                                   placeholder="Kullanıcı Adı" autocomplete="username" />
+                            <label for="userName">Kullanıcı Adı</label>
+                            <ValidationMessage For="@(() => registerModel.UserName)" class="text-danger small mt-1" />
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <InputText class="form-control" id="email" @bind-Value="registerModel.Email" 
+                                   placeholder="ornek@example.com" autocomplete="email" />
+                            <label for="email">E-posta Adresi</label>
+                            <ValidationMessage For="@(() => registerModel.Email)" class="text-danger small mt-1" />
+                        </div>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <InputText class="form-control" id="firstName" @bind-Value="registerModel.FirstName" 
+                                           placeholder="Adınız" autocomplete="given-name" />
+                                    <label for="firstName">Ad</label>
+                                    <ValidationMessage For="@(() => registerModel.FirstName)" class="text-danger small mt-1" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <InputText class="form-control" id="lastName" @bind-Value="registerModel.LastName" 
+                                           placeholder="Soyadınız" autocomplete="family-name" />
+                                    <label for="lastName">Soyad</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <InputText type="password" class="form-control" id="password" @bind-Value="registerModel.Password" 
+                                           placeholder="Şifre" autocomplete="new-password" />
+                                    <label for="password">Şifre</label>
+                                    <ValidationMessage For="@(() => registerModel.Password)" class="text-danger small mt-1" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <InputText type="password" class="form-control" id="confirmPassword" @bind-Value="registerModel.ConfirmPassword" 
+                                           placeholder="Şifre Tekrar" autocomplete="new-password" />
+                                    <label for="confirmPassword">Şifre Tekrar</label>
+                                    <ValidationMessage For="@(() => registerModel.ConfirmPassword)" class="text-danger small mt-1" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="password-hint">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                            </svg>
+                            En az 6 karakter, bir büyük harf ve bir rakam içermelidir
+                        </p>
+                        
+                        <!-- Company Fields (Hidden if not employer) -->
+                        @if (registerModel.AccountType == "Employer")
+                        {
+                            <div id="company-fields" class="company-section">
+                                <div class="company-section-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/>
+                                        <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3V1z"/>
+                                    </svg>
+                                    <span>Şirket Bilgileri</span>
+                                </div>
+                                
+                                <div class="form-floating mb-3">
+                                    <InputText class="form-control" id="company-name" @bind-Value="registerModel.CompanyName" 
+                                           placeholder="Şirket Adı" />
+                                    <label for="company-name">Şirket Adı</label>
+                                    <ValidationMessage For="@(() => registerModel.CompanyName)" class="text-danger small mt-1" />
+                                </div>
+                                
+                                <div class="form-floating mb-3">
+                                    <InputTextArea class="form-control" id="company-description" @bind-Value="registerModel.CompanyDescription" 
+                                              placeholder="Şirket Açıklaması" style="height: 100px;" />
+                                    <label for="company-description">Şirket Açıklaması</label>
+                                    <ValidationMessage For="@(() => registerModel.CompanyDescription)" class="text-danger small mt-1" />
+                                </div>
+                                
+                                <div class="form-floating">
+                                    <InputText class="form-control" id="company-logo" @bind-Value="registerModel.CompanyLogoUrl" 
+                                           placeholder="Logo URL" />
+                                    <label for="company-logo">Logo URL (Opsiyonel)</label>
+                                    <ValidationMessage For="@(() => registerModel.CompanyLogoUrl)" class="text-danger small mt-1" />
+                                </div>
+                            </div>
+                        }
+                        
+                        <button type="submit" class="btn btn-primary w-100 btn-lg auth-submit mt-4" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                <span>Kayıt Olunuyor...</span>
+                            }
+                            else
+                            {
+                                <span>Hesap Oluştur</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                </svg>
+                            }
+                        </button>
+                    </EditForm>
+                    
+                    <!-- Footer -->
+                    <div class="auth-footer">
+                        <p>Zaten hesabın var mı?</p>
+                        <a href="/account/login" class="auth-link">
+                            <span>Giriş Yap</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Back to Home -->
+                <div class="text-center mt-4">
+                    <a href="/" class="back-home">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                        <span>Ana Sayfaya Dön</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Auth Page Layout */
+    .auth-page {
+        position: relative;
+        min-height: 100vh;
+        overflow-x: hidden; /* Allow vertical scroll, prevent horizontal */
+    }
+    
+    /* Header */
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #004225, #2d6a4f);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem;
+        color: white;
+        box-shadow: 0 10px 25px -5px rgba(0, 66, 37, 0.4);
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9375rem;
+        margin: 0;
+    }
+    
+    /* Account Type Selector */
+    .account-type-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .account-type-option {
+        cursor: pointer;
+    }
+    
+    .account-type-option input {
+        display: none;
+    }
+    
+    .account-type-option .option-content {
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-primary);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        text-align: center;
+        transition: all 150ms ease;
+    }
+    
+    .account-type-option input:checked + .option-content {
+        background: linear-gradient(135deg, rgba(0, 66, 37, 0.1), rgba(45, 106, 79, 0.1));
+        border-color: var(--aurora-primary);
+    }
+    
+    .account-type-option:hover .option-content {
+        border-color: var(--aurora-primary-light);
+    }
+    
+    .option-icon {
+        color: var(--aurora-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .option-label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9375rem;
+    }
+    
+    .option-desc {
+        display: block;
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+    }
+    
+    /* Form Floating Labels Override */
+    .form-floating > .form-control {
+        height: 3.5rem;
+    }
+    
+    .form-floating > textarea.form-control {
+        height: auto;
+        min-height: 100px;
+    }
+    
+    /* Password Hint */
+    .password-hint {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        margin-top: -0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Company Section */
+    .company-section {
+        background: var(--gradient-aurora-soft);
+        border: 1px solid var(--border-primary);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .company-section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--aurora-primary);
+        margin-bottom: 1rem;
+    }
+    
+    /* Submit Button */
+    .auth-submit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    /* Footer */
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-secondary);
+    }
+    
+    .auth-footer p {
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        font-size: 0.9375rem;
+    }
+    
+    .auth-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        color: var(--aurora-primary);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 150ms ease;
+        text-decoration: none;
+    }
+    
+    .auth-link:hover {
+        color: var(--aurora-secondary);
+        gap: 0.625rem;
+    }
+    
+    /* Back Home Link */
+    .back-home {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 150ms ease;
+        text-decoration: none;
+    }
+    
+    .back-home:hover {
+        color: white;
+        gap: 0.75rem;
+    }
+</style>
+
+@code {
+    private RegisterDto registerModel = new() { AccountType = "JobSeeker" };
+    private string? errorMessage;
+    private bool isLoading = false;
+    private IJSObjectReference? module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("ErrorMessage", out var error))
+        {
+            errorMessage = error.ToString();
+        }
+
+        if (query.TryGetValue("AccountType", out var accountType))
+        {
+            registerModel.AccountType = accountType.ToString();
+        }
+    }
+
+    private void SetAccountType(string type)
+    {
+        registerModel.AccountType = type;
+    }
+
+    private async Task HandleRegister()
+    {
+        if (isLoading) return;
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            if (module != null)
+            {
+                var result = await module.InvokeAsync<JsonElement>("auth.register", "/api/account/register", registerModel);
+                
+                if (result.TryGetProperty("success", out var successInfo) && successInfo.GetBoolean())
+                {
+                    // Success handled in JS redirect
+                }
+                else
+                {
+                     if (result.TryGetProperty("errors", out var errorsInfo))
+                     {
+                         // Handle validation errors if needed, but BadRequest usually returns a dictionary.
+                         // For simplicity, we just show a generic message or the first error.
+                         errorMessage = "Lütfen form alanlarını kontrol ediniz.";
+                         // We could parse specific errors here and map to ValidationMessageStore if we wanted advanced handling.
+                     }
+                     else if (result.TryGetProperty("message", out var msgInfo))
+                     {
+                         errorMessage = msgInfo.GetString();
+                     }
+                     else
+                     {
+                         errorMessage = "Kayıt başarısız.";
+                     }
+                     isLoading = false;
+                     StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Bir hata oluştu: " + ex.Message;
+            isLoading = false;
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}

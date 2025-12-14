@@ -19,27 +19,28 @@ var builder = WebApplication.CreateBuilder(args);
 // Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<KariyerDBContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseSqlServer(connectionString));
 
 // Identity
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
-  options.Password.RequireDigit = true;
+    options.Password.RequireDigit = false;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
 })
 .AddEntityFrameworkStores<KariyerDBContext>()
-.AddDefaultTokenProviders();
+.AddDefaultTokenProviders()
+.AddClaimsPrincipalFactory<microbloom.Services.Factory.AppUserClaimsPrincipalFactory>();
 
 // Identity Cookie
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = ".AspNetCore.Identity.Application";
     options.Cookie.HttpOnly = true;
- options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-  options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Lax;
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.LoginPath = "/account/login";
@@ -55,23 +56,36 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 builder.Services.AddCascadingAuthenticationState();
 
-// HttpClient
+// HttpClient with cookie forwarding for API calls
 builder.Services.AddScoped(sp => 
 {
     var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
     var httpContext = httpContextAccessor.HttpContext;
     string baseAddress = "https://localhost:5001";
 
+    var handler = new HttpClientHandler();
+    handler.UseCookies = true;
+    handler.CookieContainer = new System.Net.CookieContainer();
+
     if (httpContext != null)
     {
         try
-    {
-     baseAddress = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+        {
+            baseAddress = $"{httpContext.Request.Scheme}://{httpContext.Request.Host.Value}";
+            
+            // Forward authentication cookie to API
+            var cookies = httpContext.Request.Cookies;
+            foreach (var cookie in cookies)
+            {
+                handler.CookieContainer.Add(
+                    new Uri(baseAddress), 
+                    new System.Net.Cookie(cookie.Key, cookie.Value));
+            }
         }
         catch { }
     }
 
-    return new HttpClient { BaseAddress = new Uri(baseAddress) };
+    return new HttpClient(handler) { BaseAddress = new Uri(baseAddress) };
 });
 
 // Services
@@ -116,6 +130,7 @@ using (var scope = app.Services.CreateScope())
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     await SeedRolesAsync(roleManager);
         await DbSeeder.SeedRolesAndAdminAsync(services);
+        await DbSeeder.SeedRandomDataAsync(services);
     }
     catch (Exception ex)
     {

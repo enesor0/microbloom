@@ -1,0 +1,380 @@
+@page "/company/profile/edit"
+@using microbloom.DTOs
+@using microbloom.Entities
+@using microbloom.Services.Interfaces
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize(Roles = "Employer")]
+
+@inject ICompanyService CompanyService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<AppUser> UserManager
+
+<PageTitle>Şirket Profili Düzenle - microbloom</PageTitle>
+
+<style>
+    .company-header {
+        background: linear-gradient(135deg, #004225, #1b4332);
+        padding: 3rem 2rem;
+        border-radius: var(--radius-2xl);
+        margin-bottom: 2rem;
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .company-header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .company-header h1 {
+        position: relative;
+        z-index: 1;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .company-header p {
+        position: relative;
+        z-index: 1;
+        opacity: 0.9;
+    }
+
+    .logo-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 20px;
+        border: 4px solid white;
+        overflow: hidden;
+        margin: 0 auto 1.5rem;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .logo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .company-form-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #004225;
+        box-shadow: 0 0 0 4px rgba(0, 66, 37, 0.1);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #004225, #1b4332);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 66, 37, 0.3);
+        color: white;
+    }
+
+    .info-box {
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-box i {
+        color: #16a34a;
+    }
+</style>
+
+<div class="container my-4">
+    <div class="company-header">
+        <div class="logo-container">
+            @if (!string.IsNullOrEmpty(companyModel.LogoUrl))
+            {
+                <img src="@companyModel.LogoUrl" alt="@companyModel.Name Logo" />
+            }
+            else
+            {
+                <span style="font-size: 3rem; color: #004225;">🏢</span>
+            }
+        </div>
+        <h1 class="text-white">@(string.IsNullOrEmpty(companyModel.Name) ? "Şirket Profili" : companyModel.Name)</h1>
+        <p class="text-white">Şirket bilgilerinizi güncelleyin</p>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+        </div>
+    }
+    else if (errorMessage != null)
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>@errorMessage
+        </div>
+    }
+    else
+    {
+        <div class="company-form-card">
+            @if (successMessage != null)
+            {
+                <div class="alert alert-success mb-4">
+                    <i class="bi bi-check-circle me-2"></i>@successMessage
+                </div>
+            }
+
+            <EditForm Model="@companyModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="alert alert-warning" />
+
+                <!-- Şirket Temel Bilgileri -->
+                <h5 class="section-title"><i class="bi bi-building me-2"></i>Şirket Bilgileri</h5>
+
+                <div class="info-box">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <small>Bu bilgiler iş ilanlarınızda ve şirket profilinizde görüntülenecektir.</small>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Şirket Adı *</label>
+                        <InputText @bind-Value="companyModel.Name" class="form-control" placeholder="Şirket adınız" />
+                        <ValidationMessage For="@(() => companyModel.Name)" class="text-danger small" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Sektör</label>
+                        <InputSelect @bind-Value="companyModel.Industry" class="form-select">
+                            <option value="">Sektör seçin...</option>
+                            <option value="Teknoloji">Teknoloji</option>
+                            <option value="E-Ticaret">E-Ticaret</option>
+                            <option value="Finans">Finans & Bankacılık</option>
+                            <option value="Sağlık">Sağlık</option>
+                            <option value="Eğitim">Eğitim</option>
+                            <option value="Üretim">Üretim & Sanayi</option>
+                            <option value="Perakende">Perakende</option>
+                            <option value="Danışmanlık">Danışmanlık</option>
+                            <option value="Diğer">Diğer</option>
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label class="form-label fw-medium">Şirket Açıklaması</label>
+                        <InputTextArea @bind-Value="companyModel.Description" class="form-control" rows="4" 
+                            placeholder="Şirketinizi tanıtın... Ne iş yapıyorsunuz? Vizyonunuz nedir?" />
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Çalışan Sayısı</label>
+                        <InputSelect @bind-Value="companyModel.EmployeeCount" class="form-select">
+                            <option value="">Seçin...</option>
+                            <option value="1-10">1-10 çalışan</option>
+                            <option value="11-50">11-50 çalışan</option>
+                            <option value="51-200">51-200 çalışan</option>
+                            <option value="201-500">201-500 çalışan</option>
+                            <option value="501-1000">501-1000 çalışan</option>
+                            <option value="1000+">1000+ çalışan</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Kuruluş Yılı</label>
+                        <InputNumber @bind-Value="companyModel.FoundedYear" class="form-control" placeholder="Örn: 2010" />
+                    </div>
+                </div>
+
+                <!-- İletişim Bilgileri -->
+                <h5 class="section-title mt-4"><i class="bi bi-telephone me-2"></i>İletişim Bilgileri</h5>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium"><i class="bi bi-globe me-2"></i>Web Sitesi</label>
+                        <InputText @bind-Value="companyModel.Website" class="form-control" placeholder="https://www.sirketiniz.com" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium"><i class="bi bi-envelope me-2"></i>İletişim E-postası</label>
+                        <InputText @bind-Value="companyModel.ContactEmail" class="form-control" placeholder="info@sirketiniz.com" />
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium"><i class="bi bi-telephone me-2"></i>Telefon</label>
+                        <InputText @bind-Value="companyModel.Phone" class="form-control" placeholder="+90 212 XXX XX XX" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium"><i class="bi bi-geo-alt me-2"></i>Lokasyon</label>
+                        <InputText @bind-Value="companyModel.Location" class="form-control" placeholder="İstanbul, Türkiye" />
+                    </div>
+                </div>
+
+                <!-- Sosyal Medya -->
+                <h5 class="section-title mt-4"><i class="bi bi-share me-2"></i>Sosyal Medya</h5>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium"><i class="bi bi-linkedin me-2"></i>LinkedIn</label>
+                        <InputText @bind-Value="companyModel.LinkedInUrl" class="form-control" placeholder="https://linkedin.com/company/..." />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium"><i class="bi bi-twitter-x me-2"></i>Twitter/X</label>
+                        <InputText @bind-Value="companyModel.TwitterUrl" class="form-control" placeholder="https://twitter.com/..." />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium"><i class="bi bi-instagram me-2"></i>Instagram</label>
+                        <InputText @bind-Value="companyModel.InstagramUrl" class="form-control" placeholder="https://instagram.com/..." />
+                    </div>
+                </div>
+
+                <!-- Logo -->
+                <h5 class="section-title mt-4"><i class="bi bi-image me-2"></i>Şirket Logosu</h5>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label class="form-label fw-medium">Logo URL</label>
+                        <InputText @bind-Value="companyModel.LogoUrl" class="form-control" placeholder="https://... (Logo resmi URL'si)" />
+                        <small class="text-muted">Logo resminizin URL'sini girin veya bir resim yükleyin.</small>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="/company-dashboard" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left me-2"></i>Geri Dön
+                    </a>
+                    <button type="submit" class="btn btn-save" disabled="@isSaving">
+                        @if (isSaving)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            <span>Kaydediliyor...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-check-lg me-2"></i>
+                            <span>Değişiklikleri Kaydet</span>
+                        }
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    }
+</div>
+
+@code {
+    private CompanyProfileDto companyModel = new();
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string? errorMessage;
+    private string? successMessage;
+    private int? currentCompanyId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+             if (user.Identity?.IsAuthenticated == true)
+            {
+                var appUser = await UserManager.GetUserAsync(user);
+                if (appUser?.CompanyId != null)
+                {
+                    currentCompanyId = appUser.CompanyId;
+                    var profile = await CompanyService.GetCompanyProfileAsync(currentCompanyId.Value);
+                    if (profile != null)
+                    {
+                        companyModel = profile;
+                    }
+                }
+                else
+                {
+                    errorMessage = "Şirket kaydınız bulunamadı.";
+                }
+            }
+            else
+            {
+                errorMessage = "Oturum açmanız gerekiyor.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Hata: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (!currentCompanyId.HasValue) return;
+
+        isSaving = true;
+        successMessage = null;
+        errorMessage = null;
+
+        try
+        {
+            await CompanyService.UpdateCompanyProfileAsync(currentCompanyId.Value, companyModel);
+            successMessage = "Şirket bilgileri başarıyla güncellendi!";
+            
+            // Re-fetch to ensure we have the latest state (optional)
+            var profile = await CompanyService.GetCompanyProfileAsync(currentCompanyId.Value);
+            if(profile != null) companyModel = profile;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Güncelleme başarısız: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

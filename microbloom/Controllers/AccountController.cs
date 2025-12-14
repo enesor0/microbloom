@@ -35,27 +35,26 @@ namespace microbloom.Controllers
 
     [HttpPost("register")]
     [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             var isCompanyAccount = string.Equals(registerDto.AccountType, "Employer", StringComparison.OrdinalIgnoreCase);
-            var accountTypeQuery = $"AccountType={(isCompanyAccount ? "Employer" : "JobSeeker")}";
 
             if (!ModelState.IsValid)
             {
-                var errors = string.Join(" ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-                return Redirect($"/account/register?{accountTypeQuery}&ErrorMessage={Uri.EscapeDataString(errors)}");
+                return BadRequest(ModelState);
             }
 
             try
             {
                 if (isCompanyAccount && string.IsNullOrWhiteSpace(registerDto.CompanyName))
                 {
-                    return Redirect($"/account/register?{accountTypeQuery}&ErrorMessage={Uri.EscapeDataString("Şirket kaydı için şirket adı gereklidir.")}");
+                    ModelState.AddModelError("CompanyName", "Şirket kaydı için şirket adı gereklidir.");
+                    return BadRequest(ModelState);
                 }
 
                 var user = new AppUser
                 {
-                    UserName = registerDto.Email,
+                    UserName = registerDto.UserName,
                     Email = registerDto.Email,
                     FirstName = registerDto.FirstName,
                     LastName = registerDto.LastName
@@ -65,16 +64,24 @@ namespace microbloom.Controllers
 
                 if (!result.Succeeded)
                 {
-                    var errors = string.Join(" ", result.Errors.Select(e => e.Description));
-                    return Redirect($"/account/register?{accountTypeQuery}&ErrorMessage={Uri.EscapeDataString(errors)}");
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(error.Code, error.Description);
+                    }
+                    return BadRequest(ModelState);
                 }
 
                 var targetRole = isCompanyAccount ? "Employer" : "JobSeeker";
                 var roleResult = await _userManager.AddToRoleAsync(user, targetRole);
                 if (!roleResult.Succeeded)
                 {
-                    var errors = string.Join(" ", roleResult.Errors.Select(e => e.Description));
-                    return Redirect($"/account/register?{accountTypeQuery}&ErrorMessage={Uri.EscapeDataString("Rol atanırken hata: " + errors)}");
+                    // Clean up user if role assignment fails
+                    await _userManager.DeleteAsync(user);
+                     foreach (var error in roleResult.Errors)
+                    {
+                        ModelState.AddModelError(error.Code, error.Description);
+                    }
+                    return BadRequest(ModelState);
                 }
 
                 if (isCompanyAccount)
@@ -101,12 +108,12 @@ namespace microbloom.Controllers
                 await _signInManager.SignInAsync(user, isPersistent: false);
         
                 _logger.LogInformation("New user registered and logged in: {Email}", user.Email);
-                return Redirect(isCompanyAccount ? "/company-dashboard" : "/");
+                return Ok(new { success = true, returnUrl = isCompanyAccount ? "/company-dashboard" : "/" });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during registration");
-                return Redirect($"/account/register?{accountTypeQuery}&ErrorMessage={Uri.EscapeDataString("Kayıt sırasında bir hata oluştu.")}");
+                return StatusCode(500, "Kayıt sırasında bir hata oluştu.");
             }
         }
 
@@ -121,8 +128,17 @@ namespace microbloom.Controllers
                 return ValidationProblem(ModelState);
             }
 
+            // Find user by email to get their UserName (required for PasswordSignInAsync)
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            if (user == null)
+            {
+                // User not found
+                _logger.LogWarning("Invalid credentials for {Email} via API login.", loginDto.Email);
+                return Unauthorized(new { message = "E-posta veya şifre hatalı." });
+            }
+
             var result = await _signInManager.PasswordSignInAsync(
-                loginDto.Email,
+                user.UserName!,
                 loginDto.Password,
                 isPersistent: false,
                 lockoutOnFailure: false);
@@ -223,5 +239,114 @@ namespace microbloom.Controllers
 
             return Url.IsLocalUrl(returnUrl) ? returnUrl : Url.Content("~/");
         }
+
+        // Email ile kullanıcıyı Employer yap ve şirket oluştur (geliştirme amaçlı)
+        [HttpPost("make-employer")]
+        [AllowAnonymous]
+        public async Task<IActionResult> MakeEmployer([FromBody] MakeEmployerDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email))
+            {
+                return BadRequest(new { Message = "Email gereklidir." });
+            }
+
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(dto.Email);
+                if (user == null)
+                {
+                    return NotFound(new { Message = "Kullanıcı bulunamadı." });
+                }
+
+                // Mevcut rolleri kontrol et
+                var currentRoles = await _userManager.GetRolesAsync(user);
+
+                // JobSeeker rolünü kaldır
+                if (currentRoles.Contains("JobSeeker"))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, "JobSeeker");
+                }
+
+                // Employer rolü yoksa ekle
+                if (!currentRoles.Contains("Employer"))
+                {
+                    var result = await _userManager.AddToRoleAsync(user, "Employer");
+                    if (!result.Succeeded)
+                    {
+                        return BadRequest(new { Message = "Rol atanamadı: " + string.Join(", ", result.Errors.Select(e => e.Description)) });
+                    }
+                }
+
+                // Şirket yoksa oluştur ve bağla
+                if (user.CompanyId == null)
+                {
+                    var company = new Company
+                    {
+                        Name = dto.CompanyName ?? user.FirstName + " " + user.LastName + " Şirketi",
+                        Description = "Şirket açıklaması henüz eklenmedi."
+                    };
+                    _context.Companies.Add(company);
+                    await _context.SaveChangesAsync();
+
+                    user.CompanyId = company.Id;
+                    await _userManager.UpdateAsync(user);
+                }
+
+                return Ok(new { Message = $"{dto.Email} hesabına Employer rolü ve şirket atandı. Yeniden giriş yapın.", CompanyId = user.CompanyId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = $"Hata: {ex.Message}" });
+            }
+        }
+
+        // Şifre sıfırlama - email ile
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetDto)
+        {
+            if (string.IsNullOrWhiteSpace(resetDto.Email) || string.IsNullOrWhiteSpace(resetDto.NewPassword))
+            {
+                return BadRequest(new { Message = "Email ve yeni şifre gereklidir." });
+            }
+
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(resetDto.Email);
+                if (user == null)
+                {
+                    return NotFound(new { Message = "Bu email adresiyle kayıtlı kullanıcı bulunamadı." });
+                }
+
+                // Şifreyi sıfırla
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, resetDto.NewPassword);
+
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    return BadRequest(new { Message = $"Şifre sıfırlama başarısız: {errors}" });
+                }
+
+                return Ok(new { Message = "Şifre başarıyla sıfırlandı." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Şifre sıfırlama sırasında hata oluştu.");
+                return BadRequest(new { Message = $"Hata: {ex.Message}" });
+            }
+        }
+    }
+
+    public class MakeEmployerDto
+    {
+        public string Email { get; set; } = string.Empty;
+        public string? CompanyName { get; set; }
+    }
+
+    public class ResetPasswordDto
+    {
+        public string Email { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
     }
 }

@@ -1,48 +1,41 @@
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
+using microbloom.Entities;
 
 namespace microbloom.Services
 {
-    /// <summary>
-    /// Basit ve çalýþýr Server Authentication State Provider
-    /// HttpContext'ten direkt user bilgisini okur
-  /// </summary>
     public class ServerAuthenticationStateProvider : AuthenticationStateProvider
     {
+        private readonly UserManager<AppUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
-  private readonly ILogger<ServerAuthenticationStateProvider> _logger;
+        private readonly ILogger<ServerAuthenticationStateProvider> _logger;
 
         public ServerAuthenticationStateProvider(
+            UserManager<AppUser> userManager,
             IHttpContextAccessor httpContextAccessor,
-         ILogger<ServerAuthenticationStateProvider> logger)
+            ILogger<ServerAuthenticationStateProvider> logger)
         {
-       _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
-    }
+        }
 
         public override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-     
-            if (httpContext?.User?.Identity?.IsAuthenticated == true)
-      {
-         _logger.LogInformation($"? User authenticated: {httpContext.User.Identity.Name}");
-           return Task.FromResult(new AuthenticationState(httpContext.User));
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            if (user == null || !user.Identity!.IsAuthenticated)
+            {
+                return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+            }
+
+            return Task.FromResult(new AuthenticationState(user));
         }
 
-_logger.LogInformation("?? User not authenticated");
-            return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+        public async Task SignOutAsync()
+        {
+             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
         }
-
-        /// <summary>
-      /// Auth state deðiþtiðinde UI'ý bilgilendir
-        /// Login/Logout sonrasý çaðrýlmalý
-   /// </summary>
-  public void NotifyAuthenticationStateChanged()
- {
-            _logger.LogInformation("?? NotifyAuthenticationStateChanged called");
-   NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-    }
     }
 }
