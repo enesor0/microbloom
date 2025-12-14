@@ -1,0 +1,179 @@
+@page "/company/{CompanyId:int}"
+@using microbloom.DTOs
+@using microbloom.Services.Interfaces
+@using Microsoft.AspNetCore.Authorization
+
+@inject ICompanyService CompanyService
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize]
+
+<PageTitle>@(_company?.Name) - Şirket Profili</PageTitle>
+
+<div class="container my-5">
+    @if (_isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+        </div>
+    }
+    else if (_company == null)
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>Şirket profili bulunamadı.
+        </div>
+        <button class="btn btn-outline-secondary" @onclick="GoBack">
+            <i class="bi bi-arrow-left me-2"></i>Geri Dön
+        </button>
+    }
+    else
+    {
+        <button class="btn btn-outline-secondary mb-4" @onclick="GoBack">
+            <i class="bi bi-arrow-left me-2"></i>Geri Dön
+        </button>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Company Header -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-4 flex-wrap">
+                            <div class="profile-avatar">
+                                @if (!string.IsNullOrEmpty(_company.LogoUrl))
+                                {
+                                    <img src="@_company.LogoUrl" alt="Logo" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #004225;" />
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                        <i class="bi bi-building text-white fs-1"></i>
+                                    </div>
+                                }
+                            </div>
+                            <div class="flex-grow-1">
+                                <h2 class="mb-1 fw-bold">@_company.Name</h2>
+                                @if (!string.IsNullOrEmpty(_company.Industry))
+                                {
+                                    <p class="text-muted mb-2"><i class="bi bi-briefcase me-1"></i> @_company.Industry</p>
+                                }
+                                <div class="mb-2 text-muted small">
+                                    @if (!string.IsNullOrEmpty(_company.Location))
+                                    {
+                                        <span class="me-3"><i class="bi bi-geo-alt me-1"></i> @_company.Location</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(_company.ContactEmail))
+                                    {
+                                        <span><i class="bi bi-envelope me-1"></i> @_company.ContactEmail</span>
+                                    }
+                                </div>
+                                
+                                <div class="d-flex gap-3 flex-wrap mt-3">
+                                    @if (!string.IsNullOrEmpty(_company.Website))
+                                    {
+                                        <a href="@_company.Website" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-globe me-1"></i>Website
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(_company.LinkedInUrl))
+                                    {
+                                        <a href="@_company.LinkedInUrl" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-linkedin me-1"></i>LinkedIn
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(_company.TwitterUrl))
+                                    {
+                                        <a href="@_company.TwitterUrl" target="_blank" class="btn btn-sm btn-outline-dark">
+                                            <i class="bi bi-twitter-x me-1"></i>Twitter
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio/Description Section -->
+                @if (!string.IsNullOrEmpty(_company.Description))
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-info-circle-fill me-2 text-primary"></i>Hakkında</h5>
+                            <p class="mb-0" style="white-space: pre-line;">@_company.Description</p>
+                        </div>
+                    </div>
+                }
+
+                <!-- Stats -->
+                <div class="row g-3 mb-4">
+                    @if (!string.IsNullOrEmpty(_company.EmployeeCount))
+                    {
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                                        <i class="bi bi-people-fill text-info fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Çalışan Sayısı</small>
+                                        <span class="fw-bold">@_company.EmployeeCount</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (_company.FoundedYear.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                                        <i class="bi bi-calendar-check-fill text-warning fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Kuruluş Yılı</small>
+                                        <span class="fw-bold">@_company.FoundedYear</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int CompanyId { get; set; }
+
+    private CompanyProfileDto? _company;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (CompanyId > 0)
+            {
+                _company = await CompanyService.GetCompanyProfileAsync(CompanyId);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Şirket profili yükleme hatası: {ex.Message}");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/my-applications");
+    }
+}

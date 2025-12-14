@@ -5,7 +5,7 @@ namespace microbloom.Services.Interfaces
 {
     public interface ICompanyService
     {
-        Task<JobPosting> CreateJobPostingAsync(CreateJobDto jobDto, int companyId);
+        Task<JobPostingDto> CreateJobPostingAsync(CreateJobDto jobDto, int companyId);
         Task<List<JobPostingDto>> GetJobsByCompanyAsync(int companyId);
         Task<List<ApplicationDto>> GetApplicationsForJobAsync(int jobId);
         Task UpdateApplicationStatusAsync(int applicationId, string status, int companyId);

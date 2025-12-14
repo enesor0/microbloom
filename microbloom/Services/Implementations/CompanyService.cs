@@ -15,7 +15,7 @@ namespace microbloom.Services.Implementations
             _context = context;
         }
 
-        public async Task<JobPosting> CreateJobPostingAsync(CreateJobDto jobDto, int companyId)
+        public async Task<JobPostingDto> CreateJobPostingAsync(CreateJobDto jobDto, int companyId)
         {
             var jobPosting = new JobPosting
             {
@@ -30,7 +30,21 @@ namespace microbloom.Services.Implementations
             _context.JobPostings.Add(jobPosting);
             await _context.SaveChangesAsync();
 
-            return jobPosting;
+            var companyName = await _context.Companies
+                .Where(c => c.Id == companyId)
+                .Select(c => c.Name)
+                .FirstOrDefaultAsync();
+
+            return new JobPostingDto
+            {
+                Id = jobPosting.Id,
+                Title = jobPosting.Title,
+                Description = jobPosting.Description,
+                Location = jobPosting.Location,
+                PostedDate = jobPosting.PostedDate,
+                IsActive = jobPosting.IsActive,
+                CompanyName = companyName
+            };
         }
 
         public async Task<List<JobPostingDto>> GetJobsByCompanyAsync(int companyId)

@@ -76,6 +76,14 @@
                                     <h5 class="card-title mb-1 fw-bold text-primary">
                                         @app.JobTitle
                                     </h5>
+                                    @if (!string.IsNullOrEmpty(app.CompanyName) && !string.IsNullOrEmpty(app.CompanyId))
+                                    {
+                                        <p class="mb-1">
+                                            <a href="/company/@app.CompanyId" class="text-secondary text-decoration-none small">
+                                                <i class="bi bi-building"></i> @app.CompanyName
+                                            </a>
+                                        </p>
+                                    }
                                 </div>
                                 @if (app.Status == "Pending")
                                 {
