@@ -2,8 +2,13 @@
 
 namespace microbloom.Entities
 {
+    /// <summary>
+    /// Uygulama kullanıcı sınıfı. ASP.NET Core Identity'den (IdentityUser) türer.
+    /// Bu sayede Id, UserName, Email, PasswordHash gibi standart alanlar otomatik gelir.
+    /// </summary>
     public class AppUser : IdentityUser
     {
+        // Ekstra kullanıcı özellikleri buraya eklenir.
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
@@ -19,7 +24,8 @@ namespace microbloom.Entities
         public string? WebsiteUrl { get; set; }
         public string? Skills { get; set; } // Comma separated
 
-        // Company İlişkisi - Bir kullanıcı bir şirkete ait
+        // Company İlişkisi: İlişkisel veritabanı yapısı (Foreign Key).
+        // Eğer kullanıcı bir şirket hesabı ise, CompanyId dolu olur.
         public int? CompanyId { get; set; }
         public Company? Company { get; set; }
 

@@ -5,6 +5,9 @@ using microbloom.Services.Interfaces;
 
 namespace microbloom.Services.Implementations
 {
+    /// <summary>
+    /// İş ilanları ile ilgili arama ve listeleme işlemlerini yöneten servis.
+    /// </summary>
     public class JobService : IJobService
     {
         private readonly KariyerDBContext _context;
@@ -55,8 +58,13 @@ namespace microbloom.Services.Implementations
             };
         }
 
+        /// <summary>
+        /// İlan arama mantığı. Parametreler boşsa filtreleme yapılmaz.
+        /// LINQ sorguları ile veritabanı üzerinde filtreleme yapılır.
+        /// </summary>
         public async Task<List<JobPostingDto>> SearchJobsAsync(string keyword, string location)
         {
+            // IQueryable: Sorgu henüz veritabanına atılmadı, sadece oluşturuluyor.
             var query = _context.JobPostings
                 .Include(jp => jp.Company)
                 .Where(jp => jp.IsActive);

@@ -14,16 +14,27 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 Console.OutputEncoding = Encoding.UTF8;
 Console.InputEncoding = Encoding.UTF8;
 
+// ============================================================
+// MICROBLOOM - PROJE YAPILANDIRMASI (Entry Point)
+// ============================================================
+// Bu dosya, uygulamanın Dependency Injection (DI) konteynerini,
+// veritabanı bağlantılarını, kimlik doğrulama (Identity) ve 
+// HTTP istek hattını (Pipeline) yapılandırır.
+// ============================================================
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Database
+// 1. VERİTABANI BAĞLANTISI (EF Core)
+// SQL Server kullanılarak veritabanı bağlamı (Context) havuza eklenir.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<KariyerDBContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Identity
+// 2. KİMLİK DOĞRULAMA (Identity)
+// Kullanıcı yönetimi, rol tabanlı yetkilendirme ve parola kuralları burada belirlenir.
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
+    // Sunum Notu: Geliştirme kolaylığı için parola kuralları esnek tutulmuştur.
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
@@ -50,9 +61,21 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 // HttpContextAccessor
-builder.Services.AddHttpContextAccessor();
+// 3. BAĞIMLILIK ENJEKSİYONU (Dependency Injection - Services)
+// Katmanlı mimarinin servisleri (Business Logic) burada Scoped ömrüyle kaydedilir.
+// Bu sayede her HTTP isteği için yeni bir servis örneği oluşturulur.
+builder.Services.AddScoped<IAuthService, ServerAuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUniversityService, UniversityService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<ICvSampleService, CvSampleService>();
+builder.Services.AddScoped<IContentService, ContentService>();
+builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
-// ✅ BASİT: Sadece ServerAuthenticationStateProvider
+// HttpContext ve Auth State (Blazor için kritik)
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 builder.Services.AddCascadingAuthenticationState();
 
@@ -88,15 +111,7 @@ builder.Services.AddScoped(sp =>
     return new HttpClient(handler) { BaseAddress = new Uri(baseAddress) };
 });
 
-// Services
-builder.Services.AddScoped<IAuthService, ServerAuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUniversityService, UniversityService>();
-builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-builder.Services.AddScoped<ICvSampleService, CvSampleService>();
-builder.Services.AddScoped<IContentService, ContentService>();
-builder.Services.AddScoped<IJobService, JobService>();
-builder.Services.AddScoped<ICompanyService, CompanyService>();
+
 
 // Blazor
 builder.Services.AddRazorPages();

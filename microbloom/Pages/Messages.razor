@@ -1,0 +1,486 @@
+@page "/messages"
+@page "/messages/{ContactId}"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@using microbloom.Entities
+@using microbloom.Services.Interfaces
+@using microbloom.DTOs
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+@using System
+@using System.Collections.Generic
+@inject IMessageService MessageService
+@inject UserManager<AppUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject IWebHostEnvironment Environment
+@attribute [Authorize]
+
+<div class="container my-4">
+    <div class="row g-4" style="height: calc(100vh - 140px); min-height: 600px;">
+        <!-- Contacts List -->
+        <div class="col-md-4 h-100">
+            <div class="card border-0 shadow-lg h-100 glass-panel overflow-hidden">
+                <div class="card-header bg-transparent border-bottom border-secondary border-opacity-10 p-4">
+                    <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-chat-square-text-fill me-2"></i>Mesajlar</h5>
+                </div>
+                <div class="list-group list-group-flush overflow-auto h-100 p-2">
+                    @foreach (var contactDto in contacts)
+                    {
+                        <a href="/messages/@contactDto.ContactId" class="list-group-item list-group-item-action border-0 rounded-3 mb-1 p-3 transition-all @(contactDto.ContactId == ContactId ? "active-chat" : "")">
+                            <div class="d-flex align-items-center">
+                                <div class="position-relative">
+                                    <div class="avatar-circle bg-gradient-primary text-white d-flex align-items-center justify-content-center shadow-sm">
+                                        <span class="fs-5 fw-bold">@(contactDto.UserName?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                                    </div>
+                                    @if(contactDto.HasUnread)
+                                    {
+                                        <span class="position-absolute bottom-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                            <span class="visually-hidden">Unread</span>
+                                        </span>
+                                    }
+                                    else 
+                                    {
+                                         <span class="position-absolute bottom-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle">
+                                            <span class="visually-hidden">Online</span>
+                                        </span>
+                                    }
+                                </div>
+                                <div class="ms-3 flex-grow-1 min-w-0">
+                                    <div class="d-flex justify-content-between align-items-baseline">
+                                        <h6 class="mb-0 fw-bold text-truncate @(contactDto.HasUnread ? "text-primary" : "text-dark")">@contactDto.UserName</h6>
+                                        <small class="text-muted" style="font-size: 0.75rem;">@contactDto.LastMessageDate.ToLocalTime().ToString("HH:mm")</small>
+                                    </div>
+                                    @if(contactDto.HasUnread)
+                                    {
+                                        <p class="mb-0 small text-truncate fw-bold text-dark">@contactDto.LastMessage</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="mb-0 text-muted small text-truncate">@contactDto.LastMessage</p>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    }
+                    @if (contacts.Count == 0)
+                    {
+                        <div class="d-flex flex-column align-items-center justify-content-center h-50 text-muted opacity-75">
+                            <i class="bi bi-inbox fs-1 mb-2"></i>
+                            <p>Henüz mesajınız yok.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="col-md-8 h-100">
+            @if (!string.IsNullOrEmpty(ContactId))
+            {
+                <div class="card border-0 shadow-lg h-100 glass-panel overflow-hidden d-flex flex-column">
+                    <!-- Chat Header -->
+                    <div class="card-header bg-white bg-opacity-75 border-bottom border-secondary border-opacity-10 p-3 backdrop-blur">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-circle-sm bg-gradient-primary text-white d-flex align-items-center justify-content-center shadow-sm me-3">
+                                <span class="fw-bold">@(currentContactName.FirstOrDefault().ToString().ToUpper())</span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold text-dark">@currentContactName</h5>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-success rounded-pill me-1" style="width: 8px; height: 8px; padding: 0;"></span>
+                                    <small class="text-muted">Çevrimiçi</small>
+                                </div>
+                            </div>
+                            <div class="ms-auto">
+                                <!-- Buttons removed for cleaner UI -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div class="card-body overflow-auto d-flex flex-column p-4 chat-background flex-grow-1" id="chatArea">
+                        @if (messages.Count == 0)
+                        {
+                            <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted opacity-75">
+                                <div class="bg-light rounded-circle p-4 mb-3 shadow-sm">
+                                    <i class="bi bi-chat-heart-fill fs-1 text-primary"></i>
+                                </div>
+                                <h5>Sohbet Başladı!</h5>
+                                <p>İlk mesajı göndererek sohbeti başlatın.</p>
+                            </div>
+                        }
+                        
+                        @foreach (var msg in messages)
+                        {
+                            <div class="d-flex mb-3 fade-in @(msg.SenderId == currentUserId ? "justify-content-end" : "justify-content-start")">
+                                @if(msg.SenderId != currentUserId) 
+                                {
+                                    <div class="avatar-circle-xs bg-gradient-secondary text-white d-flex align-items-center justify-content-center me-2 align-self-end mb-1 shadow-sm">
+                                        <small>@(currentContactName.FirstOrDefault().ToString().ToUpper())</small>
+                                    </div>
+                                }
+                                
+                                <div class="message-bubble shadow-sm @(msg.SenderId == currentUserId ? "sender" : "receiver")">
+                                    @if (!string.IsNullOrEmpty(msg.AttachmentUrl))
+                                    {
+                                        <div class="mb-2">
+                                            <a href="@msg.AttachmentUrl" target="_blank">
+                                                <img src="@msg.AttachmentUrl" class="img-fluid rounded" style="max-height: 200px;" alt="Attachment" />
+                                            </a>
+                                        </div>
+                                    }
+                                    <p class="mb-1 message-text">@msg.Content</p>
+                                    <div class="d-flex align-items-center justify-content-end gap-1 mt-1">
+                                        <small class="message-time @(msg.SenderId == currentUserId ? "text-white-50" : "text-muted")">
+                                            @msg.SentAt.ToLocalTime().ToString("HH:mm")
+                                        </small>
+                                        @if(msg.SenderId == currentUserId)
+                                        {
+                                            <i class="bi @(msg.IsRead ? "bi-check-all text-info" : "bi-check text-white-50")" style="font-size: 0.85rem;"></i>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="card-footer bg-white bg-opacity-90 border-top border-secondary border-opacity-10 p-3 backdrop-blur position-relative">
+                        @if (showEmojiPicker)
+                        {
+                            <div class="emoji-picker shadow-lg rounded-3 p-2 bg-white position-absolute bottom-100 start-0 mb-2 border ms-3" style="max-width: 300px; z-index: 1000;">
+                                <div class="d-flex flex-wrap gap-2" style="max-height: 200px; overflow-y: auto;">
+                                    @foreach (var emoji in commonEmojis)
+                                    {
+                                        <button class="btn btn-sm btn-light fs-5" @onclick="() => AddEmoji(emoji)">@emoji</button>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="input-group bg-light rounded-pill shadow-inner p-1">
+                            <button class="btn btn-link text-muted rounded-circle ms-1 hover-rotate" @onclick="ToggleEmojiPicker">
+                                <i class="bi bi-emoji-smile fs-5"></i>
+                            </button>
+                            <label class="btn btn-link text-muted rounded-circle hover-rotate" style="cursor: pointer;">
+                                <i class="bi bi-paperclip fs-5"></i>
+                                <InputFile OnChange="HandleFileSelected" hidden />
+                            </label>
+                            <input @bind="newMessage" @bind:event="oninput" @onkeyup="HandleKeyPress" type="text" class="form-control border-0 bg-transparent shadow-none" placeholder="Bir mesaj yazın..." style="height: 45px;" />
+                            <button class="btn btn-primary rounded-circle m-1 shadow-sm transition-all hover-scale" @onclick="SendMessage" disabled="@(string.IsNullOrWhiteSpace(newMessage) && selectedFile == null)" style="width: 40px; height: 40px;">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </div>
+                        @if (selectedFile != null)
+                        {
+                            <div class="mt-2 ms-3 text-muted small">
+                                <i class="bi bi-file-earmark-image me-1"></i> @selectedFile.Name (Seçildi)
+                                <button class="btn btn-link p-0 ms-2 text-danger" @onclick="() => selectedFile = null"><i class="bi bi-x"></i></button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card border-0 shadow-lg h-100 glass-panel d-flex align-items-center justify-content-center p-5 text-muted">
+                    <div class="text-center">
+                        <div class="bounce-animation mb-4">
+                            <img src="/images/logo.svg" alt="Microbloom" style="width: 80px; opacity: 0.5; filter: grayscale(100%);" />
+                        </div>
+                        <h4 class="fw-bold mb-2">Hoşgeldiniz!</h4>
+                        <p class="text-muted">Mesajlaşmaya başlamak için soldan bir kişi seçin.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? ContactId { get; set; }
+
+    private List<ContactDto> contacts = new();
+    private List<Message> messages = new();
+    private string currentUserId = "";
+    private string newMessage = "";
+    private string currentContactName = "";
+    
+    // Feature: File Upload & Emoji
+    private IBrowserFile? selectedFile;
+    private bool showEmojiPicker = false;
+    private List<string> commonEmojis = new() { "😀", "😂", "🥰", "😎", "🤔", "👍", "👎", "❤️", "🔥", "🎉", "👋", "🙏", "😢", "😡", "👀", "✨" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            var appUser = await UserManager.GetUserAsync(user);
+            if (appUser != null)
+            {
+                currentUserId = appUser.Id;
+                await LoadContacts();
+            }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(currentUserId))
+        {
+            if (!string.IsNullOrEmpty(ContactId))
+            {
+                 // Check if contact is in the list, if not add it (e.g. starting new chat from profile)
+                if (!contacts.Any(c => c.ContactId == ContactId))
+                {
+                     var contactUser = await UserManager.FindByIdAsync(ContactId);
+                     if (contactUser != null)
+                     {
+                         contacts.Insert(0, new ContactDto { 
+                             ContactId = contactUser.Id, 
+                             UserName = contactUser.UserName ?? "Kullanıcı",
+                             LastMessage = "Yeni Sohbet",
+                             LastMessageDate = DateTime.Now
+                         });
+                         currentContactName = contactUser.UserName ?? "Kullanıcı";
+                     }
+                }
+                else
+                {
+                    var contact = contacts.FirstOrDefault(c => c.ContactId == ContactId);
+                    if (contact != null) currentContactName = contact.UserName;
+                }
+
+                await LoadConversation();
+                // Scroll to bottom after load - simple JS call if possible or just rely on render
+            }
+            else
+            {
+                // Refresh contacts when going back to root /messages
+                await LoadContacts();
+            }
+        }
+    }
+
+    private async Task LoadContacts()
+    {
+        if (string.IsNullOrEmpty(currentUserId)) return;
+        contacts = await MessageService.GetRecentContactsAsync(currentUserId);
+    }
+
+    private async Task LoadConversation()
+    {
+        if (string.IsNullOrEmpty(ContactId) || string.IsNullOrEmpty(currentUserId)) return;
+        
+        messages = await MessageService.GetConversationAsync(currentUserId, ContactId);
+        
+        bool needsRefresh = false;
+        foreach(var msg in messages.Where(m => m.ReceiverId == currentUserId && !m.IsRead))
+        {
+            await MessageService.MarkAsReadAsync(msg.Id);
+            msg.IsRead = true; 
+            needsRefresh = true;
+        }
+        
+    }
+
+
+
+    private void ToggleEmojiPicker() => showEmojiPicker = !showEmojiPicker;
+    
+    private void AddEmoji(string emoji)
+    {
+        newMessage += emoji;
+        showEmojiPicker = false;
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task SendMessage()
+    {
+        if ((string.IsNullOrWhiteSpace(newMessage) && selectedFile == null) || string.IsNullOrEmpty(ContactId)) return;
+
+        string? attachmentUrl = null;
+        string? attachmentName = null;
+
+        if (selectedFile != null)
+        {
+            try
+            {
+                var folderPath = Path.Combine(Environment.WebRootPath, "uploads", "chat");
+                if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(selectedFile.Name)}";
+                var filePath = Path.Combine(folderPath, fileName);
+
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await selectedFile.OpenReadStream(maxAllowedSize: 10485760).CopyToAsync(stream); // 10MB limit
+
+                attachmentUrl = $"/uploads/chat/{fileName}";
+                attachmentName = selectedFile.Name;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File upload error: {ex.Message}");
+                // Handle error conceptually
+            }
+        }
+
+        await MessageService.SendMessageAsync(currentUserId, ContactId, newMessage ?? "", attachmentUrl, attachmentName);
+        
+        newMessage = "";
+        selectedFile = null;
+        showEmojiPicker = false;
+        
+        await LoadConversation();
+        await LoadContacts();
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+}
+
+<style>
+    /* Chat Custom Styles */
+    :root {
+        --chat-primary: #004225;
+        --chat-secondary: #eef2f5;
+        --chat-bg: #f8fafc;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 16px;
+    }
+
+    .chat-background {
+        background-color: var(--chat-bg);
+        background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .active-chat {
+        background: linear-gradient(135deg, rgba(0, 66, 37, 0.05) 0%, rgba(0, 66, 37, 0.1) 100%);
+        border-left: 4px solid var(--aurora-primary) !important;
+    }
+
+    /* Avatars */
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .avatar-circle-sm {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .avatar-circle-xs {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: 0.7rem;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--aurora-primary) 0%, #2d6a4f 100%);
+    }
+
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    }
+
+    /* Message Bubbles */
+    .message-bubble {
+        max-width: 70%;
+        padding: 12px 16px;
+        position: relative;
+        font-size: 0.95rem;
+    }
+
+    .message-bubble.sender {
+        background: var(--aurora-primary);
+        color: white;
+        border-radius: 18px 18px 4px 18px;
+        box-shadow: 0 4px 15px rgba(0, 66, 37, 0.15);
+        margin-left: auto;
+    }
+
+    .message-bubble.receiver {
+        background: white;
+        color: #333;
+        border-radius: 18px 18px 18px 4px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        align-self: flex-start;
+    }
+
+    .message-text {
+        line-height: 1.5;
+        font-weight: 500; /* Increased weight for readability */
+    }
+
+    .message-bubble.sender .message-text {
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .message-bubble.receiver .message-text {
+        color: #1a1a1a; /* Darker text */
+    }
+
+    .message-time {
+        font-size: 0.7rem;
+        opacity: 0.8;
+    }
+
+    /* Animations & Interactions */
+    .transition-all {
+        transition: all 0.2s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
+    
+    .hover-rotate:hover {
+        transform: rotate(15deg);
+        color: var(--aurora-primary) !important;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .backdrop-blur {
+        backdrop-filter: blur(5px);
+    }
+    
+    .shadow-inner {
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+    }
+</style>

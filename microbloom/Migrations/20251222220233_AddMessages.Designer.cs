@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using microbloom.Data;
 
@@ -11,9 +12,11 @@ using microbloom.Data;
 namespace microbloom.Migrations
 {
     [DbContext(typeof(KariyerDBContext))]
-    partial class KariyerDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251222220233_AddMessages")]
+    partial class AddMessages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1848,7 +1851,7 @@ namespace microbloom.Migrations
                             Description = "ASP.NET Core ve Azure konusunda deneyimli...",
                             IsActive = true,
                             Location = "İstanbul",
-                            PostedDate = new DateTime(2025, 12, 22, 22, 51, 48, 722, DateTimeKind.Utc).AddTicks(934),
+                            PostedDate = new DateTime(2025, 12, 22, 22, 2, 33, 272, DateTimeKind.Utc).AddTicks(2751),
                             Title = "Kıdemli .NET Geliştiricisi"
                         },
                         new
@@ -1858,7 +1861,7 @@ namespace microbloom.Migrations
                             Description = "React ve TypeScript bilen...",
                             IsActive = true,
                             Location = "Ankara",
-                            PostedDate = new DateTime(2025, 12, 22, 22, 51, 48, 722, DateTimeKind.Utc).AddTicks(938),
+                            PostedDate = new DateTime(2025, 12, 22, 22, 2, 33, 272, DateTimeKind.Utc).AddTicks(2754),
                             Title = "Frontend Geliştirici (React)"
                         },
                         new
@@ -1868,7 +1871,7 @@ namespace microbloom.Migrations
                             Description = "CI/CD süreçlerine hakim...",
                             IsActive = true,
                             Location = "İstanbul",
-                            PostedDate = new DateTime(2025, 12, 22, 22, 51, 48, 722, DateTimeKind.Utc).AddTicks(939),
+                            PostedDate = new DateTime(2025, 12, 22, 22, 2, 33, 272, DateTimeKind.Utc).AddTicks(2755),
                             Title = "DevOps Mühendisi"
                         });
                 });
@@ -1880,12 +1883,6 @@ namespace microbloom.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AttachmentName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AttachmentUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Content")
                         .IsRequired()

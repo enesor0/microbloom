@@ -5,6 +5,7 @@
 
 @inject UserManager<AppUser> UserManager
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 @attribute [Authorize]
 
@@ -61,6 +62,12 @@
                                 <p class="mb-2"><i class="bi bi-envelope me-1 text-primary"></i> @_user.Email</p>
                                 
                                 <div class="d-flex gap-3 flex-wrap mt-3">
+                                    @if (_currentUserId != _user.Id)
+                                    {
+                                        <a href="/messages/@_user.Id" class="btn btn-primary">
+                                            <i class="bi bi-chat-text-fill me-2"></i>Mesaj Gönder
+                                        </a>
+                                    }
                                     @if (!string.IsNullOrEmpty(_user.LinkedInUrl))
                                     {
                                         <a href="@_user.LinkedInUrl" target="_blank" class="btn btn-sm btn-outline-primary">
@@ -135,11 +142,19 @@
 
     private AppUser? _user;
     private bool _isLoading = true;
+    private string _currentUserId = "";
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var appUser = await UserManager.GetUserAsync(user);
+                _currentUserId = appUser?.Id ?? "";
+            }
             if (!string.IsNullOrEmpty(UserId))
             {
                 _user = await UserManager.FindByIdAsync(UserId);

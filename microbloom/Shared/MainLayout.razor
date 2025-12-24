@@ -6,6 +6,8 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
+@using microbloom.Services.Interfaces
+@inject IMessageService MessageService
 
 <div class="page-layout d-flex flex-column min-vh-100">
     <header class="glass-header sticky-top">
@@ -65,10 +67,21 @@
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2" style="font-size: 0.7em;">
                                         @(context.User.IsInRole("Employer") ? "Şirket" : (context.User.IsInRole("Admin") ? "Admin" : "Üye"))
                                     </span>
+                                    @if(unreadCount > 0)
+                                    {
+                                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                                            <span class="visually-hidden">New alerts</span>
+                                        </span>
+                                    }
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2" aria-labelledby="userMenu">
                                     <li>
                                         <h6 class="dropdown-header">Hesabım</h6>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/profile">
+                                            <i class="bi bi-person-circle"></i> Profilim
+                                        </a>
                                     </li>
                                     <li>
                                         @if (context.User.IsInRole("Employer"))
@@ -85,23 +98,15 @@
                                         }
                                     </li>
                                     <li>
-                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/profile">
-                                            <i class="bi bi-person-circle"></i> Profilim
+                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 justify-content-between" href="/messages">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-chat-text"></i> Mesajlar
+                                            </div>
+                                            @if (unreadCount > 0)
+                                            {
+                                                <i class="bi bi-exclamation-circle-fill text-danger"></i>
+                                            }
                                         </a>
-                                    </li>
-                                    <li>
-                                        @if (context.User.IsInRole("Employer"))
-                                        {
-                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/company/profile/edit">
-                                                <i class="bi bi-building-gear"></i> Şirket Profili Düzenle
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/profile/edit">
-                                                <i class="bi bi-person-gear"></i> Profil Düzenle
-                                            </a>
-                                        }
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
@@ -192,6 +197,26 @@
 
         // Force a reload to return to home state (fresh auth check)
         Navigation.NavigateTo("/", forceLoad: true);
+
+    }
+    
+    private int unreadCount = 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+             // We can get user ID from claims usually
+             var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value; 
+             // Or using UserManager inside a component if needed, but NameIdentifier claim is standard for Id
+             if (!string.IsNullOrEmpty(userId))
+             {
+                 unreadCount = await MessageService.GetUnreadCountAsync(userId);
+             }
+        }
     }
 }
 

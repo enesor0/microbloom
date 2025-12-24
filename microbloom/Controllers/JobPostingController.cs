@@ -63,7 +63,7 @@ namespace microbloom.Controllers
 
     // POST: /api/jobpostings/{id}/apply
         [HttpPost("{id:int}/apply")]
-        [Authorize]
+        [Authorize(Roles = "JobSeeker")]
    public async Task<IActionResult> ApplyToJob(int id)
         {
     // Giriş yapmış kullanıcının kimliğini alıyoruz

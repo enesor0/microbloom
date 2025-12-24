@@ -19,6 +19,7 @@ namespace microbloom.Data
     public DbSet<University> Universities { get; set; } = default!;
     public DbSet<Department> Departments { get; set; } = default!;
     public DbSet<CvSample> CvSamples { get; set; } = default!;
+    public DbSet<Message> Messages { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -55,6 +56,18 @@ namespace microbloom.Data
     .WithMany(u => u.Departments)
         .HasForeignKey(d => d.UniversityId)
  .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // --- CONTENT SEED DATA ---
 

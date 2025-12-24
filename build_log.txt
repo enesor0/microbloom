@@ -1,0 +1,19 @@
+  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+C:\Users\eneso\source\repos\microbloom\microbloom\Shared\Skeleton.razor(35,6): error CS0103: 'keyframes' adı geçerli bağlamda yok [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Pages\CompanyDashboard.razor(453,26): warning CS0168: 'ex' değişkeni ifade edilir ancak hiçbir zaman kullanılmaz [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Pages\CompanyDashboard.razor(472,26): warning CS0168: 'ex' değişkeni ifade edilir ancak hiçbir zaman kullanılmaz [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Services\Implementations\JobService.cs(117,36): warning CS8602: Olası bir null başvurunun başvurma işlemi. [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Pages\Company\ViewApplications.razor(294,29): warning CS8601: Olası null başvuru ataması. [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+
+Oluşturma BAŞARISIZ OLDU.
+
+C:\Users\eneso\source\repos\microbloom\microbloom\Pages\CompanyDashboard.razor(453,26): warning CS0168: 'ex' değişkeni ifade edilir ancak hiçbir zaman kullanılmaz [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Pages\CompanyDashboard.razor(472,26): warning CS0168: 'ex' değişkeni ifade edilir ancak hiçbir zaman kullanılmaz [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Services\Implementations\JobService.cs(117,36): warning CS8602: Olası bir null başvurunun başvurma işlemi. [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Pages\Company\ViewApplications.razor(294,29): warning CS8601: Olası null başvuru ataması. [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+C:\Users\eneso\source\repos\microbloom\microbloom\Shared\Skeleton.razor(35,6): error CS0103: 'keyframes' adı geçerli bağlamda yok [C:\Users\eneso\source\repos\microbloom\microbloom\microbloom.csproj]
+    4 Uyarı
+    1 Hata
+
+Geçen Süre 00:00:03.74

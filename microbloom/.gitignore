@@ -55,5 +55,10 @@ Thumbs.db
 *.swo
 *~
 
+
 # Project specific
 microbloom.db
+wwwroot/uploads/
+*.log
+build_*.txt
+*.txt

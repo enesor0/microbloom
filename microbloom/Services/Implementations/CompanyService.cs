@@ -6,17 +6,25 @@ using microbloom.Services.Interfaces;
 
 namespace microbloom.Services.Implementations
 {
+    /// <summary>
+    /// Şirket ile ilgili tüm iş mantığını (Business Logic) yöneten servis sınıfı.
+    /// İlan oluşturma, başvuru yönetimi ve profil güncelleme işlemlerini kapsar.
+    /// </summary>
     public class CompanyService : ICompanyService
     {
         private readonly KariyerDBContext _context;
 
+        // Constructor Injection: Veritabanı bağlamı (DbContext) bağımlılık olarak alınır.
+        // Bu sayede CompanyService, veritabanı bağlantısının nasıl oluşturulduğunu bilmek zorunda kalmaz.
         public CompanyService(KariyerDBContext context)
         {
             _context = context;
         }
 
+        // Asenkron Metotlar: Veritabanı işlemleri sırasında thread'i bloklamamak için 'async/await' kullanılır.
         public async Task<JobPostingDto> CreateJobPostingAsync(CreateJobDto jobDto, int companyId)
         {
+            // Entity Dönüşümü: DTO (Data Transfer Object) -> Entity
             var jobPosting = new JobPosting
             {
                 Title = jobDto.Title,
@@ -28,7 +36,9 @@ namespace microbloom.Services.Implementations
             };
 
             _context.JobPostings.Add(jobPosting);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // Değişiklikler veritabanına yansıtılır.
+
+            // ... (Geri kalan işlemler)
 
             var companyName = await _context.Companies
                 .Where(c => c.Id == companyId)
@@ -162,7 +172,8 @@ namespace microbloom.Services.Implementations
                 LinkedInUrl = company.LinkedInUrl,
                 TwitterUrl = company.TwitterUrl,
                 InstagramUrl = company.InstagramUrl,
-                ActiveJobCount = company.JobPostings?.Count(j => j.IsActive) ?? 0
+                ActiveJobCount = company.JobPostings?.Count(j => j.IsActive) ?? 0,
+                ContactUserId = company.Employees?.FirstOrDefault()?.Id
             };
         }
 
