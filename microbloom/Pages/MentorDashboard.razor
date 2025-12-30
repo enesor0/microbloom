@@ -1,0 +1,244 @@
+@page "/mentor-dashboard"
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@using microbloom.Services.Interfaces
+@using microbloom.Entities
+@attribute [Authorize(Roles = "Mentor")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IUserService UserService
+@inject NavigationManager Navigation
+
+<PageTitle>Mentor Paneli - microbloom</PageTitle>
+
+<div class="dashboard-container">
+    <div class="aurora-bg-premium"></div>
+    
+    <div class="container position-relative py-5" style="z-index: 10;">
+        <!-- Welcome Header -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="glass-card p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-uppercase text-muted fw-bold mb-2 ls-1">Mentor Paneli</h6>
+                        <h1 class="display-5 fw-bold mb-0">Merhaba, @(currentUser?.FirstName ?? "Mentor")! 👋</h1>
+                        <p class="text-muted mt-2 mb-0">Bugün kariyer yolculuğunda birilerine ilham olmaya hazır mısın?</p>
+                    </div>
+                    <div class="d-none d-md-block">
+                        <div class="date-badge">
+                            <span class="fs-4 fw-bold d-block">@DateTime.Now.Day</span>
+                            <span class="text-uppercase small">@DateTime.Now.ToString("MMM")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column: Profile & Stats -->
+            <div class="col-lg-4">
+                <!-- Profile Card -->
+                <div class="glass-card p-4 text-center h-100">
+                    <div class="position-relative d-inline-block mb-3">
+                        @if (!string.IsNullOrEmpty(currentUser?.ProfilePictureUrl))
+                        {
+                            <img src="@currentUser.ProfilePictureUrl" alt="@currentUser.UserName" class="profile-img shadow-lg" />
+                        }
+                        else
+                        {
+                            <div class="profile-img-placeholder shadow-lg">
+                                @(currentUser?.FirstName?.Substring(0, 1) ?? "M")
+                            </div>
+                        }
+                        <div class="status-indicator"></div>
+                    </div>
+                    
+                    <h3 class="fw-bold mb-1">@currentUser?.FirstName @currentUser?.LastName</h3>
+                    <p class="text-muted mb-3">@((currentUser?.Title ?? "").Split('@')[0].Trim())</p>
+                    
+                    <div class="d-flex gap-2 justify-content-center mb-4">
+                        <span class="badge bg-soft-success text-success px-3 py-2 rounded-pill">
+                            <i class="bi bi-patch-check-fill me-1"></i> Onaylı Mentor
+                        </span>
+                    </div>
+
+                    <a href="/profile/edit" class="btn btn-outline-primary w-100 rounded-pill py-2">
+                        <i class="bi bi-pencil-square me-2"></i>Profili Düzenle
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column: Content -->
+            <div class="col-lg-8">
+                <!-- Stats Row -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="glass-card stat-card p-4">
+                            <div class="icon-box bg-soft-primary text-primary mb-3">
+                                <i class="bi bi-eye-fill"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">128</h3>
+                            <p class="text-muted small mb-0">Profil Görüntülenme</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                         <div class="glass-card stat-card p-4">
+                            <div class="icon-box bg-soft-warning text-warning mb-3">
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">5.0</h3>
+                            <p class="text-muted small mb-0">Değerlendirme Puanı</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                         <div class="glass-card stat-card p-4">
+                            <div class="icon-box bg-soft-success text-success mb-3">
+                                <i class="bi bi-chat-quote-fill"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">2</h3>
+                            <p class="text-muted small mb-0">Aktif Görüşme</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions / Notifications -->
+                <div class="glass-card p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h5 class="fw-bold mb-0">Bekleyen İstekler</h5>
+                        <button class="btn btn-sm btn-link text-decoration-none">Tümünü Gör</button>
+                    </div>
+
+                    <div class="empty-state text-center py-5">
+                        <div class="mb-3">
+                            <i class="bi bi-inbox fs-1 text-muted opacity-50"></i>
+                        </div>
+                        <h6 class="fw-bold">Henüz yeni bir istek yok</h6>
+                        <p class="text-muted small mb-0">Profiliniz görüntülendikçe burada istekler belirecektir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private AppUser? currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                currentUser = await UserService.GetUserByIdAsync(userId);
+            }
+        }
+    }
+}
+
+<style>
+    .dashboard-container {
+        min-height: 100vh;
+        position: relative;
+    }
+
+    /* Glass Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 24px;
+        box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 60px -15px rgba(0,0,0,0.08);
+    }
+
+    .stat-card {
+        border-radius: 20px;
+    }
+
+    /* Date Badge */
+    .date-badge {
+        background: rgba(255,255,255,0.8);
+        border-radius: 16px;
+        padding: 10px 20px;
+        text-align: center;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* Profile Image */
+    .profile-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+    }
+
+    .profile-img-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #004225, #2d6a4f);
+        color: white;
+        font-size: 3rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid white;
+    }
+
+    .status-indicator {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 20px;
+        height: 20px;
+        background-color: #198754;
+        border: 3px solid white;
+        border-radius: 50%;
+    }
+
+    /* Utils */
+    .bg-soft-primary { background-color: rgba(0, 66, 37, 0.1); }
+    .text-primary { color: #004225 !important; }
+
+    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); }
+    .text-warning { color: #ffc107 !important; }
+
+    .bg-soft-success { background-color: rgba(25, 135, 84, 0.1); }
+    .text-success { color: #198754 !important; }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .ls-1 { letter-spacing: 1px; }
+
+    /* Aurora Background (Reused/Enhanced) */
+    .aurora-bg-premium {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 0% 0%, rgba(0, 66, 37, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 0%, rgba(45, 106, 79, 0.05) 0%, transparent 50%);
+        z-index: 0;
+    }
+</style>

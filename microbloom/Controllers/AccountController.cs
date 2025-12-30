@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using microbloom.Data;
@@ -57,7 +58,13 @@ namespace microbloom.Controllers
                     UserName = registerDto.UserName,
                     Email = registerDto.Email,
                     FirstName = registerDto.FirstName,
-                    LastName = registerDto.LastName
+                    LastName = registerDto.LastName,
+                    Title = registerDto.AccountType == "Mentor" && !string.IsNullOrEmpty(registerDto.Workplace) 
+                        ? $"{registerDto.Title} @ {registerDto.Workplace}" 
+                        : registerDto.Title,
+                    Skills = registerDto.Skills,
+                    Bio = registerDto.Bio,
+                    LinkedInUrl = registerDto.LinkedInUrl
                 };
 
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -71,7 +78,16 @@ namespace microbloom.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var targetRole = isCompanyAccount ? "Employer" : "JobSeeker";
+                string targetRole;
+                if (isCompanyAccount) targetRole = "Employer";
+                else if (registerDto.AccountType == "Mentor") targetRole = "Mentor";
+                else targetRole = "JobSeeker";
+
+                if (!await _roleManager.RoleExistsAsync(targetRole))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(targetRole));
+                }
+
                 var roleResult = await _userManager.AddToRoleAsync(user, targetRole);
                 if (!roleResult.Succeeded)
                 {
@@ -107,13 +123,18 @@ namespace microbloom.Controllers
                 // Kayıt sonrası otomatik giriş yap
                 await _signInManager.SignInAsync(user, isPersistent: false);
         
+                string finalReturnUrl;
+                if (isCompanyAccount) finalReturnUrl = "/company-dashboard";
+                else if (registerDto.AccountType == "Mentor") finalReturnUrl = "/mentor-dashboard";
+                else finalReturnUrl = "/";
+        
                 _logger.LogInformation("New user registered and logged in: {Email}", user.Email);
-                return Ok(new { success = true, returnUrl = isCompanyAccount ? "/company-dashboard" : "/" });
+                return Ok(new { success = true, returnUrl = finalReturnUrl });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during registration");
-                return StatusCode(500, "Kayıt sırasında bir hata oluştu.");
+                return StatusCode(500, new { message = "Kayıt sırasında bir hata oluştu: " + ex.Message });
             }
         }
 
@@ -145,6 +166,18 @@ namespace microbloom.Controllers
 
             if (result.Succeeded)
             {
+                if (string.Equals(targetUrl, "/", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (await _userManager.IsInRoleAsync(user, "Employer"))
+                    {
+                        targetUrl = "/company-dashboard";
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "Mentor"))
+                    {
+                        targetUrl = "/mentor-dashboard";
+                    }
+                }
+
                 _logger.LogInformation("User {Email} signed in via API.", loginDto.Email);
                 return Ok(new { returnUrl = targetUrl });
             }
@@ -336,6 +369,25 @@ namespace microbloom.Controllers
                 return BadRequest(new { Message = $"Hata: {ex.Message}" });
             }
         }
+    [HttpGet("mentors")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetMentors()
+    {
+        var mentors = await _userManager.GetUsersInRoleAsync("Mentor");
+        
+        var mentorDtos = mentors.Select(u => new MentorDto
+        {
+            Id = u.Id,
+            UserName = u.UserName,
+            FirstName = u.FirstName ?? "",
+            LastName = u.LastName ?? "",
+            Title = u.Title,
+            ProfilePictureUrl = u.ProfilePictureUrl,
+            Skills = u.Skills,
+            Bio = u.Bio
+        }).ToList();
+
+        return Ok(mentorDtos);
     }
 
     public class MakeEmployerDto
@@ -349,4 +401,5 @@ namespace microbloom.Controllers
         public string Email { get; set; } = string.Empty;
         public string NewPassword { get; set; } = string.Empty;
     }
+}
 }

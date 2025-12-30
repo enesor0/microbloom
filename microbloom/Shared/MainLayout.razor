@@ -50,6 +50,14 @@
                                 </NavLink>
                             </Authorized>
                         </AuthorizeView>
+
+                        <AuthorizeView Roles="Mentor">
+                            <Authorized>
+                                <NavLink href="/mentor-dashboard" class="nav-link text-primary fw-bold">
+                                    <i class="bi bi-mortarboard-fill me-1"></i> Mentor Paneli
+                                </NavLink>
+                            </Authorized>
+                        </AuthorizeView>
                     </nav>
                 </div>
 
@@ -65,7 +73,7 @@
                                         @(context.User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? context.User.Identity?.Name)
                                     </span>
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2" style="font-size: 0.7em;">
-                                        @(context.User.IsInRole("Employer") ? "Şirket" : (context.User.IsInRole("Admin") ? "Admin" : "Üye"))
+                                        @(context.User.IsInRole("Employer") ? "Şirket" : (context.User.IsInRole("Mentor") ? "Mentor" : (context.User.IsInRole("Admin") ? "Admin" : "Üye")))
                                     </span>
                                     @if(unreadCount > 0)
                                     {
@@ -87,6 +95,12 @@
                                         @if (context.User.IsInRole("Employer"))
                                         {
                                             <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/view-applications">
+                                                <i class="bi bi-people-fill"></i> Başvuranlar
+                                            </a>
+                                        }
+                                        else if (context.User.IsInRole("Mentor"))
+                                        {
+                                            <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="/mentor-applications">
                                                 <i class="bi bi-people-fill"></i> Başvuranlar
                                             </a>
                                         }

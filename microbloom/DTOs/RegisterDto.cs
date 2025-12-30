@@ -40,6 +40,13 @@ namespace microbloom.DTOs
         [Url(ErrorMessage = "Geçerli bir logo adresi giriniz.")]
         public string? CompanyLogoUrl { get; set; }
 
+        // Mentor Fields
+        public string? Title { get; set; }
+        public string? Workplace { get; set; }
+        public string? Skills { get; set; } // Comma separated
+        public string? Bio { get; set; }
+        public string? LinkedInUrl { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var isCompanyAccount = string.Equals(AccountType, "Employer", StringComparison.OrdinalIgnoreCase);
@@ -49,6 +56,14 @@ namespace microbloom.DTOs
                 yield return new ValidationResult(
                     "Şirket kaydı için şirket adı gereklidir.",
                     new[] { nameof(CompanyName) });
+            }
+
+            var isMentorAccount = string.Equals(AccountType, "Mentor", StringComparison.OrdinalIgnoreCase);
+            if (isMentorAccount && string.IsNullOrWhiteSpace(Title))
+            {
+                yield return new ValidationResult(
+                    "Mentor kaydı için ünvan gereklidir.",
+                    new[] { nameof(Title) });
             }
         }
     }

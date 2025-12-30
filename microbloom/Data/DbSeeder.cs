@@ -75,6 +75,46 @@ namespace microbloom.Data
                     await userManager.AddToRoleAsync(normalUser, "JobSeeker");
                 }
             }
+
+            // Mentor rolü yoksa oluştur
+            if (!await roleManager.RoleExistsAsync("Mentor"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Mentor"));
+            }
+
+            // 5 Mentor kullanıcısı oluştur
+            var mentors = new[]
+            {
+                new { Email = "mentor1@microbloom.com", FirstName = "Ahmet", LastName = "Yılmaz", Title = "Senior Software Engineer @ Microsoft", Skills = "C#, .NET, Azure, Microservices", Bio = "10+ yıl yazılım geliştirme deneyimi. Microsoft'ta bulut çözümleri üzerine çalışıyorum." },
+                new { Email = "mentor2@microbloom.com", FirstName = "Elif", LastName = "Kaya", Title = "Tech Lead @ Google", Skills = "Go, Kubernetes, Distributed Systems, System Design", Bio = "Google'da altyapı sistemleri üzerine çalışıyorum. Yeni mezunlara mentorluk yapmaktan keyif alıyorum." },
+                new { Email = "mentor3@microbloom.com", FirstName = "Mehmet", LastName = "Demir", Title = "Data Scientist @ Amazon", Skills = "Python, Machine Learning, TensorFlow, Data Analysis", Bio = "Yapay zeka ve veri bilimi alanında 7 yıl deneyim. Kariyer planlamasında yardımcı olabilirim." },
+                new { Email = "mentor4@microbloom.com", FirstName = "Zeynep", LastName = "Arslan", Title = "Product Manager @ Spotify", Skills = "Product Strategy, Agile, User Research, Analytics", Bio = "Ürün yönetimi alanında kariyer yapmak isteyenlere yol gösteriyorum." },
+                new { Email = "mentor5@microbloom.com", FirstName = "Can", LastName = "Öztürk", Title = "CTO @ Startup", Skills = "Full Stack, React, Node.js, Startup Culture", Bio = "Girişimcilik ve yazılım alanında deneyimlerimi paylaşmayı seviyorum. 3 startup kurdum." }
+            };
+
+            foreach (var m in mentors)
+            {
+                if (await userManager.FindByEmailAsync(m.Email) == null)
+                {
+                    var mentorUser = new AppUser
+                    {
+                        UserName = m.Email,
+                        Email = m.Email,
+                        FirstName = m.FirstName,
+                        LastName = m.LastName,
+                        Title = m.Title,
+                        Skills = m.Skills,
+                        Bio = m.Bio,
+                        EmailConfirmed = true
+                    };
+
+                    var result = await userManager.CreateAsync(mentorUser, "Mentor123!");
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(mentorUser, "Mentor");
+                    }
+                }
+            }
         }
 
 

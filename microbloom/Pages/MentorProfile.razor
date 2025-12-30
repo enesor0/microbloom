@@ -1,0 +1,170 @@
+@page "/mentor/{Username}"
+@using microbloom.DTOs
+@using microbloom.Services.Interfaces
+@using microbloom.Entities
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<PageTitle>@(mentor?.FirstName ?? "Mentor") - microbloom</PageTitle>
+
+<div class="container py-5">
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
+            </div>
+        </div>
+    }
+    else if (mentor == null)
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-person-x fs-1 text-muted"></i>
+            <h3 class="mt-3">Mentor Bulunamadı</h3>
+            <p class="text-muted">Bu kullanıcı artık mentor değil veya profil mevcut değil.</p>
+            <a href="/mentorship" class="btn btn-primary rounded-pill mt-3">Mentorları Gör</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Left: Profile Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="position-relative d-inline-block mb-3">
+                            @if (!string.IsNullOrEmpty(mentor.ProfilePictureUrl))
+                            {
+                                <img src="@mentor.ProfilePictureUrl" alt="@mentor.FirstName" class="rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white shadow" style="width: 120px; height: 120px; font-size: 3rem; font-weight: bold;">
+                                    @mentor.FirstName[0]
+                                </div>
+                            }
+                            <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-2 border border-3 border-white"></span>
+                        </div>
+
+                        <h3 class="fw-bold mb-1">@mentor.FirstName @mentor.LastName</h3>
+                        <p class="text-muted mb-1">@GetTitle(mentor.Title)</p>
+                        <p class="fw-semibold text-primary mb-3">@GetCompany(mentor.Title)</p>
+
+                        <div class="d-flex justify-content-center gap-2 mb-4">
+                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                                <i class="bi bi-patch-check-fill me-1"></i> Onaylı Mentor
+                            </span>
+                        </div>
+
+                        <button class="btn btn-primary w-100 rounded-pill py-2 mb-2" @onclick="RequestMentorship">
+                            <i class="bi bi-chat-dots me-2"></i>Mentorluk Talep Et
+                        </button>
+                        <a href="/mentorship" class="btn btn-outline-secondary w-100 rounded-pill py-2">
+                            <i class="bi bi-arrow-left me-2"></i>Geri Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Details -->
+            <div class="col-lg-8">
+                <!-- Bio -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Hakkında</h5>
+                        <p class="text-muted mb-0">@(mentor.Bio ?? "Bu mentor henüz bir biyografi eklememiş.")</p>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-lightning-fill me-2 text-warning"></i>Uzmanlık Alanları</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (!string.IsNullOrEmpty(mentor.Skills))
+                            {
+                                @foreach (var skill in mentor.Skills.Split(','))
+                                {
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">@skill.Trim()</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Henüz uzmanlık alanı eklenmemiş.</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm text-center p-3">
+                            <h3 class="fw-bold text-primary mb-0">5.0</h3>
+                            <small class="text-muted">Değerlendirme</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm text-center p-3">
+                            <h3 class="fw-bold text-success mb-0">12</h3>
+                            <small class="text-muted">Mentee</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm text-center p-3">
+                            <h3 class="fw-bold text-warning mb-0">48</h3>
+                            <small class="text-muted">Saat</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Username { get; set; } = "";
+
+    private MentorDto? mentor;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var mentors = await Http.GetFromJsonAsync<List<MentorDto>>("api/account/mentors");
+            mentor = mentors?.FirstOrDefault(m => m.UserName == Username);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetTitle(string? fullTitle)
+    {
+        if (string.IsNullOrEmpty(fullTitle)) return "Ünvan Belirtilmedi";
+        var parts = fullTitle.Split('@');
+        return parts[0].Trim();
+    }
+
+    private string GetCompany(string? fullTitle)
+    {
+        if (string.IsNullOrEmpty(fullTitle) || !fullTitle.Contains('@')) return "";
+        var parts = fullTitle.Split('@');
+        return parts.Length > 1 ? parts[1].Trim() : "";
+    }
+
+    private void RequestMentorship()
+    {
+        if (mentor != null)
+        {
+            Navigation.NavigateTo($"/messages/{mentor.Id}");
+        }
+    }
+}

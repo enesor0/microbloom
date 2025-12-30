@@ -78,6 +78,18 @@
                                         <span class="option-desc">İşveren</span>
                                     </div>
                                 </label>
+                                <label class="account-type-option" @onclick="@(() => SetAccountType("Mentor"))">
+                                    <input type="radio" name="AccountType" checked="@(registerModel.AccountType == "Mentor")" readonly />
+                                    <div class="option-content">
+                                        <div class="option-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="option-label">Mentor</span>
+                                        <span class="option-desc">Eğitmen</span>
+                                    </div>
+                                </label>
                             </div>
                             <ValidationMessage For="@(() => registerModel.AccountType)" class="text-danger small mt-1" />
                         </div>
@@ -175,6 +187,49 @@
                                 </div>
                             </div>
                         }
+
+                        <!-- Mentor Fields (Hidden if not mentor) -->
+                        @if (registerModel.AccountType == "Mentor")
+                        {
+                            <div id="mentor-fields" class="company-section">
+                                <div class="company-section-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1h-4zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2zm0 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1h-2z"/>
+                                    </svg>
+                                    <span>Mentor Bilgileri</span>
+                                </div>
+                                
+                                <div class="form-floating mb-3">
+                                    <InputText class="form-control" id="mentor-title" @bind-Value="registerModel.Title" 
+                                           placeholder="Ünvan (Örn: Senior Software Engineer)" />
+                                    <label for="mentor-title">Ünvan</label>
+                                </div>
+                                
+                                <div class="form-floating mb-3">
+                                    <InputText class="form-control" id="mentor-workplace" @bind-Value="registerModel.Workplace" 
+                                           placeholder="Çalışılan Yer (Opsiyonel)" />
+                                    <label for="mentor-workplace">Çalışılan Yer / Şirket</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <InputText class="form-control" id="mentor-skills" @bind-Value="registerModel.Skills" 
+                                           placeholder="Uzmanlık Alanları (Virgülle ayırın)" />
+                                    <label for="mentor-skills">Uzmanlıklar (.NET, Azure, React...)</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <InputTextArea class="form-control" id="mentor-bio" @bind-Value="registerModel.Bio" 
+                                           placeholder="Kendinizden kısaca bahsedin" style="height: 100px;" />
+                                    <label for="mentor-bio">Biyografi</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <InputText class="form-control" id="mentor-linkedin" @bind-Value="registerModel.LinkedInUrl" 
+                                           placeholder="LinkedIn Profil URL" />
+                                    <label for="mentor-linkedin">LinkedIn (Opsiyonel)</label>
+                                </div>
+                            </div>
+                        }
                         
                         <button type="submit" class="btn btn-primary w-100 btn-lg auth-submit mt-4" disabled="@isLoading">
                             @if (isLoading)
@@ -261,8 +316,9 @@
     /* Account Type Selector */
     .account-type-options {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.5rem;
     }
     
     .account-type-option {
@@ -461,18 +517,36 @@
                 {
                      if (result.TryGetProperty("errors", out var errorsInfo))
                      {
-                         // Handle validation errors if needed, but BadRequest usually returns a dictionary.
-                         // For simplicity, we just show a generic message or the first error.
-                         errorMessage = "Lütfen form alanlarını kontrol ediniz.";
-                         // We could parse specific errors here and map to ValidationMessageStore if we wanted advanced handling.
+                         // errorsInfo is the ValidationProblemDetails object
+                         if (errorsInfo.TryGetProperty("errors", out var validationErrors))
+                         {
+                             var sb = new System.Text.StringBuilder();
+                             foreach (var prop in validationErrors.EnumerateObject())
+                             {
+                                 foreach (var err in prop.Value.EnumerateArray())
+                                 {
+                                     sb.AppendLine($"- {err.GetString()}");
+                                 }
+                             }
+                             errorMessage = sb.ToString();
+                         }
+                         else
+                         {
+                             errorMessage = "Lütfen form alanlarını kontrol ediniz.";
+                         }
                      }
                      else if (result.TryGetProperty("message", out var msgInfo))
                      {
                          errorMessage = msgInfo.GetString();
                      }
+                     else if (result.TryGetProperty("Message", out var msgInfoCap))
+                     {
+                         errorMessage = msgInfoCap.GetString();
+                     }
                      else
                      {
-                         errorMessage = "Kayıt başarısız.";
+                         // Fallback: Dump the raw JSON to see what's wrong
+                         errorMessage = "Kayıt başarısız. Detay: " + result.ToString();
                      }
                      isLoading = false;
                      StateHasChanged();

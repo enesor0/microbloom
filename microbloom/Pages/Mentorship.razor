@@ -1,5 +1,8 @@
 @page "/mentorship"
 @namespace microbloom.Pages
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@using microbloom.DTOs
 
 <PageTitle>🤝 Mentorluk - microbloom</PageTitle>
 
@@ -141,53 +144,94 @@
     <!-- Mentorlar -->
     <h2 class="h4 mb-4"><i class="bi bi-people me-2"></i>Öne Çıkan Mentorlar</h2>
     <div class="row g-4">
-        <div class="col-md-4">
-            <div class="mentor-card">
-                <div class="mentor-avatar">👨‍💻</div>
-                <h5 class="mentor-name">Ahmet Yılmaz</h5>
-                <p class="mentor-title">Senior Software Engineer</p>
-                <p class="mentor-company">Microsoft</p>
-                <div class="text-center">
-                    <span class="skill-tag">React</span>
-                    <span class="skill-tag">.NET</span>
-                    <span class="skill-tag">Azure</span>
+        @if (mentors == null)
+        {
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
                 </div>
-                <button class="btn connect-btn">Bağlantı Kur</button>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="mentor-card">
-                <div class="mentor-avatar">👩‍💼</div>
-                <h5 class="mentor-name">Elif Kaya</h5>
-                <p class="mentor-title">Product Manager</p>
-                <p class="mentor-company">Google</p>
-                <div class="text-center">
-                    <span class="skill-tag">Product</span>
-                    <span class="skill-tag">UX</span>
-                    <span class="skill-tag">Agile</span>
+        }
+        else if (mentors.Count == 0)
+        {
+             <div class="col-12 text-center py-5">
+                <p class="text-muted">Henüz kayıtlı mentor bulunmuyor.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var mentor in mentors)
+            {
+                <div class="col-md-4">
+                    <div class="mentor-card">
+                        <div class="mentor-avatar">
+                             @if (!string.IsNullOrEmpty(mentor.ProfilePictureUrl))
+                             {
+                                 <img src="@mentor.ProfilePictureUrl" alt="@mentor.FirstName" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />
+                             }
+                             else
+                             {
+                                 <span>@mentor.FirstName[0]</span>
+                             }
+                        </div>
+                        <h5 class="mentor-name">@mentor.FirstName @mentor.LastName</h5>
+                        <p class="mentor-title">@GetTitle(mentor.Title)</p>
+                        <p class="mentor-company">@GetCompany(mentor.Title)</p>
+                        <div class="text-center">
+                            @if (!string.IsNullOrEmpty(mentor.Skills))
+                            {
+                                @foreach (var skill in mentor.Skills.Split(',').Take(3))
+                                {
+                                    <span class="skill-tag">@skill.Trim()</span>
+                                }
+                            }
+                        </div>
+                        <button class="btn connect-btn" @onclick="@(() => OpenProfile(mentor.UserName))">Profili Gör</button>
+                    </div>
                 </div>
-                <button class="btn connect-btn">Bağlantı Kur</button>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="mentor-card">
-                <div class="mentor-avatar">👨‍🔬</div>
-                <h5 class="mentor-name">Mehmet Demir</h5>
-                <p class="mentor-title">Data Scientist</p>
-                <p class="mentor-company">Meta</p>
-                <div class="text-center">
-                    <span class="skill-tag">Python</span>
-                    <span class="skill-tag">ML</span>
-                    <span class="skill-tag">AI</span>
-                </div>
-                <button class="btn connect-btn">Bağlantı Kur</button>
-            </div>
-        </div>
+            }
+        }
     </div>
 
     <div class="alert alert-info mt-5 border-0" role="alert">
         <i class="bi bi-info-circle-fill me-2"></i>
         <strong>Mentor olmak mı istiyorsunuz?</strong> Deneyimlerinizi paylaşın ve genç profesyonellere yol gösterin!
-        <a href="#" class="alert-link ms-2">Başvur →</a>
+        <a href="/account/register?AccountType=Mentor" class="alert-link ms-2">Başvur →</a>
     </div>
 </div>
+
+@code {
+    private List<MentorDto>? mentors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try 
+        {
+            mentors = await Http.GetFromJsonAsync<List<MentorDto>>("api/account/mentors");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching mentors: {ex.Message}");
+            mentors = new List<MentorDto>();
+        }
+    }
+
+    private string GetTitle(string? fullTitle)
+    {
+        if (string.IsNullOrEmpty(fullTitle)) return "Ünvan Belirtilmedi";
+        var parts = fullTitle.Split('@');
+        return parts[0].Trim();
+    }
+
+    private string GetCompany(string? fullTitle)
+    {
+         if (string.IsNullOrEmpty(fullTitle) || !fullTitle.Contains('@')) return "";
+         var parts = fullTitle.Split('@');
+         return parts.Length > 1 ? parts[1].Trim() : "";
+    }
+
+    private void OpenProfile(string username)
+    {
+        Navigation.NavigateTo($"/mentor/{username}");
+    }
+}
