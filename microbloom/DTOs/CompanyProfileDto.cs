@@ -20,7 +20,6 @@ namespace microbloom.DTOs
         public string? EmployeeCount { get; set; }
         public int ActiveJobCount { get; set; }
 
-        // Yeni alanlar
         public string? Industry { get; set; }
         public int? FoundedYear { get; set; }
         public string? Website { get; set; }

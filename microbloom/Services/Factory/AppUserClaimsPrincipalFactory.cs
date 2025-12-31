@@ -5,7 +5,6 @@ using microbloom.Entities;
 
 namespace microbloom.Services.Factory
 {
-    // KRITIK: UserClaimsPrincipalFactory<AppUser, IdentityRole> kullanılmalı ki roller claim'lere eklensin!
     public class AppUserClaimsPrincipalFactory : UserClaimsPrincipalFactory<AppUser, IdentityRole>
     {
         public AppUserClaimsPrincipalFactory(
@@ -34,8 +33,6 @@ namespace microbloom.Services.Factory
             {
                 identity.AddClaim(new Claim("CompanyId", user.CompanyId.Value.ToString()));
                 
-                // Note: We might need to load Company navigation property if not loaded.
-                // Assuming it might NOT be loaded, we check if it is null.
                 if (user.Company != null)
                 {
                      identity.AddClaim(new Claim("CompanyName", user.Company.Name ?? ""));

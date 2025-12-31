@@ -46,7 +46,6 @@ namespace microbloom.Services
 
         public async Task<List<ContactDto>> GetRecentContactsAsync(string userId)
         {
-            // Get latest message for each conversation
             var latestMessages = await _context.Messages
                 .Where(m => m.SenderId == userId || m.ReceiverId == userId)
                 .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
@@ -73,14 +72,10 @@ namespace microbloom.Services
                         User = user,
                         LastMessage = item.LastMessage.Content,
                         LastMessageDate = item.LastMessage.SentAt,
-                        HasUnread = item.LastMessage.ReceiverId == userId && !item.LastMessage.IsRead // Check specifically if the LAST message is unread
+                        HasUnread = item.LastMessage.ReceiverId == userId && !item.LastMessage.IsRead
                     });
                 }
             }
-            
-            // Note: HasUnread above is simplistic (only checks updated msg). 
-            // Better to check distinct unread count per user if needed, but for "bolding" the list item, checking if *any* unread exists or just the last is often sufficient. 
-            // Let's refine HasUnread to check ANY unread message from that sender.
 
             var unreadSenders = await _context.Messages
                 .Where(m => m.ReceiverId == userId && !m.IsRead)

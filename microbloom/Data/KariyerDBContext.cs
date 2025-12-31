@@ -15,7 +15,7 @@ namespace microbloom.Data
     public DbSet<JobPosting> JobPostings { get; set; } = default!;
     public DbSet<JobApplication> JobApplications { get; set; } = default!;
 
-    // Yeni eklenenler
+
     public DbSet<University> Universities { get; set; } = default!;
     public DbSet<Department> Departments { get; set; } = default!;
     public DbSet<CvSample> CvSamples { get; set; } = default!;
@@ -50,7 +50,7 @@ namespace microbloom.Data
                 .WithOne(a => a.ContentCategory)
                 .HasForeignKey(a => a.ContentCategoryId);
 
-            // Yeni ilişkiler
+
             builder.Entity<Department>()
         .HasOne(d => d.University)
     .WithMany(u => u.Departments)
@@ -69,17 +69,17 @@ namespace microbloom.Data
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // --- CONTENT SEED DATA ---
 
-            // Kategoriler
+
+
             builder.Entity<ContentCategory>().HasData(
                new { Id = 1, Title = "Üniversiteye Hazırlık", Slug = "universiteye-hazirlik" },
                           new { Id = 2, Title = "İlk İşim ve Profesyonel Hayat", Slug = "profesyonel-hayat" }
                 );
 
-            // Makaleler
+
             builder.Entity<ContentArticle>().HasData(
-    // Üniversiteye Hazırlık Kategorisi
+
     new
     {
         Id = 1,
@@ -179,7 +179,7 @@ Elektronik sistemler, güç sistemleri, telekomünikasyon alanlarında uzmanlaş
               ContentCategoryId = 1
           },
 
-      // Profesyonel Hayat Kategorisi
+
       new
       {
           Id = 4,
@@ -307,11 +307,11 @@ Elektronik sistemler, güç sistemleri, telekomünikasyon alanlarında uzmanlaş
        }
       );
 
-            // --- SEED DATA ---
 
-            // Üniversiteler - TÜRKİYE'DEKİ TÜM ÜNİVERSİTELER
+
+
             builder.Entity<University>().HasData(
-           // DEVLET ÜNİVERSİTELERİ - İSTANBUL
+
            new University { Id = 1, Name = "İstanbul Üniversitesi", City = "İstanbul", IsStateUniversity = true, WebSite = "https://istanbul.edu.tr" },
        new University { Id = 2, Name = "İstanbul Teknik Üniversitesi", City = "İstanbul", IsStateUniversity = true, WebSite = "https://itu.edu.tr" },
      new University { Id = 3, Name = "Boğaziçi Üniversitesi", City = "İstanbul", IsStateUniversity = true, WebSite = "https://boun.edu.tr" },
@@ -319,20 +319,20 @@ Elektronik sistemler, güç sistemleri, telekomünikasyon alanlarında uzmanlaş
   new University { Id = 5, Name = "Yıldız Teknik Üniversitesi", City = "İstanbul", IsStateUniversity = true, WebSite = "https://yildiz.edu.tr" },
        new University { Id = 6, Name = "Galatasaray Üniversitesi", City = "İstanbul", IsStateUniversity = true, WebSite = "https://gsu.edu.tr" },
 
-          // DEVLET ÜNİVERSİTELERİ - ANKARA
+
           new University { Id = 7, Name = "Ankara Üniversitesi", City = "Ankara", IsStateUniversity = true, WebSite = "https://ankara.edu.tr" },
         new University { Id = 8, Name = "Orta Doğu Teknik Üniversitesi", City = "Ankara", IsStateUniversity = true, WebSite = "https://metu.edu.tr" },
       new University { Id = 9, Name = "Hacettepe Üniversitesi", City = "Ankara", IsStateUniversity = true, WebSite = "https://hacettepe.edu.tr" },
                 new University { Id = 10, Name = "Gazi Üniversitesi", City = "Ankara", IsStateUniversity = true, WebSite = "https://gazi.edu.tr" },
       new University { Id = 11, Name = "Ankara Yıldırım Beyazıt Üniversitesi", City = "Ankara", IsStateUniversity = true, WebSite = "https://ybu.edu.tr" },
 
-             // DEVLET ÜNİVERSİTELERİ - İZMİR
+
              new University { Id = 12, Name = "Ege Üniversitesi", City = "İzmir", IsStateUniversity = true, WebSite = "https://ege.edu.tr" },
     new University { Id = 13, Name = "Dokuz Eylül Üniversitesi", City = "İzmir", IsStateUniversity = true, WebSite = "https://deu.edu.tr" },
  new University { Id = 14, Name = "İzmir Yüksek Teknoloji Enstitüsü", City = "İzmir", IsStateUniversity = true, WebSite = "https://iyte.edu.tr" },
             new University { Id = 15, Name = "İzmir Katip Çelebi Üniversitesi", City = "İzmir", IsStateUniversity = true, WebSite = "https://ikc.edu.tr" },
 
-    // DEVLET ÜNİVERSİTELERİ - DİĞER ŞEHİRLER
+
     new University { Id = 16, Name = "Erciyes Üniversitesi", City = "Kayseri", IsStateUniversity = true, WebSite = "https://erciyes.edu.tr" },
         new University { Id = 17, Name = "Selçuk Üniversitesi", City = "Konya", IsStateUniversity = true, WebSite = "https://selcuk.edu.tr" },
              new University { Id = 18, Name = "Atatürk Üniversitesi", City = "Erzurum", IsStateUniversity = true, WebSite = "https://atauni.edu.tr" },
@@ -349,7 +349,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
                 new University { Id = 29, Name = "Sakarya Üniversitesi", City = "Sakarya", IsStateUniversity = true, WebSite = "https://sakarya.edu.tr" },
             new University { Id = 30, Name = "Kocaeli Üniversitesi", City = "Kocaeli", IsStateUniversity = true, WebSite = "https://kocaeli.edu.tr" },
 
-      // VAKIF ÜNİVERSİTELERİ - İSTANBUL
+
       new University { Id = 31, Name = "Koç Üniversitesi", City = "İstanbul", IsStateUniversity = false, WebSite = "https://ku.edu.tr" },
           new University { Id = 32, Name = "Sabancı Üniversitesi", City = "İstanbul", IsStateUniversity = false, WebSite = "https://sabanciuniv.edu" },
           new University { Id = 33, Name = "Bahçeşehir Üniversitesi", City = "İstanbul", IsStateUniversity = false, WebSite = "https://bahcesehir.edu.tr" },
@@ -361,26 +361,26 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
            new University { Id = 39, Name = "İstanbul Kültür Üniversitesi", City = "İstanbul", IsStateUniversity = false, WebSite = "https://iku.edu.tr" },
    new University { Id = 40, Name = "Işık Üniversitesi", City = "İstanbul", IsStateUniversity = false, WebSite = "https://isikun.edu.tr" },
 
-    // VAKIF ÜNİVERSİTELERİ - ANKARA
+
     new University { Id = 41, Name = "Bilkent Üniversitesi", City = "Ankara", IsStateUniversity = false, WebSite = "https://bilkent.edu.tr" },
     new University { Id = 42, Name = "Atılım Üniversitesi", City = "Ankara", IsStateUniversity = false, WebSite = "https://atilim.edu.tr" },
     new University { Id = 43, Name = "Başkent Üniversitesi", City = "Ankara", IsStateUniversity = false, WebSite = "https://baskent.edu.tr" },
              new University { Id = 44, Name = "Çankaya Üniversitesi", City = "Ankara", IsStateUniversity = false, WebSite = "https://cankaya.edu.tr" },
     new University { Id = 45, Name = "TOBB Ekonomi ve Teknoloji Üniversitesi", City = "Ankara", IsStateUniversity = false, WebSite = "https://etu.edu.tr" },
 
-        // VAKIF ÜNİVERSİTELERİ - İZMİR
+
         new University { Id = 46, Name = "İzmir Ekonomi Üniversitesi", City = "İzmir", IsStateUniversity = false, WebSite = "https://ieu.edu.tr" },
            new University { Id = 47, Name = "Yaşar Üniversitesi", City = "İzmir", IsStateUniversity = false, WebSite = "https://yasar.edu.tr" },
 
-            // VAKIF ÜNİVERSİTELERİ - DİĞER ŞEHİRLER
+
             new University { Id = 48, Name = "Özyeğin Üniversitesi", City = "İstanbul", IsStateUniversity = false, WebSite = "https://ozyegin.edu.tr" },
      new University { Id = 49, Name = "TED Üniversitesi", City = "Ankara", IsStateUniversity = false, WebSite = "https://tedu.edu.tr" },
           new University { Id = 50, Name = "MEF Üniversitesi", City = "İstanbul", IsStateUniversity = false, WebSite = "https://mef.edu.tr" }
             );
 
-            // --- TEST DATA SEEDING ---
 
-            // Add test companies
+
+
             builder.Entity<Company>().HasData(
                 new Company
                 {
@@ -398,7 +398,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
                 }
             );
 
-            // Add test job postings
+
             builder.Entity<JobPosting>().HasData(
                 new JobPosting
                 {
@@ -434,9 +434,9 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
 
             );
 
-            // Bölümler - HER ÜNİVERSİTEYE KAPSAMLI BÖLÜMLER
+
             builder.Entity<Department>().HasData(
-    // İSTANBUL ÜNİVERSİTESİ - 15 BÖLÜM
+
     new Department { Id = 1, Name = "Hukuk", ScoreType = "EA", LastYearBaseScore = 520.5, LastYearBaseRanking = 1850, UniversityId = 1 },
     new Department { Id = 2, Name = "Tıp", ScoreType = "SAY", LastYearBaseScore = 545.2, LastYearBaseRanking = 850, UniversityId = 1 },
     new Department { Id = 3, Name = "İşletme", ScoreType = "EA", LastYearBaseScore = 495.3, LastYearBaseRanking = 3200, UniversityId = 1 },
@@ -453,7 +453,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
     new Department { Id = 14, Name = "Biyoloji", ScoreType = "SAY", LastYearBaseScore = 482.8, LastYearBaseRanking = 4550, UniversityId = 1 },
     new Department { Id = 15, Name = "İstatistik", ScoreType = "SAY", LastYearBaseScore = 472.5, LastYearBaseRanking = 5350, UniversityId = 1 },
 
-    // İTÜ - 20 BÖLÜM
+
     new Department { Id = 16, Name = "Bilgisayar Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 525.5, LastYearBaseRanking = 1250, UniversityId = 2 },
     new Department { Id = 17, Name = "Elektrik-Elektronik Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 520.3, LastYearBaseRanking = 1580, UniversityId = 2 },
     new Department { Id = 18, Name = "Makine Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 515.8, LastYearBaseRanking = 2100, UniversityId = 2 },
@@ -475,7 +475,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
     new Department { Id = 34, Name = "Matematik Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 505.7, LastYearBaseRanking = 2950, UniversityId = 2 },
     new Department { Id = 35, Name = "Mimarlık", ScoreType = "SAY", LastYearBaseScore = 508.8, LastYearBaseRanking = 2750, UniversityId = 2 },
 
-    // BOĞAZİÇİ - 18 BÖLÜM
+
     new Department { Id = 36, Name = "Bilgisayar Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 530.2, LastYearBaseRanking = 980, UniversityId = 3 },
     new Department { Id = 37, Name = "Elektrik-Elektronik Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 525.8, LastYearBaseRanking = 1280, UniversityId = 3 },
     new Department { Id = 38, Name = "Endüstri Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 522.5, LastYearBaseRanking = 1450, UniversityId = 3 },
@@ -495,7 +495,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
     new Department { Id = 52, Name = "Moleküler Biyoloji ve Genetik", ScoreType = "SAY", LastYearBaseScore = 508.5, LastYearBaseRanking = 2750, UniversityId = 3 },
     new Department { Id = 53, Name = "Çeviribilim", ScoreType = "SOZ", LastYearBaseScore = 478.5, LastYearBaseRanking = 4850, UniversityId = 3 },
 
-    // MARMARA ÜNİVERSİTESİ - 16 BÖLÜM
+
     new Department { Id = 54, Name = "Hukuk", ScoreType = "EA", LastYearBaseScore = 510.5, LastYearBaseRanking = 2350, UniversityId = 4 },
     new Department { Id = 55, Name = "Tıp", ScoreType = "SAY", LastYearBaseScore = 535.8, LastYearBaseRanking = 1150, UniversityId = 4 },
     new Department { Id = 56, Name = "Diş Hekimliği", ScoreType = "SAY", LastYearBaseScore = 518.7, LastYearBaseRanking = 1950, UniversityId = 4 },
@@ -513,7 +513,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
     new Department { Id = 68, Name = "Turizm İşletmeciliği", ScoreType = "EA", LastYearBaseScore = 465.5, LastYearBaseRanking = 6050, UniversityId = 4 },
     new Department { Id = 69, Name = "Sosyal Hizmet", ScoreType = "EA", LastYearBaseScore = 472.8, LastYearBaseRanking = 5350, UniversityId = 4 },
 
-    // YILDIZ TEKNİK ÜNİVERSİTESİ - 15 BÖLÜM
+
     new Department { Id = 70, Name = "Bilgisayar Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 518.4, LastYearBaseRanking = 1750, UniversityId = 5 },
     new Department { Id = 71, Name = "Elektrik-Elektronik Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 512.8, LastYearBaseRanking = 2450, UniversityId = 5 },
     new Department { Id = 72, Name = "İnşaat Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 505.2, LastYearBaseRanking = 2850, UniversityId = 5 },
@@ -530,7 +530,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
     new Department { Id = 83, Name = "Mimarlık", ScoreType = "SAY", LastYearBaseScore = 498.5, LastYearBaseRanking = 3450, UniversityId = 5 },
     new Department { Id = 84, Name = "Şehir ve Bölge Planlama", ScoreType = "SAY", LastYearBaseScore = 492.7, LastYearBaseRanking = 3850, UniversityId = 5 },
 
-    // GALATASARAY ÜNİVERSİTESİ - 12 BÖLÜM  
+
     new Department { Id = 85, Name = "Hukuk", ScoreType = "EA", LastYearBaseScore = 515.3, LastYearBaseRanking = 2150, UniversityId = 6 },
     new Department { Id = 86, Name = "İşletme", ScoreType = "EA", LastYearBaseScore = 492.5, LastYearBaseRanking = 3450, UniversityId = 6 },
     new Department { Id = 87, Name = "İktisat", ScoreType = "EA", LastYearBaseScore = 488.7, LastYearBaseRanking = 3950, UniversityId = 6 },
@@ -544,7 +544,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
     new Department { Id = 95, Name = "Felsefe", ScoreType = "SOZ", LastYearBaseScore = 472.5, LastYearBaseRanking = 5350, UniversityId = 6 },
     new Department { Id = 96, Name = "Tarih", ScoreType = "SOZ", LastYearBaseScore = 468.9, LastYearBaseRanking = 5650, UniversityId = 6 },
 
-    // ANKARA ÜNİVERSİTESİ - 20 BÖLÜM
+
     new Department { Id = 97, Name = "Hukuk", ScoreType = "EA", LastYearBaseScore = 522.8, LastYearBaseRanking = 1650, UniversityId = 7 },
     new Department { Id = 98, Name = "Tıp", ScoreType = "SAY", LastYearBaseScore = 542.3, LastYearBaseRanking = 920, UniversityId = 7 },
     new Department { Id = 99, Name = "Diş Hekimliği", ScoreType = "SAY", LastYearBaseScore = 522.5, LastYearBaseRanking = 1650, UniversityId = 7 },
@@ -566,7 +566,7 @@ new University { Id = 21, Name = "Ondokuz Mayıs Üniversitesi", City = "Samsun"
     new Department { Id = 115, Name = "Beslenme ve Diyetetik", ScoreType = "SAY", LastYearBaseScore = 485.5, LastYearBaseRanking = 4350, UniversityId = 7 },
     new Department { Id = 116, Name = "Ziraat Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 475.8, LastYearBaseRanking = 5050, UniversityId = 7 },
 
-    // ODTÜ - 25 BÖLÜM
+
     new Department { Id = 117, Name = "Bilgisayar Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 528.7, LastYearBaseRanking = 1100, UniversityId = 8 },
     new Department { Id = 118, Name = "Elektrik-Elektronik Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 522.5, LastYearBaseRanking = 1450, UniversityId = 8 },
     new Department { Id = 119, Name = "Makine Mühendisliği", ScoreType = "SAY", LastYearBaseScore = 515.3, LastYearBaseRanking = 2150, UniversityId = 8 },

@@ -46,7 +46,7 @@ namespace microbloom.Services.Implementations
                 LogoUrl = university.LogoUrl,
                 WebSite = university.WebSite,
                 Departments = university.Departments?
-                    .OrderBy(d => d.LastYearBaseRanking) // Sıralama: düşükten yükseğe (en iyi sıralama önce)
+                    .OrderBy(d => d.LastYearBaseRanking)
                     .Select(d => new DepartmentDto
                     {
                         Id = d.Id,

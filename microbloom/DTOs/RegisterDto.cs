@@ -40,10 +40,9 @@ namespace microbloom.DTOs
         [Url(ErrorMessage = "Geçerli bir logo adresi giriniz.")]
         public string? CompanyLogoUrl { get; set; }
 
-        // Mentor Fields
         public string? Title { get; set; }
         public string? Workplace { get; set; }
-        public string? Skills { get; set; } // Comma separated
+        public string? Skills { get; set; }
         public string? Bio { get; set; }
         public string? LinkedInUrl { get; set; }
 
@@ -68,6 +67,3 @@ namespace microbloom.DTOs
         }
     }
 }
-
-
-

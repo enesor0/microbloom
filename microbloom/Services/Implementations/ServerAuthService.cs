@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+ï»¿using Microsoft.AspNetCore.Identity;
 using microbloom.DTOs;
 using microbloom.Services.Interfaces;
 using System.Net.Http;
@@ -6,108 +6,99 @@ using System.Net.Http.Json;
 
 namespace microbloom.Services.Implementations
 {
-    /// <summary>
-    /// Server-side Blazor için API endpoint'leri kullanan auth servisi
-    /// Cookie iþlemleri API tarafýnda yapýlýr
-    /// </summary>
     public class ServerAuthService : IAuthService
     {
         private readonly HttpClient _httpClient;
         private readonly UserManager<AppUser> _userManager;
 
-        public ServerAuthService(
-         HttpClient httpClient,
-    UserManager<AppUser> userManager)
-      {
-    _httpClient = httpClient;
-   _userManager = userManager;
+        public ServerAuthService(HttpClient httpClient, UserManager<AppUser> userManager)
+        {
+            _httpClient = httpClient;
+            _userManager = userManager;
         }
 
-   public async Task<AuthResult> RegisterAsync(RegisterDto registerDto)
+        public async Task<AuthResult> RegisterAsync(RegisterDto registerDto)
         {
-  try
-  {
-       var user = new AppUser
+            try
             {
-           UserName = registerDto.Email,
-      Email = registerDto.Email,
-      FirstName = registerDto.FirstName,
-         LastName = registerDto.LastName
-  };
+                var user = new AppUser
+                {
+                    UserName = registerDto.Email,
+                    Email = registerDto.Email,
+                    FirstName = registerDto.FirstName,
+                    LastName = registerDto.LastName
+                };
 
-        var result = await _userManager.CreateAsync(user, registerDto.Password);
+                var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-         if (!result.Succeeded)
- {
-           var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-return new AuthResult { Successful = false, Error = errors };
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    return new AuthResult { Successful = false, Error = errors };
+                }
+
+                var roleResult = await _userManager.AddToRoleAsync(user, "JobSeeker");
+                if (!roleResult.Succeeded)
+                {
+                    var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    return new AuthResult { Successful = false, Error = $"Rol atanirken hata: {errors}" };
+                }
+
+                return new AuthResult { Successful = true };
             }
-
-    // Varsayýlan rol: JobSeeker
-      var roleResult = await _userManager.AddToRoleAsync(user, "JobSeeker");
-     if (!roleResult.Succeeded)
-          {
-        var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-    return new AuthResult { Successful = false, Error = $"Rol atanýrken hata: {errors}" };
-    }
-
-             return new AuthResult { Successful = true };
-       }
-   catch (Exception ex)
+            catch (Exception ex)
             {
-        return new AuthResult { Successful = false, Error = $"Kayýt hatasý: {ex.Message}" };
-  }
-   }
+                return new AuthResult { Successful = false, Error = $"Kayit hatasi: {ex.Message}" };
+            }
+        }
 
         public async Task<AuthResult> LoginAsync(LoginDto loginDto)
- {
-    try
+        {
+            try
             {
-           Console.WriteLine($"?? ServerAuthService.LoginAsync called for: {loginDto.Email}");
-        Console.WriteLine($"?? HttpClient BaseAddress: {_httpClient.BaseAddress}");
+                Console.WriteLine($"ServerAuthService.LoginAsync called for: {loginDto.Email}");
+                Console.WriteLine($"HttpClient BaseAddress: {_httpClient.BaseAddress}");
 
-     // API endpoint'ini kullan - cookie API tarafýnda set edilir
-  var response = await _httpClient.PostAsJsonAsync("api/account/login", loginDto);
-     
-     Console.WriteLine($"?? API Response Status: {response.StatusCode}");
+                var response = await _httpClient.PostAsJsonAsync("api/account/login", loginDto);
 
-        if (!response.IsSuccessStatusCode)
+                Console.WriteLine($"API Response Status: {response.StatusCode}");
+
+                if (!response.IsSuccessStatusCode)
                 {
-       var error = await response.Content.ReadAsStringAsync();
-    Console.WriteLine($"? API Error Response: {error}");
-         return new AuthResult 
-          { 
-       Successful = false, 
-    Error = error.Contains("Giriþ bilgileri") ? error : "E-posta veya þifre hatalý." 
-       };
-    }
+                    var error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"API Error Response: {error}");
+                    return new AuthResult
+                    {
+                        Successful = false,
+                        Error = error.Contains("Giris bilgileri") ? error : "E-posta veya sifre hatali."
+                    };
+                }
 
- var responseContent = await response.Content.ReadAsStringAsync();
-  Console.WriteLine($"? API Success Response: {responseContent}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Success Response: {responseContent}");
 
-          return new AuthResult { Successful = true };
- }
-        catch (Exception ex)
-  {
-     Console.WriteLine($"?? Exception in ServerAuthService.LoginAsync: {ex}");
-       return new AuthResult 
-    { 
-          Successful = false, 
-        Error = $"Giriþ hatasý: {ex.Message}" 
-     };
-   }
-  }
+                return new AuthResult { Successful = true };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in ServerAuthService.LoginAsync: {ex}");
+                return new AuthResult
+                {
+                    Successful = false,
+                    Error = $"Giris hatasi: {ex.Message}"
+                };
+            }
+        }
 
- public async Task LogoutAsync()
-   {
-   try
-  {
-    await _httpClient.PostAsync("api/account/logout", null);
-    }
-      catch (Exception)
-   {
-       // Çýkýþ yaparken hata olursa sessizce geç
-      }
- }
+        public async Task LogoutAsync()
+        {
+            try
+            {
+                await _httpClient.PostAsync("api/account/logout", null);
+            }
+            catch (Exception)
+            {
+            }
+        }
     }
 }
