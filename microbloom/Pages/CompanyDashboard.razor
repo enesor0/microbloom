@@ -450,7 +450,7 @@
             var profile = await CompanyService.GetCompanyProfileAsync(currentCompanyId.Value);
             companyProfile = profile ?? new CompanyProfileDto();
         }
-        catch (Exception ex)
+        catch
         {
             companyProfile = new CompanyProfileDto();
             profileStatusMessage = "Şirket profili yüklenemedi.";
@@ -469,7 +469,7 @@
         {
             myJobs = await CompanyService.GetJobsByCompanyAsync(currentCompanyId.Value);
         }
-        catch (Exception ex)
+        catch
         {
             myJobs = new List<JobPostingDto>();
         }

@@ -281,12 +281,10 @@
         
         messages = await MessageService.GetConversationAsync(currentUserId, ContactId);
         
-        bool needsRefresh = false;
         foreach(var msg in messages.Where(m => m.ReceiverId == currentUserId && !m.IsRead))
         {
             await MessageService.MarkAsReadAsync(msg.Id);
-            msg.IsRead = true; 
-            needsRefresh = true;
+            msg.IsRead = true;
         }
         
     }

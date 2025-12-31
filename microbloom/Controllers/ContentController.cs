@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using microbloom.Services.Interfaces;
+using microbloom.DTOs;
 
 [Route("api/content")]
 [ApiController]

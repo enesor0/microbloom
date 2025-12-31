@@ -1,7 +1,8 @@
 @page "/guide"
 @namespace microbloom.Pages
 @using microbloom.DTOs
-@inject HttpClient Http
+@using microbloom.Services.Interfaces
+@inject IContentService _ContentService
 @inject NavigationManager NavigationManager
 
 <PageTitle>🎓 Üniversite Rehberi - microbloom</PageTitle>
@@ -302,7 +303,7 @@
     {
         try
         {
-            var categories = await Http.GetFromJsonAsync<List<ContentCategoryDto>>("api/content/all");
+            var categories = await _ContentService.GetAllCategoriesWithArticlesAsync();
             // Sadece "Üniversiteye Hazırlık" kategorisini al
             universityCategory = categories?.FirstOrDefault(c => c.Slug == "universiteye-hazirlik");
         }

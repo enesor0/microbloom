@@ -4,7 +4,6 @@
 @using Microsoft.AspNetCore.Identity
 @using microbloom.Entities
 @using microbloom.Services.Interfaces
-@using microbloom.Services.Interfaces
 @inject ICompanyService CompanyService
 @inject UserManager<AppUser> UserManager
 
@@ -367,8 +366,8 @@
         /* Smooth, low-jitter animated gradient - British Racing Green */
         background: linear-gradient(-35deg, #0f172a, #003018, #1b4332, #2d6a4f);
         background-size: 250% 250%;
-        animation: gradientBG 24s ease-in-out infinite;
-        will-change: background-position;
+        /* animation removed */
+        will-change: auto;
         transform: translateZ(0);
         z-index: 1;
     }

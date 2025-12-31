@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using microbloom.Services.Interfaces;
 using microbloom.DTOs;
+using microbloom.Data;
+using microbloom.Entities;
 
 namespace microbloom.Services.Implementations
 {

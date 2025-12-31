@@ -294,7 +294,7 @@
                 jobs.Add(new JobViewModel
                 {
                     Id = job.Id,
-                    Title = job.Title,
+                    Title = job.Title ?? string.Empty,
                     Applications = applications,
                     ApplicationCount = applications.Count
                 });

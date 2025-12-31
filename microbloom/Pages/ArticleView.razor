@@ -1,5 +1,5 @@
 ﻿@page "/guide/{CategorySlug}/{ArticleSlug}"
-@inject HttpClient Http
+@inject microbloom.Services.Interfaces.IContentService _ContentService
 @inject NavigationManager Navigation
 @using microbloom.DTOs
 
@@ -181,17 +181,12 @@ else if (article != null)
     {
         try
         {
-            article = await Http.GetFromJsonAsync<ContentArticleDetailDto>(
-                $"api/content/{CategorySlug}/{ArticleSlug}");
+            article = await _ContentService.GetArticleBySlugAsync(CategorySlug, ArticleSlug);
 
             if (article == null)
             {
                 errorMessage = "Makale bulunamadı.";
             }
-        }
-        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-        {
-            errorMessage = "Aradığınız makale bulunamadı.";
         }
         catch (Exception ex)
         {

@@ -134,7 +134,7 @@ namespace microbloom.Services.Implementations
                     ApplicationDate = ja.ApplicationDate,
                     Status = ja.Status ?? "Pending",
                     CompanyId = ja.JobPosting != null ? ja.JobPosting.CompanyId.ToString() : null,
-                    CompanyName = (ja.JobPosting != null && ja.JobPosting.Company != null) ? ja.JobPosting.Company.Name : string.Empty
+                    CompanyName = (ja.JobPosting != null && ja.JobPosting.Company != null) ? ja.JobPosting.Company.Name ?? string.Empty : string.Empty
                 })
                 .ToListAsync();
         }

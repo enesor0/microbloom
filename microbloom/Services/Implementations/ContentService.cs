@@ -1,9 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using microbloom.DTOs;
+using microbloom.Data;
+using microbloom.Entities;
+using microbloom.Services.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-public class ContentService : IContentService
+namespace microbloom.Services.Implementations
 {
-    private readonly KariyerDBContext _context;
-    public ContentService(KariyerDBContext context) { _context = context; }
+    public class ContentService : IContentService
+    {
+        private readonly KariyerDBContext _context;
+        public ContentService(KariyerDBContext context) { _context = context; }
 
     public async Task<List<ContentCategoryDto>> GetAllCategoriesWithArticlesAsync()
     {
@@ -33,5 +42,6 @@ public class ContentService : IContentService
        Title = a.Title,
      Content = a.Content
             }).FirstOrDefaultAsync();
+    }
     }
 }

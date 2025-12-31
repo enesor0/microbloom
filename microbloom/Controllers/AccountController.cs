@@ -378,7 +378,7 @@ namespace microbloom.Controllers
         var mentorDtos = mentors.Select(u => new MentorDto
         {
             Id = u.Id,
-            UserName = u.UserName,
+            UserName = u.UserName ?? "",
             FirstName = u.FirstName ?? "",
             LastName = u.LastName ?? "",
             Title = u.Title,

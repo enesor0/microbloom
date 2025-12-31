@@ -54,3 +54,5 @@ Thumbs.db
 *.swp
 *.swo
 *~
+build_result.txt
+build_output.txt

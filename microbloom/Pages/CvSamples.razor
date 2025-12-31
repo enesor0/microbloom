@@ -1,7 +1,8 @@
 @page "/cv-samples"
 @namespace microbloom.Pages
 @using microbloom.DTOs
-@inject HttpClient Http
+@using microbloom.Services.Interfaces
+@inject ICvSampleService _CvSampleService
 @inject NavigationManager NavigationManager
 
 <PageTitle>📄 CV Örnekleri - microbloom</PageTitle>
@@ -191,7 +192,7 @@
     {
         try
         {
-            cvSamples = await Http.GetFromJsonAsync<List<CvSampleDto>>("api/cvsample");
+            cvSamples = await _CvSampleService.GetAllCvSamplesAsync();
         }
         catch (Exception ex)
         {

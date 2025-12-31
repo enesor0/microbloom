@@ -1,7 +1,8 @@
 @page "/career-guide"
 @namespace microbloom.Pages
 @using microbloom.DTOs
-@inject HttpClient Http
+@using microbloom.Services.Interfaces
+@inject IContentService _ContentService
 @inject NavigationManager NavigationManager
 
 <PageTitle>💼 İş Hayatı Rehberi - microbloom</PageTitle>
@@ -363,7 +364,7 @@
     {
         try
         {
-            var categories = await Http.GetFromJsonAsync<List<ContentCategoryDto>>("api/content/all");
+            var categories = await _ContentService.GetAllCategoriesWithArticlesAsync();
             // Sadece "İlk İşim ve Profesyonel Hayat" kategorisini al
             careerCategory = categories?.FirstOrDefault(c => c.Slug == "profesyonel-hayat");
         }

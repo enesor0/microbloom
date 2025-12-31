@@ -1,0 +1,438 @@
+@page "/salary-guide"
+@namespace microbloom.Pages
+
+<PageTitle>💰 Maaş Rehberi - microbloom</PageTitle>
+
+<style>
+    .salary-hero {
+        background: linear-gradient(135deg, #004225, #1b4332);
+        padding: 4rem 2rem;
+        border-radius: 24px;
+        margin-bottom: 3rem;
+        color: white;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 66, 37, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .salary-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .salary-hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: white !important; position: relative; z-index: 1; }
+    .salary-hero p { color: white !important; opacity: 0.95; position: relative; z-index: 1; }
+
+    .stat-box {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number { font-size: 2.5rem; font-weight: 700; color: #004225; }
+    .stat-label { color: #64748b; font-size: 0.9rem; }
+
+    .salary-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        height: 100%;
+        transition: all 0.3s ease;
+        border-left: 4px solid #004225;
+    }
+
+    .salary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .position-title { font-weight: 700; color: #1f2937; margin-bottom: 0.5rem; font-size: 1.1rem; }
+    .salary-range { font-weight: 600; font-size: 1.25rem; color: #10b981; margin-bottom: 0.5rem; }
+    .experience-tag { 
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+    .exp-junior { background: #d1fae5; color: #047857; }
+    .exp-mid { background: #a7f3d0; color: #065f46; }
+    .exp-senior { background: #6ee7b7; color: #064e3b; }
+    .exp-lead { background: #34d399; color: #022c22; }
+
+    .sector-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .sector-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .sector-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .sector-name { font-weight: 600; color: #374151; margin-bottom: 0.25rem; }
+    .sector-avg { font-weight: 700; color: #004225; font-size: 1.2rem; }
+
+    .city-comparison {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .city-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .city-row:last-child { border-bottom: none; }
+
+    .city-name { font-weight: 600; color: #374151; }
+    .city-index { font-weight: 700; color: #004225; }
+
+    .salary-bar {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        flex: 1;
+        margin: 0 1rem;
+    }
+
+    .salary-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #004225, #2d6a4f);
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1.25rem;
+        border: 2px solid #e2e8f0;
+        background: white;
+        border-radius: 25px;
+        font-weight: 500;
+        color: #64748b;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+        border-color: #004225;
+        background: #004225;
+        color: white;
+    }
+
+    .tip-card {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border-left: 4px solid #059669;
+    }
+
+    .tip-card h5 { color: #065f46; font-weight: 700; }
+    .tip-card p { color: #047857; margin-bottom: 0; }
+
+    .category-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: #f3f4f6;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        background: #f9fafb;
+        border-radius: 16px;
+        color: #6b7280;
+    }
+
+    .no-results i { font-size: 3rem; margin-bottom: 1rem; color: #d1d5db; }
+</style>
+
+<div class="container my-5">
+    <div class="salary-hero">
+        <h1>💰 Maaş Rehberi 2025</h1>
+        <p>Türkiye'deki güncel maaş verileri ve sektörel karşılaştırmalar</p>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">₺42K</div>
+                <div class="stat-label">Ortalama Brüt Maaş</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">+18%</div>
+                <div class="stat-label">Yıllık Maaş Artışı</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">₺85K</div>
+                <div class="stat-label">Teknoloji Sektörü Ort.</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="stat-number">2.4x</div>
+                <div class="stat-label">Senior/Junior Farkı</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <button class="filter-btn @(selectedCategory == "Tümü" ? "active" : "")" @onclick='() => FilterByCategory("Tümü")'>Tümü</button>
+        <button class="filter-btn @(selectedCategory == "Yazılım" ? "active" : "")" @onclick='() => FilterByCategory("Yazılım")'>Yazılım</button>
+        <button class="filter-btn @(selectedCategory == "Veri Bilimi" ? "active" : "")" @onclick='() => FilterByCategory("Veri Bilimi")'>Veri Bilimi</button>
+        <button class="filter-btn @(selectedCategory == "Tasarım" ? "active" : "")" @onclick='() => FilterByCategory("Tasarım")'>Tasarım</button>
+        <button class="filter-btn @(selectedCategory == "Ürün" ? "active" : "")" @onclick='() => FilterByCategory("Ürün")'>Ürün</button>
+        <button class="filter-btn @(selectedCategory == "Güvenlik" ? "active" : "")" @onclick='() => FilterByCategory("Güvenlik")'>Güvenlik</button>
+    </div>
+
+    <!-- Pozisyon Maaşları -->
+    <h2 class="h4 mb-4"><i class="bi bi-cash-stack me-2"></i>Popüler Pozisyonlar <span class="badge bg-success">@filteredPositions.Count pozisyon</span></h2>
+    
+    @if (filteredPositions.Any())
+    {
+        <div class="row g-4 mb-5">
+            @foreach (var pos in filteredPositions)
+            {
+                <div class="col-md-4">
+                    <div class="salary-card">
+                        <span class="category-badge">@pos.Category</span>
+                        <div class="d-flex align-items-center mb-2">
+                            <span style="font-size: 1.5rem; margin-right: 0.5rem;">@pos.Icon</span>
+                            <span class="position-title">@pos.Title</span>
+                        </div>
+                        <div class="salary-range">@pos.SalaryRange</div>
+                        <div class="mt-2">
+                            <span class="experience-tag exp-junior">Junior: @pos.JuniorSalary</span>
+                            <span class="experience-tag exp-mid">Mid: @pos.MidSalary</span>
+                            <span class="experience-tag exp-senior">Senior: @pos.SeniorSalary</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-results mb-5">
+            <i class="bi bi-search"></i>
+            <h5>Bu kategoride pozisyon bulunamadı</h5>
+            <p>Farklı bir kategori seçmeyi deneyin</p>
+        </div>
+    }
+
+    <!-- Sektörlere Göre -->
+    <h2 class="h4 mb-4"><i class="bi bi-building me-2"></i>Sektörlere Göre Ortalama Maaşlar</h2>
+    <div class="row g-3 mb-5">
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">💻</div>
+                <div class="sector-name">Teknoloji</div>
+                <div class="sector-avg">₺85K</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">🏦</div>
+                <div class="sector-name">Finans & Bankacılık</div>
+                <div class="sector-avg">₺72K</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">🏥</div>
+                <div class="sector-name">Sağlık</div>
+                <div class="sector-avg">₺58K</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">🎓</div>
+                <div class="sector-name">Eğitim</div>
+                <div class="sector-avg">₺38K</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">🛒</div>
+                <div class="sector-name">E-Ticaret</div>
+                <div class="sector-avg">₺62K</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">🏭</div>
+                <div class="sector-name">Üretim</div>
+                <div class="sector-avg">₺48K</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">🎮</div>
+                <div class="sector-name">Oyun</div>
+                <div class="sector-avg">₺78K</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="sector-card text-center">
+                <div class="sector-icon">📡</div>
+                <div class="sector-name">Telekomünikasyon</div>
+                <div class="sector-avg">₺65K</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Şehirlere Göre -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <h2 class="h4 mb-4"><i class="bi bi-geo-alt me-2"></i>Şehirlere Göre Maaş Endeksi</h2>
+            <div class="city-comparison">
+                <div class="city-row">
+                    <span class="city-name">İstanbul</span>
+                    <div class="salary-bar"><div class="salary-bar-fill" style="width: 100%"></div></div>
+                    <span class="city-index">100</span>
+                </div>
+                <div class="city-row">
+                    <span class="city-name">Ankara</span>
+                    <div class="salary-bar"><div class="salary-bar-fill" style="width: 82%"></div></div>
+                    <span class="city-index">82</span>
+                </div>
+                <div class="city-row">
+                    <span class="city-name">İzmir</span>
+                    <div class="salary-bar"><div class="salary-bar-fill" style="width: 78%"></div></div>
+                    <span class="city-index">78</span>
+                </div>
+                <div class="city-row">
+                    <span class="city-name">Bursa</span>
+                    <div class="salary-bar"><div class="salary-bar-fill" style="width: 72%"></div></div>
+                    <span class="city-index">72</span>
+                </div>
+                <div class="city-row">
+                    <span class="city-name">Antalya</span>
+                    <div class="salary-bar"><div class="salary-bar-fill" style="width: 68%"></div></div>
+                    <span class="city-index">68</span>
+                </div>
+                <div class="city-row">
+                    <span class="city-name">Konya</span>
+                    <div class="salary-bar"><div class="salary-bar-fill" style="width: 62%"></div></div>
+                    <span class="city-index">62</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h2 class="h4 mb-4"><i class="bi bi-lightbulb me-2"></i>Maaş Artırma İpuçları</h2>
+            <div class="tip-card mb-3">
+                <h5>💡 Sertifikalar Önemli!</h5>
+                <p>AWS, Azure veya Google Cloud sertifikaları maaşınızı %15-25 artırabilir.</p>
+            </div>
+            <div class="tip-card mb-3">
+                <h5>🌍 Remote Çalışma</h5>
+                <p>Yurtdışı şirketlerde remote çalışarak 2-3 kat fazla kazanabilirsiniz.</p>
+            </div>
+            <div class="tip-card mb-3">
+                <h5>📚 Sürekli Öğrenme</h5>
+                <p>AI/ML, Cloud ve DevOps alanlarında uzmanlaşma en yüksek artışları sağlıyor.</p>
+            </div>
+            <div class="tip-card">
+                <h5>🤝 Network Gücü</h5>
+                <p>Referansla bulunan işlerde maaşlar ortalama %10 daha yüksek.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Uyarı -->
+    <div class="alert alert-success d-flex align-items-center rounded-3" role="alert">
+        <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+        <div>
+            <strong>Not:</strong> Bu veriler 2025 yılı Türkiye piyasa araştırmalarına dayanmaktadır. 
+            Gerçek maaşlar şirket büyüklüğü, sektör, lokasyon ve kişisel yeteneklere göre değişiklik gösterebilir.
+        </div>
+    </div>
+</div>
+
+@code {
+    private string selectedCategory = "Tümü";
+    private List<PositionSalary> allPositions = new();
+    private List<PositionSalary> filteredPositions = new();
+
+    protected override void OnInitialized()
+    {
+        // Pozisyon verilerini yükle
+        allPositions = new List<PositionSalary>
+        {
+            new("Frontend Developer", "💻", "Yazılım", "₺35K - ₺95K", "₺35-45K", "₺50-70K", "₺75-95K"),
+            new("Backend Developer", "⚙️", "Yazılım", "₺40K - ₺110K", "₺40-50K", "₺55-80K", "₺85-110K"),
+            new("Full Stack Developer", "🔧", "Yazılım", "₺45K - ₺115K", "₺45-55K", "₺60-85K", "₺90-115K"),
+            new("Mobile Developer", "📱", "Yazılım", "₺40K - ₺105K", "₺40-52K", "₺55-75K", "₺80-105K"),
+            new("DevOps Engineer", "🛡️", "Yazılım", "₺50K - ₺120K", "₺50-65K", "₺70-90K", "₺95-120K"),
+            
+            new("Data Scientist", "📊", "Veri Bilimi", "₺50K - ₺130K", "₺50-65K", "₺70-95K", "₺100-130K"),
+            new("Data Engineer", "🔢", "Veri Bilimi", "₺45K - ₺115K", "₺45-58K", "₺62-85K", "₺90-115K"),
+            new("AI/ML Engineer", "🤖", "Veri Bilimi", "₺60K - ₺150K", "₺60-75K", "₺80-110K", "₺120-150K"),
+            new("Data Analyst", "📈", "Veri Bilimi", "₺35K - ₺80K", "₺35-45K", "₺48-62K", "₺65-80K"),
+            
+            new("UI/UX Designer", "🎨", "Tasarım", "₺30K - ₺85K", "₺30-40K", "₺45-60K", "₺65-85K"),
+            new("Product Designer", "✏️", "Tasarım", "₺35K - ₺90K", "₺35-45K", "₺50-65K", "₺70-90K"),
+            new("Graphic Designer", "🖼️", "Tasarım", "₺25K - ₺60K", "₺25-32K", "₺35-45K", "₺48-60K"),
+            
+            new("Product Manager", "📋", "Ürün", "₺45K - ₺120K", "₺45-55K", "₺60-85K", "₺90-120K"),
+            new("Project Manager", "📁", "Ürün", "₺40K - ₺100K", "₺40-50K", "₺55-75K", "₺80-100K"),
+            new("Scrum Master", "🔄", "Ürün", "₺40K - ₺95K", "₺40-50K", "₺55-72K", "₺78-95K"),
+            
+            new("Cyber Security Analyst", "🔒", "Güvenlik", "₺45K - ₺115K", "₺45-58K", "₺62-85K", "₺90-115K"),
+            new("Security Engineer", "🛡️", "Güvenlik", "₺50K - ₺125K", "₺50-65K", "₺70-95K", "₺100-125K"),
+            new("Penetration Tester", "🎯", "Güvenlik", "₺45K - ₺110K", "₺45-55K", "₺60-80K", "₺85-110K")
+        };
+
+        FilterByCategory("Tümü");
+    }
+
+    private void FilterByCategory(string category)
+    {
+        selectedCategory = category;
+        
+        if (category == "Tümü")
+        {
+            filteredPositions = allPositions.ToList();
+        }
+        else
+        {
+            filteredPositions = allPositions.Where(p => p.Category == category).ToList();
+        }
+    }
+
+    private record PositionSalary(string Title, string Icon, string Category, string SalaryRange, string JuniorSalary, string MidSalary, string SeniorSalary);
+}
