@@ -20,6 +20,7 @@ namespace microbloom.Data
     public DbSet<Department> Departments { get; set; } = default!;
     public DbSet<CvSample> CvSamples { get; set; } = default!;
     public DbSet<Message> Messages { get; set; } = default!;
+    public DbSet<MentorshipApplication> MentorshipApplications { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -67,6 +68,19 @@ namespace microbloom.Data
                 .HasOne(m => m.Receiver)
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.Entity<MentorshipApplication>()
+                .HasOne(m => m.Mentee)
+                .WithMany()
+                .HasForeignKey(m => m.MenteeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<MentorshipApplication>()
+                .HasOne(m => m.Mentor)
+                .WithMany()
+                .HasForeignKey(m => m.MentorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

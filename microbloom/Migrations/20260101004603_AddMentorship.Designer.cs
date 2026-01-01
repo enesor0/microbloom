@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using microbloom.Data;
 
@@ -11,9 +12,11 @@ using microbloom.Data;
 namespace microbloom.Migrations
 {
     [DbContext(typeof(KariyerDBContext))]
-    partial class KariyerDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260101004603_AddMentorship")]
+    partial class AddMentorship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -8,15 +8,16 @@ namespace microbloom.Services
 {
     public class MessageService : IMessageService
     {
-        private readonly KariyerDBContext _context;
+        private readonly IDbContextFactory<KariyerDBContext> _factory;
 
-        public MessageService(KariyerDBContext context)
+        public MessageService(IDbContextFactory<KariyerDBContext> factory)
         {
-            _context = context;
+            _factory = factory;
         }
 
         public async Task<Message> SendMessageAsync(string senderId, string receiverId, string content, string? attachmentUrl = null, string? attachmentName = null)
         {
+            using var context = await _factory.CreateDbContextAsync();
             var message = new Message
             {
                 SenderId = senderId,
@@ -28,14 +29,15 @@ namespace microbloom.Services
                 AttachmentName = attachmentName
             };
 
-            _context.Messages.Add(message);
-            await _context.SaveChangesAsync();
+            context.Messages.Add(message);
+            await context.SaveChangesAsync();
             return message;
         }
 
         public async Task<List<Message>> GetConversationAsync(string userId1, string userId2)
         {
-            return await _context.Messages
+            using var context = await _factory.CreateDbContextAsync();
+            return await context.Messages
                 .Include(m => m.Sender)
                 .Include(m => m.Receiver)
                 .Where(m => (m.SenderId == userId1 && m.ReceiverId == userId2) ||
@@ -46,7 +48,8 @@ namespace microbloom.Services
 
         public async Task<List<ContactDto>> GetRecentContactsAsync(string userId)
         {
-            var latestMessages = await _context.Messages
+            using var context = await _factory.CreateDbContextAsync();
+            var latestMessages = await context.Messages
                 .Where(m => m.SenderId == userId || m.ReceiverId == userId)
                 .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
                 .Select(g => new { 
@@ -56,7 +59,7 @@ namespace microbloom.Services
                 .ToListAsync();
 
             var contactIds = latestMessages.Select(x => x.UserId).ToList();
-            var users = await _context.Users.Where(u => contactIds.Contains(u.Id)).ToListAsync();
+            var users = await context.Users.Where(u => contactIds.Contains(u.Id)).ToListAsync();
 
             var contactDtos = new List<ContactDto>();
 
@@ -77,7 +80,7 @@ namespace microbloom.Services
                 }
             }
 
-            var unreadSenders = await _context.Messages
+            var unreadSenders = await context.Messages
                 .Where(m => m.ReceiverId == userId && !m.IsRead)
                 .Select(m => m.SenderId)
                 .Distinct()
@@ -96,17 +99,19 @@ namespace microbloom.Services
 
         public async Task MarkAsReadAsync(int messageId)
         {
-            var message = await _context.Messages.FindAsync(messageId);
+            using var context = await _factory.CreateDbContextAsync();
+            var message = await context.Messages.FindAsync(messageId);
             if (message != null && !message.IsRead)
             {
                 message.IsRead = true;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
         }
 
         public async Task<int> GetUnreadCountAsync(string userId)
         {
-            return await _context.Messages
+            using var context = await _factory.CreateDbContextAsync();
+            return await context.Messages
                 .CountAsync(m => m.ReceiverId == userId && !m.IsRead);
         }
     }

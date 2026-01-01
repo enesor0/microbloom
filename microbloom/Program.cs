@@ -19,6 +19,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<KariyerDBContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddDbContextFactory<KariyerDBContext>(options =>
+    options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
+
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
@@ -54,7 +57,7 @@ builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-
+builder.Services.AddScoped<IMentorshipService, MentorshipService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 builder.Services.AddCascadingAuthenticationState();
@@ -142,12 +145,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
-app.UseAuthorization();
-
+app.UseAuthorization();                                                                     
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-
+                                                                    
 app.Run();
 
 static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
